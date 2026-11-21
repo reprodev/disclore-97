@@ -239,7 +239,7 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/components/app.test.tsx`: open a disc, read a section, follow a hotspot, play a KeepMaze round to victory, confirm the session starts unmuted, toggle mute and confirm no audio nodes on a mock context, and render ErrorList for an invalid injected manifest
     - _Requirements: 5.12, 10.2, 10.4, 11.4, 12.5, 13.7, 13.8, 13.11_
 
-- [ ] 11. Final checkpoint - Ensure all tests pass
+- [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
