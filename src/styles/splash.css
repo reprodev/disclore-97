@@ -61,9 +61,16 @@
   animation: spinup-block 0.01s steps(1, end) both;
 }
 
+/* Reduced motion: no animation. The bar advances in four steps, one per status message. */
 @media (prefers-reduced-motion: reduce) {
   .splash__block {
     animation: none;
+  }
+
+  .splash__bar[data-step="0"] .splash__block:nth-child(-n + 5),
+  .splash__bar[data-step="1"] .splash__block:nth-child(-n + 10),
+  .splash__bar[data-step="2"] .splash__block:nth-child(-n + 15),
+  .splash__bar[data-step="3"] .splash__block {
     visibility: visible;
   }
 }

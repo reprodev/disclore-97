@@ -53,20 +53,44 @@ export function SplashArt() {
 }
 
 const BLOCKS = 20;
-const STEP = 0.08;
 
-/** CSS-only "Initializing multimedia drivers..." bar: 20 blocks that fill in over about 1.6 s. */
-export function InitBar() {
+export interface InitBarProps {
+  /** Seconds for the bar to fill. Blocks appear evenly across this time. */
+  durationSec: number;
+  /** Which status message is showing (0-based). Used to step the bar when motion is reduced. */
+  step: number;
+  /** Status line under the bar. Announced politely when it changes. */
+  message: string;
+}
+
+/**
+ * Boot progress bar: 20 blocks that fill in over `durationSec` using CSS
+ * animation. With reduced motion, the animation is off and the bar advances
+ * in four steps tied to the status messages instead.
+ */
+export function InitBar({ durationSec, step, message }: InitBarProps) {
   return (
     <>
-      <div className="splash__bar" role="progressbar" aria-label="Initializing multimedia drivers" aria-busy="true">
+      <div
+        className="splash__bar"
+        role="progressbar"
+        aria-label="Initializing multimedia drivers"
+        aria-busy="true"
+        data-step={step}
+      >
         <div className="splash__track" aria-hidden="true">
           {Array.from({ length: BLOCKS }, (_, i) => (
-            <span key={i} className="splash__block" style={{ animationDelay: `${(i * STEP).toFixed(2)}s` }} />
+            <span
+              key={i}
+              className="splash__block"
+              style={{ animationDelay: `${((i * durationSec) / BLOCKS).toFixed(2)}s` }}
+            />
           ))}
         </div>
       </div>
-      <p className="splash__init">Initializing multimedia drivers...</p>
+      <p className="splash__init" role="status" aria-live="polite">
+        {message}
+      </p>
     </>
   );
 }

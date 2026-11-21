@@ -1,10 +1,20 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BevelButton } from './BevelButton';
 import { InitBar, SplashArt } from './SplashArt';
 import '../styles/splash.css';
 
+/** Status lines shown in order, one per quarter of the boot time. */
+export const BOOT_MESSAGES = [
+  'Detecting 4x CD-ROM drive (D:)...',
+  'Initializing procedural WebAudio synth...',
+  'Verifying KeepMaze BFS solver...',
+  'Mounting Expansion Packs...',
+] as const;
+
+export const BOOT_DURATION_MS = 10000;
+
 export interface BootSplashProps {
-  /** Called once when the splash ends, by timer, click, Enter, or Skip. */
+  /** Called once when the splash ends, by timer, click, Enter, Escape, or Skip. */
   onDone: () => void;
   /** Auto-advance delay in milliseconds. */
   delayMs?: number;
@@ -12,31 +22,27 @@ export interface BootSplashProps {
 
 /**
  * Stage 1: a compact boot plaque shown alone on the teal desktop. It advances
- * after about 1.6 s, or at once on click, Enter, or Skip. With reduced motion
- * it advances immediately.
+ * after 10 seconds, or at once on click, Enter, Escape, or Skip. Reduced motion
+ * only simplifies the CSS animation. It never dismisses the splash.
  */
-export function BootSplash({ onDone, delayMs = 1600 }: BootSplashProps) {
+export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashProps) {
   const finished = useRef(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
+  const [step, setStep] = useState(0);
+
+  const finish = () => {
+    if (finished.current) return;
+    finished.current = true;
+    doneRef.current();
+  };
 
   useEffect(() => {
-    const finish = () => {
-      if (finished.current) return;
-      finished.current = true;
-      doneRef.current();
-    };
-
-    const reduced =
-      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      finish();
-      return;
-    }
-
+    const quarter = delayMs / BOOT_MESSAGES.length;
     const timer = window.setTimeout(finish, delayMs);
+    const ticker = window.setInterval(() => setStep((s) => Math.min(s + 1, BOOT_MESSAGES.length - 1)), quarter);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === 'Escape') {
         e.preventDefault();
         finish();
       }
@@ -44,24 +50,19 @@ export function BootSplash({ onDone, delayMs = 1600 }: BootSplashProps) {
     document.addEventListener('keydown', onKey);
     return () => {
       window.clearTimeout(timer);
+      window.clearInterval(ticker);
       document.removeEventListener('keydown', onKey);
     };
   }, [delayMs]);
 
-  const advance = () => {
-    if (finished.current) return;
-    finished.current = true;
-    doneRef.current();
-  };
-
   return (
-    <div className="boot-splash" onClick={advance}>
+    <div className="boot-splash" onClick={finish}>
       <div className="boot-plaque" role="region" aria-label="DiscLore '97 boot splash">
         <div className="splash">
           <SplashArt />
           <div className="splash__text">
             <h1 className="splash__title">DiscLore '97 Multimedia Encyclopedia &mdash; 1997 Edition</h1>
-            <InitBar />
+            <InitBar durationSec={delayMs / 1000} step={step} message={BOOT_MESSAGES[step]!} />
           </div>
         </div>
         <div className="boot-plaque__footer">
@@ -69,7 +70,7 @@ export function BootSplash({ onDone, delayMs = 1600 }: BootSplashProps) {
           <BevelButton
             onClick={(e) => {
               e.stopPropagation();
-              advance();
+              finish();
             }}
           >
             Skip
