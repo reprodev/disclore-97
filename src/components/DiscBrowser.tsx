@@ -118,6 +118,7 @@ export function DiscBrowser({
         onMinimize={onMinimize}
         minimized={minimized}
         maximizable
+        defaultMaximized
         draggable
         className="disc-window"
         menuBar={
@@ -217,6 +218,8 @@ export function DiscBrowser({
         onQuickJump={onQuickJump}
         onOpenReadMe={onOpenReadMe}
         onReplaySplash={onReplaySplash}
+        minimized={minimized}
+        onMinimize={onMinimize}
       />
     </div>
   );

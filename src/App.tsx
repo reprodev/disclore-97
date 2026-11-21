@@ -35,8 +35,8 @@ export interface AppProps {
   sources?: readonly unknown[];
   /**
    * Skips the Stage 1 boot splash and lands on the Home launcher. Defaults to
-   * true when custom sources are passed (tests, embedding) and false for the
-   * built-in discs.
+   * true when sources is passed (tests, embedding) and false when it is
+   * omitted, which uses the built-in discs.
    */
   skipSplash?: boolean;
 }
@@ -48,9 +48,10 @@ interface Shell {
 
 const initialShell: Shell = { nav: initialNav, history: initialHistory };
 
-export function App({ sources = prebakedDiscs, skipSplash }: AppProps) {
+export function App({ sources, skipSplash }: AppProps) {
+  const discSources = sources ?? prebakedDiscs;
   const [stage, setStage] = useState<'splash' | 'home'>(
-    (skipSplash ?? sources !== prebakedDiscs) ? 'home' : 'splash',
+    (skipSplash ?? sources !== undefined) ? 'home' : 'splash',
   );
   const [lastDiscId, setLastDiscId] = useState<string | null>(null);
   const [shell, setShell] = useState<Shell>(initialShell);
@@ -62,13 +63,13 @@ export function App({ sources = prebakedDiscs, skipSplash }: AppProps) {
   const { discs, failures } = useMemo(() => {
     const ok: DiscManifest[] = [];
     const bad: ValidationError[][] = [];
-    for (const src of sources) {
+    for (const src of discSources) {
       const r = loadDisc(src, false);
       if (r.ok) ok.push(r.manifest);
       else bad.push(r.errors);
     }
     return { discs: ok, failures: bad };
-  }, [sources]);
+  }, [discSources]);
 
   const disc = discs.find((d) => d.disc_id === nav.discId);
 
@@ -122,7 +123,10 @@ export function App({ sources = prebakedDiscs, skipSplash }: AppProps) {
   };
 
   let main = null;
-  const active: ActiveWindowInfo | null = disc ? { title: disc.title, icon: 'cd' } : null;
+  // The taskbar tab follows the main window: the open disc, or the Home launcher when none is open.
+  const active: ActiveWindowInfo = disc
+    ? { title: disc.title, icon: 'cd' }
+    : { title: "DiscLore '97 Home", icon: 'home' };
   if (disc && nav.view) {
     const v = nav.view;
     if (v.kind === 'section') {

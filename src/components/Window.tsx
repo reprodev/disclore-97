@@ -13,6 +13,8 @@ export interface WindowProps {
   minimized?: boolean;
   /** Adds a Maximize/Restore button. The window then fills the workspace when maximized. */
   maximizable?: boolean;
+  /** Starts maximized. Only meaningful with maximizable. The user can still restore it. */
+  defaultMaximized?: boolean;
   /** Lets the user drag the window by its title bar (not while maximized). */
   draggable?: boolean;
   /** Marks the dialog as modal for assistive technology. The parent blocks the content behind it. */
@@ -41,6 +43,7 @@ export function Window({
   onMinimize,
   minimized = false,
   maximizable = false,
+  defaultMaximized = false,
   draggable = false,
   modal = false,
   menuBar,
@@ -51,7 +54,7 @@ export function Window({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const drag = useRef<DragState | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [maximized, setMaximized] = useState(false);
+  const [maximized, setMaximized] = useState(maximizable && defaultMaximized);
   const canDrag = draggable && !maximized;
 
   // A resized viewport could strand a dragged window, so return it to center.

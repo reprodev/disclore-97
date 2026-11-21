@@ -15,6 +15,9 @@ export interface HomeLauncherProps {
   onQuickJump?: (mode: QuickJumpMode) => void;
   onOpenReadMe?: () => void;
   onReplaySplash?: () => void;
+  /** Hides the Home window without closing it. The parent owns this state. */
+  minimized?: boolean;
+  onMinimize?: () => void;
 }
 
 function Card({
@@ -51,12 +54,28 @@ function Group({ legend, children }: { legend: string; children: ReactNode }) {
 }
 
 /** Stage 2: the "DiscLore '97 Home" window with Expansion Packs, Quick Jump Modes, and Utilities. */
-export function HomeLauncher({ discs, onPickDisc, onQuickJump, onOpenReadMe, onReplaySplash }: HomeLauncherProps) {
+export function HomeLauncher({
+  discs,
+  onPickDisc,
+  onQuickJump,
+  onOpenReadMe,
+  onReplaySplash,
+  minimized = false,
+  onMinimize,
+}: HomeLauncherProps) {
   const hasDiagrams = discs.some((d) => d.diagrams.length > 0);
   const hasDungeons = discs.some((d) => d.dungeons.length > 0);
 
   return (
-    <Window title="DiscLore '97 Home" className="home-window">
+    <Window
+      title="DiscLore '97 Home"
+      className="home-window"
+      maximizable
+      defaultMaximized
+      draggable
+      minimized={minimized}
+      onMinimize={onMinimize}
+    >
       <div className="home">
         <header className="home__header">
           <PixelIcon name="cd" size={32} />

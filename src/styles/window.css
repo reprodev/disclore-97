@@ -36,7 +36,7 @@
 }
 
 /* Maximized: fill the workspace (the positioned .desktop__work), above the taskbar. */
-.window.window--maximized {
+.window.window--maximized[role="dialog"] {
   position: absolute;
   top: 0;
   right: 0;
