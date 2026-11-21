@@ -456,6 +456,61 @@
         "chatSessionId": "sess_62b48896-c402-4340-b150-047a3ec9fb0b",
         "timestamp": 1795281177031
       }
+    ],
+    "7.1 Write the \"Ancient Castles & Keeps\" disc in `src/discs/castles.ts`": [
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281270286
+      },
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281471141
+      }
+    ],
+    "7.2 Write the \"Retro Computing & Dial-Up Era\" disc in `src/discs/retro.ts`": [
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281270536
+      },
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281471532
+      }
+    ],
+    "7.3 Create the disc index and loader": [
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281471912
+      },
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281530972
+      }
+    ],
+    "7.4 Write pre-baked disc invariant tests": [
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281531453
+      },
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281568405
+      }
+    ],
+    "7. Create the pre-baked discs": [
+      {
+        "executionId": "56a8dea8-880b-4fd2-a105-3dd60695d1e4",
+        "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
+        "timestamp": 1795281568445
+      }
     ]
   }
 }

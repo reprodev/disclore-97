@@ -159,23 +159,23 @@ Property tests live under `tests/properties/` with one file per property, and ea
 - [x] 6. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Create the pre-baked discs
-  - [ ] 7.1 Write the "Ancient Castles & Keeps" disc in `src/discs/castles.ts`
+- [x] 7. Create the pre-baked discs
+  - [x] 7.1 Write the "Ancient Castles & Keeps" disc in `src/discs/castles.ts`
     - Title "DiscLore '97: Ancient Castles & Keeps" as a typed `DiscManifest`
     - At least 5 original sections, 1 original SVG diagram (shapes using `currentColor`, `none`, or `var(--...)`, never hex literals) with at least 3 in-range hotspots referencing real sections, at least 5 trivia questions citing real sections, and a dungeon of at least 8 rooms with castle-themed descriptions, solvable from `entrance` to `throne_room` with no orphan rooms
     - Use original text and artwork only
     - _Requirements: 6.1, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ] 7.2 Write the "Retro Computing & Dial-Up Era" disc in `src/discs/retro.ts`
+  - [x] 7.2 Write the "Retro Computing & Dial-Up Era" disc in `src/discs/retro.ts`
     - Title "DiscLore '97: Retro Computing & Dial-Up Era" with the same minimums and rules as 7.1, with dungeon descriptions themed on retro computing
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ] 7.3 Create the disc index and loader
+  - [x] 7.3 Create the disc index and loader
     - `src/discs/index.ts` exports the pre-baked disc list
     - Add `loadDisc(source: unknown, prebaked: boolean)` in `src/discs/loader.ts` that passes non-pre-baked manifests through `validateManifest` and returns either the disc or the error list
     - _Requirements: 5.12, 6.1, 6.2_
 
-  - [ ]* 7.4 Write pre-baked disc invariant tests
+  - [x] 7.4 Write pre-baked disc invariant tests
     - Create `tests/discs.test.ts`: for each disc, `validateManifest` returns zero errors, every hotspot is in `0..100` and references an existing section, every trivia question cites an existing section, every dungeon has a BFS path from `entrance` to `throne_room` and zero orphans, content minimums hold, and `loadDisc` rejects an invalid non-pre-baked manifest with errors
     - _Requirements: 5.12, 6.3, 6.4, 8.1, 8.2, 8.3_
 
