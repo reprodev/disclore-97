@@ -1,16 +1,19 @@
 .keepmaze {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
   font-family: var(--font-ui);
   font-size: 12px;
   color: var(--color-bevel-edge);
   background: var(--color-surface);
-  padding: 8px;
+  padding: 6px;
 }
 
 .keepmaze__hud {
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
-  padding: 8px;
-  margin-bottom: 8px;
+  padding: 6px 8px;
 }
 
 .keepmaze__room {
@@ -21,8 +24,15 @@
 
 .keepmaze__stats {
   display: flex;
+  align-items: center;
   gap: 16px;
-  margin: 0 0 8px;
+  margin: 4px 0 6px;
+}
+
+.keepmaze__restart {
+  margin-left: auto;
+  min-width: 0;
+  padding: 1px 10px;
 }
 
 .keepmaze__list {
@@ -37,13 +47,12 @@
 .keepmaze__question {
   background: var(--color-tooltip-bg);
   border: 1px solid var(--color-bevel-edge);
-  padding: 8px;
-  margin-bottom: 8px;
+  padding: 6px 8px;
 }
 
 .keepmaze__options {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -70,16 +79,18 @@
   margin: 4px 0;
 }
 
+/* Top row: archway viewport and mini-map side by side, at most 175px tall. */
 .keepmaze__scene {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
-  margin-bottom: 8px;
+  max-height: 175px;
 }
 
 .keepmaze__view {
-  flex: 1 1 auto;
+  flex: 0 1 262px;
   min-width: 0;
+  box-sizing: border-box;
   padding: 2px;
   background: var(--color-surface);
   border: var(--bevel-w) solid;
@@ -87,22 +98,59 @@
 }
 
 .keepmaze__map {
-  flex: 0 0 150px;
+  flex: 1 1 0;
+  min-width: 120px;
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 2px;
-  background: var(--color-surface);
+  overflow: hidden;
+  background: var(--color-crt-bg);
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
 }
 
-.viewport,
+.viewport {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 167px;
+}
+
 .minimap {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 165px;
 }
 
+/* Lower row: room and exits on the left, the active question on the right. */
+.keepmaze__panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+}
+
+.keepmaze__side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.keepmaze__hint {
+  margin: 0;
+  padding: 6px 8px;
+  color: var(--color-bevel-shadow);
+}
+
+@media (max-width: 720px) {
+  .keepmaze__panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .viewport__flame {
   animation: torch-flicker 0.6s steps(2, end) infinite;
   transform-box: fill-box;

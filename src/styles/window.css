@@ -26,20 +26,58 @@
   white-space: nowrap;
 }
 
-.window-close {
-  width: 16px;
-  height: 14px;
+.window[hidden] {
+  display: none;
+}
+
+.window--draggable .window-title-bar {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Maximized: fill the workspace (the positioned .desktop__work), above the taskbar. */
+.window.window--maximized {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  transform: none;
+  box-sizing: border-box;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.window-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 16px;
   min-width: 0;
   padding: 0;
   line-height: 1;
-  font-size: 10px;
-  font-weight: bold;
+  color: var(--color-bevel-edge);
 }
 
-.window-close[data-pressed="true"] {
+.window-ctrl[data-pressed="true"] {
   padding: 1px 0 0 1px;
 }
 
+.window-close {
+  margin-left: 2px;
+}
 .window-menubar {
   background: var(--color-surface);
 }

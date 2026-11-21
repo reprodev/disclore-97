@@ -41,6 +41,7 @@ const initialShell: Shell = { nav: initialNav, history: initialHistory };
 export function App({ sources = prebakedDiscs }: AppProps) {
   const [shell, setShell] = useState<Shell>(initialShell);
   const [notFound, setNotFound] = useState<string | null>(null);
+  const [minimized, setMinimized] = useState(false);
   const { nav, history } = shell;
 
   const { discs, failures } = useMemo(() => {
@@ -58,10 +59,12 @@ export function App({ sources = prebakedDiscs }: AppProps) {
 
   const openDisc = (discId: string) => {
     setNotFound(null);
+    setMinimized(false);
     setShell({ nav: { discId, view: null }, history: initialHistory });
   };
   const closeDisc = () => {
     setNotFound(null);
+    setMinimized(false);
     setShell(initialShell);
   };
   /** Visits a view and records it in the history. */
@@ -87,23 +90,19 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   };
 
   let main = null;
-  let active: ActiveWindowInfo | null = disc ? { title: disc.title, icon: 'cd' } : null;
+  const active: ActiveWindowInfo | null = disc ? { title: disc.title, icon: 'cd' } : null;
   if (disc && nav.view) {
     const v = nav.view;
     if (v.kind === 'section') {
-      const section = disc.sections.find((s) => s.section_id === v.section_id);
-      active = { title: section?.title ?? 'Article', icon: 'book' };
       main = <ArticleViewer sections={disc.sections} sectionId={v.section_id} onSelectSection={goSection} />;
     } else if (v.kind === 'diagram') {
       const diagram = disc.diagrams.find((d) => d.diagram_id === v.diagram_id);
       if (diagram) {
-        active = { title: diagram.title, icon: 'diagram' };
         main = <HotspotViewer diagram={diagram} onNavigate={goSection} />;
       }
     } else {
       const dungeon = disc.dungeons.find((d) => d.dungeon_id === v.dungeon_id);
       if (dungeon) {
-        active = { title: dungeon.title, icon: 'torch' };
         main = (
           <KeepMazeUI
             key={`${disc.disc_id}/${dungeon.dungeon_id}`}
@@ -134,6 +133,8 @@ export function App({ sources = prebakedDiscs }: AppProps) {
           onBack={() => move(goBack)}
           onForward={() => move(goForward)}
           onHome={() => visit(null)}
+          minimized={minimized}
+          onMinimize={() => setMinimized(true)}
         />
         {notFound ? (
           <p role="alert" className="app-not-found">
@@ -144,7 +145,14 @@ export function App({ sources = prebakedDiscs }: AppProps) {
           <ErrorList key={i} errors={errors} />
         ))}
       </div>
-      <Taskbar discs={discs} active={active} onOpenDisc={openDisc} onCloseAll={closeDisc} />
+      <Taskbar
+        discs={discs}
+        active={active}
+        minimized={minimized}
+        onToggleActive={() => setMinimized((m) => !m)}
+        onOpenDisc={openDisc}
+        onCloseAll={closeDisc}
+      />
     </div>
   );
 }

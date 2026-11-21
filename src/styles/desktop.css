@@ -22,6 +22,7 @@ body {
 }
 
 .desktop__work {
+  position: relative;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;

@@ -16,6 +16,10 @@ export interface TaskbarProps {
   discs: DiscManifest[];
   /** Topmost open window, shown as the active tab. Null when none is open. */
   active: ActiveWindowInfo | null;
+  /** True when the active window is minimized: its tab is shown raised. */
+  minimized?: boolean;
+  /** Clicking the tab minimizes a visible window or restores a minimized one. */
+  onToggleActive?: () => void;
   onOpenDisc: (discId: string) => void;
   onCloseAll: () => void;
 }
@@ -24,7 +28,14 @@ export interface TaskbarProps {
  * Bottom taskbar: Start button and menu, the active window's tab, and a tray
  * holding the global Mute control.
  */
-export function Taskbar({ discs, active, onOpenDisc, onCloseAll }: TaskbarProps) {
+export function Taskbar({
+  discs,
+  active,
+  minimized = false,
+  onToggleActive,
+  onOpenDisc,
+  onCloseAll,
+}: TaskbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -98,10 +109,22 @@ export function Taskbar({ discs, active, onOpenDisc, onCloseAll }: TaskbarProps)
 
       <div className="taskbar__tabs">
         {active ? (
-          <div className="taskbar__tab" aria-current="true">
+          <button
+            type="button"
+            className="taskbar__tab"
+            aria-pressed={!minimized}
+            aria-label={`${active.title} (window)`}
+            data-minimized={minimized ? 'true' : 'false'}
+            onClick={() => {
+              playClick();
+              onToggleActive?.();
+            }}
+          >
             <PixelIcon name={active.icon} />
-            <span className="taskbar__tab-text">{active.title}</span>
-          </div>
+            <span className="taskbar__tab-text" aria-hidden="true">
+              {active.title}
+            </span>
+          </button>
         ) : null}
       </div>
 

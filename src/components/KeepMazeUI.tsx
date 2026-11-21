@@ -113,13 +113,17 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
   return (
     <div className="keepmaze">
       {scene}
+      <div className="keepmaze__panels">
       <div className="keepmaze__hud">
         <p className="keepmaze__room">{room?.name ?? state.roomId}</p>
         <p className="keepmaze__message">{room?.description}</p>
-        <p className="keepmaze__stats">
+        <div className="keepmaze__stats">
           <span>Moves: {state.moves}</span>
           <span>Incorrect: {state.incorrect}</span>
-        </p>
+          <BevelButton className="keepmaze__restart" onClick={restart}>
+            Restart
+          </BevelButton>
+        </div>
         <div>
           <span>Exits:</span>
           <ul className="keepmaze__list">
@@ -140,6 +144,10 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
         </div>
       </div>
 
+      <div className="keepmaze__side">
+      {!pending && !state.lastWrong && (
+        <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
+      )}
       {pending && (
         <div className="keepmaze__question" role="group" aria-label="Trivia question">
           <p className="keepmaze__message">{pending.question.prompt}</p>
@@ -168,8 +176,8 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
           </button>
         </div>
       )}
-
-      <BevelButton onClick={restart}>Restart</BevelButton>
+      </div>
+      </div>
     </div>
   );
 }

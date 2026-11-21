@@ -34,6 +34,10 @@ export interface DiscBrowserProps {
   onForward?: () => void;
   /** Returns to the disc home page. */
   onHome?: () => void;
+  /** Hides the open disc window without closing it. The parent owns this state. */
+  minimized?: boolean;
+  /** When provided, the open disc window has a Minimize button. */
+  onMinimize?: () => void;
 }
 
 /** Breadcrumb trail and status-bar label for a view. */
@@ -68,6 +72,8 @@ export function DiscBrowser({
   onBack,
   onForward,
   onHome,
+  minimized = false,
+  onMinimize,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
 
@@ -92,6 +98,10 @@ export function DiscBrowser({
       <Window
         title={disc.title}
         onClose={onCloseDisc}
+        onMinimize={onMinimize}
+        minimized={minimized}
+        maximizable
+        draggable
         className="disc-window"
         menuBar={
           <MenuBar

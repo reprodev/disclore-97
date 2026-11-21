@@ -59,6 +59,24 @@
   border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
 }
 
+.taskbar__tab {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-bevel-edge);
+  text-align: left;
+  cursor: default;
+}
+
+.taskbar__tab[data-minimized="true"] {
+  font-weight: normal;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.taskbar__tab:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
 .taskbar__tab-text {
   overflow: hidden;
   text-overflow: ellipsis;
