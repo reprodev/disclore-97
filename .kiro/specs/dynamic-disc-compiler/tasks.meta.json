@@ -55,6 +55,61 @@
         "chatSessionId": "sess_3c36e1d9-f72c-4af0-b0f5-a8db9f04a12a",
         "timestamp": 1795298009594
       }
+    ],
+    "2.1 Implement section planning in `src/model/compile/sections.ts`": [
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298135057
+      },
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298193722
+      }
+    ],
+    "2.2 Implement the diagram stage in `src/model/compile/diagram.ts`": [
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298135368
+      },
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298194529
+      }
+    ],
+    "2.3 Implement the trivia stage in `src/model/compile/trivia.ts`": [
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298136131
+      },
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298195029
+      }
+    ],
+    "2.4 Implement the dungeon stage in `src/model/compile/dungeon.ts`": [
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298136623
+      },
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298195696
+      }
+    ],
+    "2. Implement the compiler stages": [
+      {
+        "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
+        "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
+        "timestamp": 1795298195750
+      }
     ]
   }
 }

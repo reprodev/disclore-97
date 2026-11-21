@@ -38,24 +38,24 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Assert that `fc.sample(arbExtractedSource, 120)` returns at least 100 sources and that the samples include empty, long, and HTML-like inputs
     - _Requirements: 2.7, 7.1, 7.2, 7.3, 7.8, 17.1, 17.2_
 
-- [ ] 2. Implement the compiler stages
-  - [ ] 2.1 Implement section planning in `src/model/compile/sections.ts`
+- [x] 2. Implement the compiler stages
+  - [x] 2.1 Implement section planning in `src/model/compile/sections.ts`
     - Plan 5 to 12 section titles from usable headings (case-insensitive dedupe) and the fixed template pool, split paragraphs proportionally with at most 8 per section, and add the attribution paragraph `Source ({kindLabel}): {label}` to section 0
     - Build 1 to 4 facts, a timeline of reading order, a `plate` key from the per-kind list that `Plate.tsx` defines, and the disc title and tagline (1 to 80 and 1 to 140 characters, never empty)
     - Return plain JSON values with no `undefined`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.8, 2.9, 2.12, 7.3, 7.7_
 
-  - [ ] 2.2 Implement the diagram stage in `src/model/compile/diagram.ts`
+  - [x] 2.2 Implement the diagram stage in `src/model/compile/diagram.ts`
     - Build `diagram-1` with `viewBox` `0 0 100 100`, numeric shapes only, fills and strokes from `none`, `currentColor`, or the 12 allowed `var(--color-...)` tokens, at least 3 distinct tokens, and hotspots positioned from the `'diagram'` stream within `[15, 85]` by `[27, 81]`
     - Set hotspot `section_id` with `sections[i % N]` and labels of 1 to 40 characters. Export the `ALLOWED_TOKENS` list
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 7.5_
 
-  - [ ] 2.3 Implement the trivia stage in `src/model/compile/trivia.ts`
+  - [x] 2.3 Implement the trivia stage in `src/model/compile/trivia.ts`
     - Produce `min(max(N, 5), 10)` questions that cite `sections[q % N]`, with 3 or 4 distinct options per question, statement and title forms, distractors from other sections, and the fixed `GENERIC_DISTRACTORS` fill
     - Place the correct option at `(offset + q) % count` so positions vary deterministically. Enforce prompt (1 to 200) and option (1 to 120) lengths
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8_
 
-  - [ ] 2.4 Implement the dungeon stage in `src/model/compile/dungeon.ts`
+  - [x] 2.4 Implement the dungeon stage in `src/model/compile/dungeon.ts`
     - Build `R = clamp(N + 3, 8, 12)` rooms with exactly one `entrance` and one `throne_room`, a spanning tree rooted at `entrance` (at most 3 tree children per parent), a throne parent at depth 2 or more when possible, bounded extra loops, and dead-end repair so every room except `throne_room` has an exit
     - Name and describe rooms from section titles with the 6 original description templates
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8_
