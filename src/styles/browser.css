@@ -1,0 +1,54 @@
+.disc-browser {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-ui);
+}
+
+.disc-list,
+.disc-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.disc-list-item + .disc-list-item {
+  margin-top: 4px;
+}
+
+.disc-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+}
+
+.disc-title {
+  font-weight: bold;
+}
+
+.disc-tagline {
+  font-family: var(--font-ui);
+}
+
+.disc-tree {
+  padding: 4px;
+  font-family: var(--font-ui);
+}
+
+.disc-group-title {
+  font-family: var(--font-ui);
+  font-size: 1em;
+  font-weight: bold;
+  margin: 4px 0 2px;
+}
+
+.disc-entry {
+  width: 100%;
+  text-align: left;
+}
+
+.disc-trivia-item {
+  padding: 2px 4px;
+}

@@ -206,26 +206,26 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - If a check fails, fix the component or stylesheet minimally
     - _Requirements: 9.4, 9.7, 9.8, 9.11, 9.14, 9.15, 9.16_
 
-- [ ] 9. Build the viewers and game UI
-  - [ ] 9.1 Implement DiscBrowser and ArticleViewer
+- [x] 9. Build the viewers and game UI
+  - [x] 9.1 Implement DiscBrowser and ArticleViewer
     - `DiscBrowser.tsx` lists discs by title and tagline. Opening a disc calls `playSpinUp()` and shows a `Window` with entries for sections, diagrams, a Trivia group, and dungeons
     - `ArticleViewer.tsx` renders the section title and paragraphs in the serif token, calls `playPageFlip()` on selection, resets `scrollTop` to 0 via a ref when `section_id` changes, and shows a not-found message for unknown ids while the previous navigation state is kept
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
 
-  - [ ] 9.2 Implement HotspotViewer
+  - [x] 9.2 Implement HotspotViewer
     - `HotspotViewer.tsx` renders shapes in `<svg viewBox="0 0 100 100">` and each hotspot as a focusable `<g role="button" tabindex="0" aria-label={label}>` at `(x, y)` wrapped in Tooltip. Click or Enter calls the navigation callback with the hotspot `section_id` and `playPageFlip()`
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-  - [ ] 9.3 Implement KeepMazeUI
+  - [x] 9.3 Implement KeepMazeUI
     - `KeepMazeUI.tsx` using `gameReducer` and the question queue. HUD in the sans-serif token with room name, description, exits, moves, and incorrect count. Show the pending question, call `playTorch()` on room entry and `playDoorUnlock()` on a correct answer. On a wrong answer show the cited section title and a link that opens it in the Article_Viewer. Show the victory message with moves and incorrect count, and a restart control. Each exit selection draws one question and the exit stays locked until answered correctly. A wrong answer closes the question with no move counted, and selecting the exit again draws the next question. The queue cycles when exhausted, so discs with fewer questions than exits still play. Disable Start with a message when the disc has no trivia questions
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 12.10, 12.11, 12.12_
 
-  - [ ] 9.4 Implement MuteToggle and ErrorList
+  - [x] 9.4 Implement MuteToggle and ErrorList
     - MuteToggle.tsx: a BevelButton with `aria-pressed` bound to `subscribeMuted`/`toggleMuted`, showing the current state. The App starts unmuted and does not persist the state
     - `ErrorList.tsx`: renders `path: message` for each `ValidationError`
     - _Requirements: 5.12, 5.15, 13.8, 13.11_
 
-  - [ ] 9.5 Write viewer and game UI component tests
+  - [x] 9.5 Write viewer and game UI component tests
     - Create `tests/components/viewers.test.tsx`: DiscBrowser listing and spin-up request, ArticleViewer scroll reset and not-found message, HotspotViewer tooltip and navigation, KeepMazeUI flow (correct answer, wrong answer with section link and no move counted, retry draws the next question, victory counts, restart, no-trivia disabled start), MuteToggle state display, ErrorList output
     - _Requirements: 5.12, 10.1, 10.2, 10.4, 10.5, 10.6, 11.3, 11.4, 12.1, 12.3, 12.4, 12.5, 12.6, 12.8, 12.9, 12.10, 12.12, 13.8_
 

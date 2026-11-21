@@ -1,0 +1,49 @@
+.hotspot-viewer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--color-surface);
+  color: var(--color-bevel-edge);
+}
+
+.hotspot-shapes {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hotspot-anchor {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.hotspot-marker {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+}
+
+.hotspot-button {
+  cursor: pointer;
+  outline: none;
+}
+
+.hotspot-button rect {
+  fill: var(--color-title-bg);
+  stroke: var(--color-bevel-hi);
+  stroke-width: 1px;
+}
+
+.hotspot-button:hover rect {
+  fill: var(--color-bevel-shadow);
+}
+
+.hotspot-button:focus-visible rect {
+  stroke: var(--color-bevel-edge);
+  stroke-dasharray: 2 1;
+  stroke-width: 2px;
+}

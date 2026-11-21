@@ -1,0 +1,71 @@
+.keepmaze {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-bevel-edge);
+  background: var(--color-surface);
+  padding: 8px;
+}
+
+.keepmaze__hud {
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.keepmaze__room {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 4px;
+}
+
+.keepmaze__stats {
+  display: flex;
+  gap: 16px;
+  margin: 0 0 8px;
+}
+
+.keepmaze__list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.keepmaze__question {
+  background: var(--color-tooltip-bg);
+  border: 1px solid var(--color-bevel-edge);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.keepmaze__options {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.keepmaze__link {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-title-bg);
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.keepmaze__link:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+}
+
+.keepmaze__message {
+  margin: 4px 0;
+}

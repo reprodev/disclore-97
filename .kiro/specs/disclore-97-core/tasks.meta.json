@@ -578,6 +578,73 @@
         "chatSessionId": "sess_24ce1bbf-f034-49e9-9a68-fb4cf91c1f62",
         "timestamp": 1795282698720
       }
+    ],
+    "9.2 Implement HotspotViewer": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795282916994
+      },
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283006504
+      }
+    ],
+    "9.3 Implement KeepMazeUI": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795282917067
+      },
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283005704
+      }
+    ],
+    "9.4 Implement MuteToggle and ErrorList": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795282917313
+      },
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283005165
+      }
+    ],
+    "9.1 Implement DiscBrowser and ArticleViewer": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283008494
+      },
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283076972
+      }
+    ],
+    "9.5 Write viewer and game UI component tests": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283077505
+      },
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283152813
+      }
+    ],
+    "9. Build the viewers and game UI": [
+      {
+        "executionId": "eaa25196-f348-4f8d-887f-bf95ea2ec883",
+        "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
+        "timestamp": 1795283152874
+      }
     ]
   }
 }
