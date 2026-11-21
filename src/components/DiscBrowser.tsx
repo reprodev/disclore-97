@@ -45,6 +45,12 @@ export interface DiscBrowserProps {
   minimized?: boolean;
   /** When provided, the open disc window has a Minimize button. */
   onMinimize?: () => void;
+  /** Opens the Burn dialog. Omit to hide the File menu item and the launcher buttons. */
+  onBurnNew?: () => void;
+  /** Removes a burned disc from the library. */
+  onRemoveDisc?: (discId: string) => void;
+  /** Ids of burned discs that may be removed. */
+  removableIds?: ReadonlySet<string>;
 }
 
 /** Breadcrumb trail and status-bar label for a view. */
@@ -84,6 +90,9 @@ export function DiscBrowser({
   onQuickJump,
   onOpenReadMe,
   onReplaySplash,
+  onBurnNew,
+  onRemoveDisc,
+  removableIds,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -128,6 +137,7 @@ export function DiscBrowser({
                 label: 'File',
                 items: [
                   { label: 'Load Disc...', onSelect: () => setLoadOverId(disc.disc_id) },
+                  ...(onBurnNew ? [{ label: 'Burn New Disc...', onSelect: onBurnNew }] : []),
                   { label: 'Close Disc', onSelect: onCloseDisc },
                 ],
               },
@@ -204,6 +214,9 @@ export function DiscBrowser({
               handleOpen(id);
             }}
             onCancel={() => setLoadOverId(null)}
+            onBurnNew={onBurnNew}
+            removableIds={removableIds}
+            onRemoveDisc={onRemoveDisc}
           />
         ) : null}
       </>
@@ -218,6 +231,7 @@ export function DiscBrowser({
         onQuickJump={onQuickJump}
         onOpenReadMe={onOpenReadMe}
         onReplaySplash={onReplaySplash}
+        onBurnNew={onBurnNew}
         minimized={minimized}
         onMinimize={onMinimize}
       />

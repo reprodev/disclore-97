@@ -341,28 +341,28 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Also assert: the presets list has at least 2 GitHub and at least 2 topic presets and each parses to its declared kind with `parseInput`, and with the mute toggle on, burning and clicking buttons creates no audio nodes (mock context counters, as in `app.test.tsx`)
     - _Requirements: 13.5, 13.6, 13.7, 13.8, 13.9, 13.10, 13.12, 13.13, 13.14, 13.16, 14.1, 14.3, 14.4, 14.7, 16.9, 17.16_
 
-- [ ] 15. Add the three entry points and integrate with App
-  - [ ] 15.1 Add the Home card, Load Disc button, and Remove control
+- [x] 15. Add the three entry points and integrate with App
+  - [x] 15.1 Add the Home card, Load Disc button, and Remove control
     - `HomeLauncher.tsx`: add a `Burn New CD-R Disc...` card that calls `onBurnNew`
     - `LoadDiscDialog.tsx`: add a `Burn New Disc...` button that closes the dialog and calls `onBurnNew`, and a `Remove` control for burned discs that calls `onRemoveDisc(disc_id)`
     - `ExpansionPackList.tsx`: add an optional `renderExtra` slot used for the Remove control. Existing props and behavior stay unchanged
     - _Requirements: 13.3, 13.4, 15.6_
 
-  - [ ] 15.2 Add the File menu item and wire `DiscBrowser`
+  - [x] 15.2 Add the File menu item and wire `DiscBrowser`
     - Add a `Burn New Disc...` item to the File menu items in `DiscBrowser.tsx` (`MenuBar.tsx` takes menu data and needs no change), and pass `onBurnNew` and `onRemoveDisc` down to `HomeLauncher` and `LoadDiscDialog`. The File menu item is available inside an open disc
     - _Requirements: 13.2, 13.3, 13.4, 15.6_
 
-  - [ ] 15.3 Integrate burned discs, the library, and the dialog in `App.tsx`
+  - [x] 15.3 Integrate burned discs, the library, and the dialog in `App.tsx`
     - Keep `sources` as the base list and append burned discs, dropping a burned disc whose id equals a base id. Accept optional `fetch` and `storage` props on `App` (passed to `BurnDialog` and `createDiscLibrary`) so tests can inject fakes. Create the library from `storage` when given, otherwise from `getBrowserStorage()` only when the `sources` prop is omitted, so existing App tests never touch `localStorage`
     - Own the Burn dialog state, render it as the last child of `.desktop__work`, and on `onBurned(manifest)` add the disc, call `library.save`, open the disc, request the spin-up sound through the Audio_Module, and close the dialog. Show `The disc is open, but it could not be saved to this browser.` when saving fails while the disc still mounts
     - At start load stored discs through `loadDisc(m, false)` and list those that pass in the Load Disc dialog. `Remove` deletes the stored disc. Import `compileDisc` only from `src/model/compiler`, and keep the previous disc open on any failed burn
     - _Requirements: 6.2, 6.3, 6.5, 13.2, 13.3, 13.4, 13.11, 14.5, 15.1, 15.3, 15.4, 15.5, 15.6, 15.9, 15.10_
 
-  - [ ] 15.4 Write entry point component tests
+  - [x] 15.4 Write entry point component tests
     - Create `tests/components/burn-entry.test.tsx`: the Home card, the File menu item inside an open disc, and the Load Disc dialog button each open the Burn dialog, and the Load Disc button closes the Load Disc dialog first
     - _Requirements: 13.2, 13.3, 13.4, 17.16_
 
-  - [ ] 15.5 Write App integration tests for mounting and the library
+  - [x] 15.5 Write App integration tests for mounting and the library
     - Create `tests/components/burn-app.test.tsx`: a successful burn mounts the disc and requests the spin-up sound, a failed burn keeps the previous disc, discs are restored at start from a fake `Storage`, `Remove` deletes a stored disc, a throwing `Storage` shows the not-saved notice while the disc still mounts, and existing `sources` prop tests never read `localStorage`
     - _Requirements: 6.3, 13.11, 15.3, 15.5, 15.6, 17.16, 17.17_
 

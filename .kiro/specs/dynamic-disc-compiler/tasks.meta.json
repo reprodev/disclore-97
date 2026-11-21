@@ -930,6 +930,73 @@
         "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
         "timestamp": 1795302233411
       }
+    ],
+    "15.1 Add the Home card, Load Disc button, and Remove control": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302418682
+      },
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302482064
+      }
+    ],
+    "15.2 Add the File menu item and wire `DiscBrowser`": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302482596
+      },
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302592124
+      }
+    ],
+    "15.3 Integrate burned discs, the library, and the dialog in `App.tsx`": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302591615
+      },
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302655692
+      }
+    ],
+    "15.4 Write entry point component tests": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302655187
+      },
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302797206
+      }
+    ],
+    "15.5 Write App integration tests for mounting and the library": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302658866
+      },
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302797657
+      }
+    ],
+    "15. Add the three entry points and integrate with App": [
+      {
+        "executionId": "94380a10-ace5-4c19-bcb1-46bd7b0ad700",
+        "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
+        "timestamp": 1795302797710
+      }
     ]
   }
 }

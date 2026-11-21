@@ -14,6 +14,12 @@ export interface LoadDiscDialogProps {
   onLoad: (discId: string) => void;
   /** Called by Cancel, the title bar Close button, and Escape. */
   onCancel: () => void;
+  /** Closes this dialog, then opens the Burn dialog. Omit to hide the button. */
+  onBurnNew?: () => void;
+  /** Ids of burned discs that may be removed from the library. */
+  removableIds?: ReadonlySet<string>;
+  /** Called with a burned disc's id by its Remove control. */
+  onRemoveDisc?: (discId: string) => void;
 }
 
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -22,7 +28,15 @@ const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), [tabin
  * Modal "Load Disc" dialog drawn over the open disc window. Escape cancels,
  * Tab stays inside the dialog, and focus returns to where it was on close.
  */
-export function LoadDiscDialog({ discs, currentDiscId, onLoad, onCancel }: LoadDiscDialogProps) {
+export function LoadDiscDialog({
+  discs,
+  currentDiscId,
+  onLoad,
+  onCancel,
+  onBurnNew,
+  removableIds,
+  onRemoveDisc,
+}: LoadDiscDialogProps) {
   const layerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -72,9 +86,33 @@ export function LoadDiscDialog({ discs, currentDiscId, onLoad, onCancel }: LoadD
               discs={discs}
               currentDiscId={currentDiscId}
               onPick={(id) => (id === currentDiscId ? onCancel() : onLoad(id))}
+              renderExtra={
+                onRemoveDisc && removableIds
+                  ? (disc) =>
+                      removableIds.has(disc.disc_id) && disc.disc_id !== currentDiscId ? (
+                        <BevelButton
+                          className="disc-remove"
+                          aria-label={`Remove ${disc.title} from library`}
+                          onClick={() => onRemoveDisc(disc.disc_id)}
+                        >
+                          Remove
+                        </BevelButton>
+                      ) : null
+                  : undefined
+              }
             />
           </fieldset>
           <div className="load-dialog__buttons">
+            {onBurnNew ? (
+              <BevelButton
+                onClick={() => {
+                  onCancel();
+                  onBurnNew();
+                }}
+              >
+                Burn New Disc...
+              </BevelButton>
+            ) : null}
             <BevelButton onClick={onCancel}>Cancel</BevelButton>
           </div>
         </div>

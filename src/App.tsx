@@ -1,4 +1,7 @@
 import { useMemo, useState } from 'react';
+import type { FetchLike } from './adapters/types';
+import { playSpinUp } from './audio/audio';
+import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
 import { BootSplash } from './components/BootSplash';
 import { DesktopIcons } from './components/DesktopIcons';
@@ -11,6 +14,8 @@ import { Taskbar } from './components/Taskbar';
 import type { ActiveWindowInfo } from './components/Taskbar';
 import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
+import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
+import type { StorageLike } from './library/discLibrary';
 import type { DiscManifest, ValidationError } from './model/manifest';
 import {
   canGoBack,
@@ -39,6 +44,10 @@ export interface AppProps {
    * omitted, which uses the built-in discs.
    */
   skipSplash?: boolean;
+  /** Fetch used by the Burn dialog. Defaults to the global fetch. */
+  fetch?: FetchLike;
+  /** Storage for burned discs. Defaults to localStorage only when sources is omitted. */
+  storage?: StorageLike;
 }
 
 interface Shell {
@@ -48,7 +57,7 @@ interface Shell {
 
 const initialShell: Shell = { nav: initialNav, history: initialHistory };
 
-export function App({ sources, skipSplash }: AppProps) {
+export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps) {
   const discSources = sources ?? prebakedDiscs;
   const [stage, setStage] = useState<'splash' | 'home'>(
     (skipSplash ?? sources !== undefined) ? 'home' : 'splash',
@@ -60,7 +69,14 @@ export function App({ sources, skipSplash }: AppProps) {
   const [readMeOpen, setReadMeOpen] = useState(false);
   const { nav, history } = shell;
 
-  const { discs, failures } = useMemo(() => {
+  const [library] = useState(() =>
+    createDiscLibrary(storage ?? (sources === undefined ? getBrowserStorage() : undefined)),
+  );
+  const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
+  const [burnOpen, setBurnOpen] = useState(false);
+  const [saveNotice, setSaveNotice] = useState(false);
+
+  const { discs, failures, removable } = useMemo(() => {
     const ok: DiscManifest[] = [];
     const bad: ValidationError[][] = [];
     for (const src of discSources) {
@@ -68,8 +84,18 @@ export function App({ sources, skipSplash }: AppProps) {
       if (r.ok) ok.push(r.manifest);
       else bad.push(r.errors);
     }
-    return { discs: ok, failures: bad };
-  }, [discSources]);
+    const baseIds = new Set(ok.map((d) => d.disc_id));
+    const removableIds = new Set<string>();
+    for (const m of burned) {
+      if (baseIds.has(m.disc_id)) continue;
+      const r = loadDisc(m, false);
+      if (r.ok) {
+        ok.push(r.manifest);
+        removableIds.add(r.manifest.disc_id);
+      }
+    }
+    return { discs: ok, failures: bad, removable: removableIds };
+  }, [discSources, burned]);
 
   const disc = discs.find((d) => d.disc_id === nav.discId);
 
@@ -78,6 +104,19 @@ export function App({ sources, skipSplash }: AppProps) {
     setMinimized(false);
     setLastDiscId(discId);
     setShell({ nav: { discId, view: null }, history: initialHistory });
+  };
+  const onBurned = (m: DiscManifest) => {
+    setBurned((b) => [...b.filter((x) => x.disc_id !== m.disc_id), m]);
+    const saved = library.save(m);
+    setSaveNotice(!saved.saved);
+    openDisc(m.disc_id);
+    playSpinUp();
+    setBurnOpen(false);
+  };
+  const removeDisc = (discId: string) => {
+    library.remove(discId);
+    setBurned((b) => b.filter((x) => x.disc_id !== discId));
+    if (nav.discId === discId) closeDisc();
   };
   const closeDisc = () => {
     setNotFound(null);
@@ -183,6 +222,9 @@ export function App({ sources, skipSplash }: AppProps) {
           onQuickJump={quickJump}
           onOpenReadMe={() => setReadMeOpen(true)}
           onReplaySplash={() => setStage('splash')}
+          onBurnNew={() => setBurnOpen(true)}
+          onRemoveDisc={removeDisc}
+          removableIds={removable}
         />
         {notFound ? (
           <p role="alert" className="app-not-found">
@@ -192,7 +234,19 @@ export function App({ sources, skipSplash }: AppProps) {
         {failures.map((errors, i) => (
           <ErrorList key={i} errors={errors} />
         ))}
+        {saveNotice ? (
+          <p role="status" className="app-not-found">
+            The disc is open, but it could not be saved to this browser.
+          </p>
+        ) : null}
         {readMeOpen ? <NotepadWindow onClose={() => setReadMeOpen(false)} /> : null}
+        {burnOpen ? (
+          <BurnDialog
+            onBurned={onBurned}
+            onClose={() => setBurnOpen(false)}
+            {...(fetchImpl ? { fetch: fetchImpl } : {})}
+          />
+        ) : null}
       </div>
       <Taskbar
         discs={discs}

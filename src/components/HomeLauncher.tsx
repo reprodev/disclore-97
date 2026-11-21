@@ -17,6 +17,8 @@ export interface HomeLauncherProps {
   onQuickJump?: (mode: QuickJumpMode) => void;
   onOpenReadMe?: () => void;
   onReplaySplash?: () => void;
+  /** Opens the Burn dialog. Omit to disable the card. */
+  onBurnNew?: () => void;
   /** Hides the Home window without closing it. The parent owns this state. */
   minimized?: boolean;
   onMinimize?: () => void;
@@ -80,6 +82,7 @@ export function HomeLauncher({
   onQuickJump,
   onOpenReadMe,
   onReplaySplash,
+  onBurnNew,
   minimized = false,
   onMinimize,
 }: HomeLauncherProps) {
@@ -138,6 +141,12 @@ export function HomeLauncher({
 
             <Group legend="Utilities">
               <div className="home__cards">
+                <Card
+                  icon="cd"
+                  title="Burn New CD-R Disc..."
+                  text="Turn a GitHub repo, web page, or topic into a disc."
+                  onClick={onBurnNew}
+                />
                 <Card
                   icon="notepad"
                   title="About / ReadMe.txt"
