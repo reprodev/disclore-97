@@ -124,28 +124,28 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
 - [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement URL parsing and classification
-  - [ ] 5.1 Implement `parseInput` in `src/model/sourceInput.ts`
+- [x] 5. Implement URL parsing and classification
+  - [x] 5.1 Implement `parseInput` in `src/model/sourceInput.ts`
     - Export `InputErrorCode`, `ParsedInput`, and `parseInput(raw)` with the design check order: trim, `empty-input`, `input-too-long`, `unsupported-scheme` (scheme followed by `//` or a known scheme name, so `Rust: a language` stays a topic), single-line URL parsing with `new URL` in a `try`, GitHub owner and repo validation (`invalid-github-url`), webpage normalization without fragment, markdown detection, then topic with collapsed whitespace
     - Perform no network access, throw nothing, and import nothing from React or browser globals
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 1.10_
 
-  - [ ] 5.2 Write property test for GitHub URL classification
+  - [x] 5.2 Write property test for GitHub URL classification
     - Create `tests/properties/dc11-github-url.test.ts` using `arbGithubUrl`
     - **Property 11: GitHub URL classification**
     - **Validates: Requirements 1.1, 1.8**
 
-  - [ ] 5.3 Write property test for classification partition, trim invariance, and purity
+  - [x] 5.3 Write property test for classification partition, trim invariance, and purity
     - Create `tests/properties/dc12-classification.test.ts` and stub `globalThis.fetch` to fail the test if called
     - **Property 12: Classification partition, trim invariance, and purity**
     - **Validates: Requirements 1.2, 1.3, 1.4, 1.9, 1.10**
 
-  - [ ] 5.4 Write property test for input error codes
+  - [x] 5.4 Write property test for input error codes
     - Create `tests/properties/dc13-input-errors.test.ts`
     - **Property 13: Input error codes**
     - **Validates: Requirements 1.5, 1.6, 1.7**
 
-  - [ ] 5.5 Write parser unit tests
+  - [x] 5.5 Write parser unit tests
     - Create `tests/compiler/sourceInput.test.ts`: each kind, each error code, `www.`, `.git`, sub-path, `Rust: a language` stays a topic, `javascript:alert(1)` is `unsupported-scheme`, `https://github.com/owner` is `invalid-github-url`, and `http://` falls back to topic
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 17.10_
 
