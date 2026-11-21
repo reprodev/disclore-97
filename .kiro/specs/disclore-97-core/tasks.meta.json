@@ -1,5 +1,14 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "2.3 Write property test for reachable set and orphan partition": {
+      "status": "passed",
+      "lastRunTimestamp": 1795278788230
+    },
+    "2.4 Write property test for shortest path validity and minimality": {
+      "status": "passed",
+      "lastRunTimestamp": 1795278904261
+    }
+  },
   "executionHistory": {
     "1.1 Create repo files and project scaffolding": [
       {
@@ -52,6 +61,73 @@
         "executionId": "9cdaf101-4cdf-4413-adec-f8b95f81a464",
         "chatSessionId": "sess_2d3c1884-a0d4-4cea-84be-c90e38fdd368",
         "timestamp": 1795278318985
+      }
+    ],
+    "2.1 Define manifest types in `src/model/manifest.ts`": [
+      {
+        "executionId": "74627fe0-5b11-49b5-95a7-e1096a198a75",
+        "chatSessionId": "sess_978ae60b-24b8-4ee2-8740-515682f40f08",
+        "timestamp": 1795278577257
+      },
+      {
+        "executionId": "74627fe0-5b11-49b5-95a7-e1096a198a75",
+        "chatSessionId": "sess_978ae60b-24b8-4ee2-8740-515682f40f08",
+        "timestamp": 1795278647337
+      }
+    ],
+    "2.2 Implement `solveDungeon` in `src/model/solver.ts`": [
+      {
+        "executionId": "74627fe0-5b11-49b5-95a7-e1096a198a75",
+        "chatSessionId": "sess_978ae60b-24b8-4ee2-8740-515682f40f08",
+        "timestamp": 1795278647777
+      },
+      {
+        "executionId": "74627fe0-5b11-49b5-95a7-e1096a198a75",
+        "chatSessionId": "sess_978ae60b-24b8-4ee2-8740-515682f40f08",
+        "timestamp": 1795278672928
+      }
+    ],
+    "2. Implement the DiscManifest types and the KeepMaze solver": [
+      {
+        "executionId": "74627fe0-5b11-49b5-95a7-e1096a198a75",
+        "chatSessionId": "sess_978ae60b-24b8-4ee2-8740-515682f40f08",
+        "timestamp": 1795278672965
+      }
+    ],
+    "2.3 Write property test for reachable set and orphan partition": [
+      {
+        "executionId": "cce26d73-5863-40ec-a373-0f9f10db414e",
+        "chatSessionId": "sess_c78cfb8d-df16-456d-897e-180a3e8b575d",
+        "timestamp": 1795278744497
+      },
+      {
+        "executionId": "cce26d73-5863-40ec-a373-0f9f10db414e",
+        "chatSessionId": "sess_c78cfb8d-df16-456d-897e-180a3e8b575d",
+        "timestamp": 1795278793933
+      }
+    ],
+    "2.4 Write property test for shortest path validity and minimality": [
+      {
+        "executionId": "d2496ffa-3aff-4473-8055-90cd545673df",
+        "chatSessionId": "sess_77502dab-b1f4-4b8e-9430-8a3b25cd7723",
+        "timestamp": 1795278843899
+      },
+      {
+        "executionId": "d2496ffa-3aff-4473-8055-90cd545673df",
+        "chatSessionId": "sess_77502dab-b1f4-4b8e-9430-8a3b25cd7723",
+        "timestamp": 1795278909750
+      }
+    ],
+    "2.5 Write solver performance and edge-case unit tests": [
+      {
+        "executionId": "5cd342af-e0b8-4b0e-9aa2-60c0f42a0a6c",
+        "chatSessionId": "sess_35df32f4-6164-4021-925d-dc96b638bb84",
+        "timestamp": 1795279069400
+      },
+      {
+        "executionId": "5cd342af-e0b8-4b0e-9aa2-60c0f42a0a6c",
+        "chatSessionId": "sess_35df32f4-6164-4021-925d-dc96b638bb84",
+        "timestamp": 1795279145748
       }
     ]
   }

@@ -26,28 +26,28 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/static.test.ts` that checks: `LICENSE` has MIT text, `.gitignore` entries, no `.env` or `.mp3`/`.wav`/`.ogg` files, hex literals only in `tokens.css` with token values matching Requirement 3.1, no nonzero border-radius, blurred box-shadow, `backdrop-filter`, or gradients in stylesheets, `AudioContext` and `createOscillator` only under `src/audio`, runtime dependencies equal `react` and `react-dom`, and `tsconfig.json` has `"strict": true`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.3, 2.4, 3.1, 3.4, 3.5, 3.6, 13.2, 13.6_
 
-- [ ] 2. Implement the DiscManifest types and the KeepMaze solver
-  - [ ] 2.1 Define manifest types in `src/model/manifest.ts`
+- [x] 2. Implement the DiscManifest types and the KeepMaze solver
+  - [x] 2.1 Define manifest types in `src/model/manifest.ts`
     - Export `DiscManifest`, `Section`, `Shape`, `Hotspot`, `Diagram`, `TriviaQuestion`, `Exit`, `Room`, `Dungeon`, `ValidationError`, `ErrorCode`, and `ValidationResult` exactly as in the design
     - Document the reserved room ids `entrance` and `throne_room`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-  - [ ] 2.2 Implement `solveDungeon` in `src/model/solver.ts`
+  - [x] 2.2 Implement `solveDungeon` in `src/model/solver.ts`
     - BFS from `entrance` over directed exits with a visited set and parent map, returning `{ reachable, path, orphans }`
     - Ignore exits to unknown rooms. Return an empty path when the throne room is unreachable, and treat all rooms as orphans when `entrance` is absent
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.7_
 
-  - [ ]* 2.3 Write property test for reachable set and orphan partition
+  - [x] 2.3 Write property test for reachable set and orphan partition
     - Create `tests/properties/p10-partition.test.ts` and an independent iterative DFS reference. Include an `arbDungeon` generator inline or import it once available from `tests/generators.ts`
     - **Property 10: Reachable set and orphans partition the rooms**
     - **Validates: Requirements 7.1, 7.4, 8.6**
 
-  - [ ]* 2.4 Write property test for shortest path validity and minimality
+  - [x] 2.4 Write property test for shortest path validity and minimality
     - Create `tests/properties/p11-shortest-path.test.ts` with a Bellman-Ford style reference distance
     - **Property 11: Shortest path is valid and minimal**
     - **Validates: Requirements 7.2, 7.3, 7.5, 7.7, 8.5, 8.7**
 
-  - [ ]* 2.5 Write solver performance and edge-case unit tests
+  - [x] 2.5 Write solver performance and edge-case unit tests
     - Create `tests/solver.test.ts`: a 500-room dungeon solves in under 100 ms, a cycle terminates, a missing entrance gives all rooms as orphans, and directed edges are respected
     - _Requirements: 7.5, 7.6, 7.7_
 
