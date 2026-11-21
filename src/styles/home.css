@@ -1,0 +1,100 @@
+/* Stage 2: the DiscLore '97 Home window. */
+.disc-browser--select {
+  min-height: 0;
+}
+
+.window.home-window {
+  width: min(880px, 100%);
+  max-height: 100%;
+}
+
+.home-window .window-content {
+  overflow: auto;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.home__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.home__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-gold);
+}
+
+.home__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+.home__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.home__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.home__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.home-card__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-card__title {
+  font-weight: bold;
+}
+
+.home-card__desc {
+  font-size: 11px;
+}
+
+.home__note,
+.home__empty {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--color-bevel-shadow);
+}
+
+@media (max-width: 720px) {
+  .home__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,7 +1,5 @@
 import '../styles/splash.css';
 
-const BLOCKS = 20;
-const STEP = 0.08;
 
 const C = {
   ink: 'var(--color-bevel-edge)',
@@ -19,7 +17,7 @@ const C = {
 };
 
 /** Original pixel-art CD-ROM next to a heraldic crest. Flat token colors only. */
-function SplashArt() {
+export function SplashArt() {
   return (
     <svg
       className="splash__art"
@@ -54,31 +52,21 @@ function SplashArt() {
   );
 }
 
-/**
- * 1997 AutoPlay splash header for the disc selection window. The init bar is
- * CSS-only and never delays the disc buttons below it.
- */
-export function SplashBanner() {
+const BLOCKS = 20;
+const STEP = 0.08;
+
+/** CSS-only "Initializing multimedia drivers..." bar: 20 blocks that fill in over about 1.6 s. */
+export function InitBar() {
   return (
-    <header className="splash">
-      <SplashArt />
-      <div className="splash__text">
-        <h1 className="splash__title">DiscLore '97 Multimedia Encyclopedia</h1>
-        <p className="splash__status">AutoPlay Ready</p>
-        <div
-          className="splash__bar"
-          role="progressbar"
-          aria-label="Initializing multimedia drivers"
-          aria-busy="true"
-        >
-          <div className="splash__track" aria-hidden="true">
-            {Array.from({ length: BLOCKS }, (_, i) => (
-              <span key={i} className="splash__block" style={{ animationDelay: `${(i * STEP).toFixed(2)}s` }} />
-            ))}
-          </div>
+    <>
+      <div className="splash__bar" role="progressbar" aria-label="Initializing multimedia drivers" aria-busy="true">
+        <div className="splash__track" aria-hidden="true">
+          {Array.from({ length: BLOCKS }, (_, i) => (
+            <span key={i} className="splash__block" style={{ animationDelay: `${(i * STEP).toFixed(2)}s` }} />
+          ))}
         </div>
-        <p className="splash__init">Initializing multimedia drivers...</p>
       </div>
-    </header>
+      <p className="splash__init">Initializing multimedia drivers...</p>
+    </>
   );
 }

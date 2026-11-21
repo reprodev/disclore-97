@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ArticleViewer } from './components/ArticleViewer';
+import { BootSplash } from './components/BootSplash';
 import { DesktopIcons } from './components/DesktopIcons';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
@@ -19,10 +20,11 @@ import {
   goForward,
   initialHistory,
   initialNav,
+  pickQuickJump,
   pushView,
   selectSection,
 } from './model/nav';
-import type { History, NavState, View } from './model/nav';
+import type { History, NavState, QuickJumpMode, View } from './model/nav';
 import './styles/desktop.css';
 
 export { initialNav, selectSection };
@@ -31,6 +33,12 @@ export type { NavState, View };
 export interface AppProps {
   /** Disc sources; defaults to the pre-baked discs. Every source goes through loadDisc. */
   sources?: readonly unknown[];
+  /**
+   * Skips the Stage 1 boot splash and lands on the Home launcher. Defaults to
+   * true when custom sources are passed (tests, embedding) and false for the
+   * built-in discs.
+   */
+  skipSplash?: boolean;
 }
 
 interface Shell {
@@ -40,7 +48,11 @@ interface Shell {
 
 const initialShell: Shell = { nav: initialNav, history: initialHistory };
 
-export function App({ sources = prebakedDiscs }: AppProps) {
+export function App({ sources = prebakedDiscs, skipSplash }: AppProps) {
+  const [stage, setStage] = useState<'splash' | 'home'>(
+    (skipSplash ?? sources !== prebakedDiscs) ? 'home' : 'splash',
+  );
+  const [lastDiscId, setLastDiscId] = useState<string | null>(null);
   const [shell, setShell] = useState<Shell>(initialShell);
   const [notFound, setNotFound] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
@@ -63,6 +75,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   const openDisc = (discId: string) => {
     setNotFound(null);
     setMinimized(false);
+    setLastDiscId(discId);
     setShell({ nav: { discId, view: null }, history: initialHistory });
   };
   const closeDisc = () => {
@@ -83,6 +96,22 @@ export function App({ sources = prebakedDiscs }: AppProps) {
     setShell((s) => {
       const h = step(s.history);
       return h === s.history ? s : { nav: { ...s.nav, view: currentView(h) }, history: h };
+    });
+  };
+
+  /** Home hub Quick Jump: opens a disc with the target view already on the history stack. */
+  const quickJump = (mode: QuickJumpMode) => {
+    const target = pickQuickJump(discs, lastDiscId, mode);
+    if (!target) {
+      setNotFound(mode === 'diagram' ? 'No interactive diagrams are available.' : 'No KeepMaze dungeons are available.');
+      return;
+    }
+    setNotFound(null);
+    setMinimized(false);
+    setLastDiscId(target.disc.disc_id);
+    setShell({
+      nav: { discId: target.disc.disc_id, view: target.view },
+      history: pushView(initialHistory, target.view),
     });
   };
 
@@ -118,6 +147,14 @@ export function App({ sources = prebakedDiscs }: AppProps) {
     }
   }
 
+  if (stage === 'splash') {
+    return (
+      <div className="desktop desktop--boot">
+        <BootSplash onDone={() => setStage('home')} />
+      </div>
+    );
+  }
+
   return (
     <div className="desktop">
       <div className="desktop__work app-shell">
@@ -139,6 +176,9 @@ export function App({ sources = prebakedDiscs }: AppProps) {
           onHome={() => visit(null)}
           minimized={minimized}
           onMinimize={() => setMinimized(true)}
+          onQuickJump={quickJump}
+          onOpenReadMe={() => setReadMeOpen(true)}
+          onReplaySplash={() => setStage('splash')}
         />
         {notFound ? (
           <p role="alert" className="app-not-found">

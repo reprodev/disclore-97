@@ -2,16 +2,15 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
-import type { View } from '../model/nav';
+import type { QuickJumpMode, View } from '../model/nav';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
 import { DiscCover } from './DiscCover';
-import { ExpansionPackList } from './ExpansionPackList';
+import { HomeLauncher } from './HomeLauncher';
 import { LoadDiscDialog } from './LoadDiscDialog';
 import { MenuBar } from './MenuBar';
 import { NavToolbar } from './NavToolbar';
 import { SpinUpBar } from './SpinUpBar';
-import { SplashBanner } from './SplashBanner';
 import { StatusBar } from './StatusBar';
 import { Window } from './Window';
 import '../styles/browser.css';
@@ -36,6 +35,12 @@ export interface DiscBrowserProps {
   onForward?: () => void;
   /** Returns to the disc home page. */
   onHome?: () => void;
+  /** Home hub: open a disc straight to its first diagram or dungeon. */
+  onQuickJump?: (mode: QuickJumpMode) => void;
+  /** Home hub: open the ReadMe.txt Notepad. */
+  onOpenReadMe?: () => void;
+  /** Home hub: replay the boot splash. */
+  onReplaySplash?: () => void;
   /** Hides the open disc window without closing it. The parent owns this state. */
   minimized?: boolean;
   /** When provided, the open disc window has a Minimize button. */
@@ -76,6 +81,9 @@ export function DiscBrowser({
   onHome,
   minimized = false,
   onMinimize,
+  onQuickJump,
+  onOpenReadMe,
+  onReplaySplash,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -203,17 +211,13 @@ export function DiscBrowser({
 
   return (
     <div className="disc-browser disc-browser--select">
-      <Window title="DiscLore '97 - Select a CD-ROM" className="disc-select-window">
-        <div className="disc-select">
-          <SplashBanner />
-          <fieldset className="groupbox">
-            <legend className="groupbox__legend">Expansion Packs (CD-ROM Drive D:)</legend>
-            <p className="disc-select__prompt">Insert a disc to begin.</p>
-            {discs.length === 0 ? <p className="disc-select__empty">No discs are available.</p> : null}
-            <ExpansionPackList discs={discs} onPick={handleOpen} />
-          </fieldset>
-        </div>
-      </Window>
+      <HomeLauncher
+        discs={discs}
+        onPickDisc={handleOpen}
+        onQuickJump={onQuickJump}
+        onOpenReadMe={onOpenReadMe}
+        onReplaySplash={onReplaySplash}
+      />
     </div>
   );
 }

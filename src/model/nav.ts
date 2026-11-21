@@ -69,3 +69,28 @@ export function goBack(h: History): History {
 export function goForward(h: History): History {
   return canGoForward(h) ? { ...h, index: h.index + 1 } : h;
 }
+
+
+export type QuickJumpMode = 'diagram' | 'keepmaze';
+
+/**
+ * Chooses where a Quick Jump goes. Prefers the last disc the user opened,
+ * then the first disc that has the requested content. Returns null when no
+ * disc has any.
+ */
+export function pickQuickJump(
+  discs: DiscManifest[],
+  lastDiscId: string | null,
+  mode: QuickJumpMode,
+): { disc: DiscManifest; view: View } | null {
+  const ordered = [...discs.filter((d) => d.disc_id === lastDiscId), ...discs];
+  for (const disc of ordered) {
+    if (mode === 'diagram' && disc.diagrams[0]) {
+      return { disc, view: { kind: 'diagram', diagram_id: disc.diagrams[0].diagram_id } };
+    }
+    if (mode === 'keepmaze' && disc.dungeons[0]) {
+      return { disc, view: { kind: 'keepmaze', dungeon_id: disc.dungeons[0].dungeon_id } };
+    }
+  }
+  return null;
+}
