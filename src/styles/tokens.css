@@ -1,0 +1,18 @@
+:root {
+  --color-surface: #C0C0C0;
+  --color-title-bg: #000080;
+  --color-title-text: #FFFFFF;
+  --color-bevel-hi: #FFFFFF;
+  --color-bevel-shadow: #808080;
+  --color-bevel-edge: #000000;
+  --color-tooltip-bg: #FFFFE1;
+
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-ui: "MS Sans Serif", Tahoma, sans-serif;
+
+  --bevel-w: 2px;
+}
+
+* {
+  border-radius: 0;
+}

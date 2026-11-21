@@ -8,21 +8,21 @@ Property tests live under `tests/properties/` with one file per property, and ea
 
 ## Tasks
 
-- [ ] 1. Set up repository hygiene, project scaffolding, and design tokens
-  - [ ] 1.1 Create repo files and project scaffolding
+- [x] 1. Set up repository hygiene, project scaffolding, and design tokens
+  - [x] 1.1 Create repo files and project scaffolding
     - Add `LICENSE` (MIT), `.gitignore` (`node_modules`, `dist`, `.env`, `.env.*`, `.wrangler`), `package.json` with scripts `build` (`tsc --noEmit && vite build`) and `test` (`vitest --run`), `tsconfig.json` with `"strict": true`, `vite.config.ts` (jsdom test environment), `index.html`, and `src/main.tsx` placeholder
     - Runtime dependencies are only `react` and `react-dom`. Dev dependencies are build, type, lint, and test tooling: `vite`, `@vitejs/plugin-react`, `typescript`, `vitest`, `fast-check`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@types/react`, `@types/react-dom`, `eslint`
     - Add an ESLint rule `no-restricted-globals` for `AudioContext`, `webkitAudioContext`, `OscillatorNode` that applies outside `src/audio`
     - Create the empty directory layout from the design (`src/model`, `src/discs`, `src/audio`, `src/components`, `src/styles`, `tests`, `tests/properties`)
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 13.6_
 
-  - [ ] 1.2 Create design tokens and base Win95 styles
+  - [x] 1.2 Create design tokens and base Win95 styles
     - Write `src/styles/tokens.css` with the color, font, and bevel variables from the design, plus `* { border-radius: 0; }`. This is the only file containing hex literals
     - Write `src/styles/win95.css` with shared outset and inset bevel classes composed from the variables, and import both from `src/main.tsx`
     - Use no blurred `box-shadow`, `backdrop-filter`, or gradients
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
-  - [ ]* 1.3 Write static repository scan tests
+  - [x] 1.3 Write static repository scan tests
     - Create `tests/static.test.ts` that checks: `LICENSE` has MIT text, `.gitignore` entries, no `.env` or `.mp3`/`.wav`/`.ogg` files, hex literals only in `tokens.css` with token values matching Requirement 3.1, no nonzero border-radius, blurred box-shadow, `backdrop-filter`, or gradients in stylesheets, `AudioContext` and `createOscillator` only under `src/audio`, runtime dependencies equal `react` and `react-dom`, and `tsconfig.json` has `"strict": true`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.3, 2.4, 3.1, 3.4, 3.5, 3.6, 13.2, 13.6_
 
