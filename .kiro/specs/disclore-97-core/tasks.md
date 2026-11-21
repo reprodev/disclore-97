@@ -109,20 +109,20 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - **Property 9: Unsolvable and orphaned dungeons are reported**
     - **Validates: Requirements 5.10, 5.11**
 
-- [ ] 4. Implement the procedural audio module
-  - [ ] 4.1 Implement `src/audio/audio.ts`
+- [x] 4. Implement the procedural audio module
+  - [x] 4.1 Implement `src/audio/audio.ts`
     - Export `playSpinUp`, `playClick`, `playPageFlip`, `playTorch`, `playDoorUnlock`, `setMuted`, `isMuted`, `toggleMuted`, `subscribeMuted`, and `__setContextFactory`
     - Create the `AudioContext` lazily on the first play call, resume it when suspended, catch constructor and `resume()` errors, and return silently when the API is unavailable
     - Route all effects through one master `GainNode` and track active oscillators. On mute, return before touching the context for new requests, and for playing effects set master gain to 0 and stop active nodes immediately
     - Synthesize the five effects from oscillators and noise bursts with no audio files and no network requests
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.9, 13.10_
 
-  - [ ]* 4.2 Write property test for muted audio silence
+  - [x] 4.2 Write property test for muted audio silence
     - Create `tests/properties/p16-muted-silent.test.ts` using a mock `AudioContext` through `__setContextFactory` and random sequences of the five effects
     - **Property 16: Muted audio is silent**
     - **Validates: Requirements 8.11, 13.7**
 
-  - [ ]* 4.3 Write audio unit tests
+  - [x] 4.3 Write audio unit tests
     - Create `tests/audio.test.ts`: lazy context creation, resume when suspended, silent no-op when `AudioContext` is missing, master gain 0 and nodes stopped when muting during playback, mute state flip and subscriber notification, and one exported function per effect
     - _Requirements: 13.3, 13.4, 13.5, 13.8, 13.9, 13.10_
 

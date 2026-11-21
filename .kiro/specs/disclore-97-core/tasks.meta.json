@@ -31,6 +31,10 @@
     "3.11 Write property test for unsolvable and orphaned dungeons": {
       "status": "passed",
       "lastRunTimestamp": 1795279914138
+    },
+    "4.2 Write property test for muted audio silence": {
+      "status": "passed",
+      "lastRunTimestamp": 1795280340160
     }
   },
   "executionHistory": {
@@ -301,6 +305,49 @@
         "executionId": "7d77e9fe-ff69-4947-8bdc-bef5993af022",
         "chatSessionId": "sess_a667da57-4a16-4fb3-958d-8dd3ba3f6f29",
         "timestamp": 1795280090714
+      }
+    ],
+    "4.1 Implement `src/audio/audio.ts`": [
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280256308
+      },
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280314805
+      }
+    ],
+    "4.2 Write property test for muted audio silence": [
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280315358
+      },
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280358493
+      }
+    ],
+    "4.3 Write audio unit tests": [
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280315862
+      },
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280358865
+      }
+    ],
+    "4. Implement the procedural audio module": [
+      {
+        "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
+        "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
+        "timestamp": 1795280358903
       }
     ]
   }
