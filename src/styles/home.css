@@ -1,18 +1,24 @@
-/* Stage 2: the DiscLore '97 Home window. */
+/* Stage 2: the DiscLore '97 Home window, matched to the night-navy and gold boot splash. */
 .disc-browser--select {
   min-height: 0;
 }
 
 .window.home-window {
-  width: min(880px, 100%);
+  width: min(960px, 100%);
   max-height: 100%;
 }
 
 .home-window .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow: auto;
 }
 
+/* Fills the window when maximized, grows past it (and scrolls) when content is taller. */
 .home {
+  flex: 1 0 auto;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -21,34 +27,90 @@
   font-size: 12px;
 }
 
-.home__header {
+/* Hero header */
+.home-hero {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px 18px;
+  padding: 10px 14px;
   color: var(--color-title-text);
-  background: var(--color-title-bg);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  background: var(--color-night);
+  border: 2px solid var(--color-gold);
+  outline: 1px solid var(--color-gold-dark);
+  outline-offset: -6px;
 }
 
-.home__title {
+.home-hero__emblem {
+  flex: 0 0 200px;
+  max-width: 100%;
+  background: var(--color-night);
+  border: 1px solid var(--color-gold-dark);
+}
+
+.home-hero__emblem .boot-hero__art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.home-hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.home-hero__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 18px;
-  color: var(--color-gold);
+  font-size: 42px;
+  font-weight: bold;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--color-gold-light);
+  text-shadow: 2px 2px 0 var(--color-crimson);
 }
 
-.home__subtitle {
-  margin: 2px 0 0;
+.home-hero__subtitle {
+  margin: 0;
+  font-family: var(--font-serif);
   font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-paper);
 }
 
+.home-hero__badge {
+  margin: 0 0 0 auto;
+  padding: 5px 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  color: var(--color-phosphor);
+  background: var(--color-crt-bg);
+  border: 1px solid var(--color-gold-dark);
+}
+
+/* Two-column portal grid */
 .home__grid {
+  flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   gap: 10px;
-  align-items: start;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.home-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home-group--packs {
+  min-height: 0;
 }
 
 .home__side {
@@ -58,6 +120,80 @@
   min-width: 0;
 }
 
+/* Expansion Pack cards: paper fill, emblem on a night tile, gold-trimmed edge. */
+.disc-list--cards {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.disc-list--cards .disc-list-item {
+  flex: 1 1 0;
+  display: flex;
+  margin: 0;
+}
+
+.disc-list .pack-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 16px;
+  text-align: left;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+.disc-list .pack-card:hover,
+.disc-list .pack-card:focus-visible {
+  background: var(--color-tooltip-bg);
+}
+
+.pack-card__emblem {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: var(--color-night);
+  border: 2px solid var(--color-gold);
+  outline: 1px solid var(--color-gold-dark);
+  outline-offset: 1px;
+}
+
+.disc-list .pack-card .disc-text {
+  gap: 4px;
+  min-width: 0;
+}
+
+.disc-list .pack-card .disc-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--color-title-bg);
+}
+
+.disc-list .pack-card .disc-tagline {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-ink);
+}
+
+.pack-card__meta {
+  margin-top: 4px;
+  padding-top: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-crimson);
+  border-top: 1px solid var(--color-parchment-dark);
+}
+
+/* Quick Jump and Utility cards */
 .home__cards {
   display: flex;
   flex-direction: column;
@@ -93,15 +229,70 @@
   color: var(--color-bevel-shadow);
 }
 
+/* "How DiscLore '97 Works": parchment info card that takes the remaining height. */
+.home-info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  color: var(--color-ink);
+  background: var(--color-tooltip-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.home-info__title {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-crimson);
+  border-bottom: 3px double var(--color-bevel-shadow);
+}
+
+.home-info__list {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 8px;
+  margin: 0;
+}
+
+.home-info__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.home-info__row dt {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--color-title-bg);
+}
+
+.home-info__row dd {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Home status bar: reuses the .status-bar panels */
+.home-status {
+  flex: 0 0 auto;
+}
+
+.home-status .status-bar__panel--cd {
+  flex: 0 0 190px;
+}
+
 @media (max-width: 720px) {
   .home__grid {
     grid-template-columns: minmax(0, 1fr);
   }
-}
 
-.home {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
+  .home-hero__badge {
+    margin-left: 0;
+  }
 }
