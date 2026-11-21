@@ -255,18 +255,18 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/extract/handler.test.ts` with an injected upstream `fetch`: 400, 403 for the initial URL and after a redirect, 405 for `POST`, `PUT`, `DELETE`, and `HEAD`, 200, 415, 502, 504, a 3-redirect chain succeeding and a 4-redirect chain failing, a body over 1 MiB, the mock `fetch` never called for a rejected URL, and upstream headers with a `User-Agent` and no `Cookie`
     - _Requirements: 9.1, 9.6, 9.7, 9.8, 9.9, 9.10, 9.12, 10.8, 10.9, 10.10, 17.15_
 
-- [ ] 9. Implement the webpage adapter client
-  - [ ] 9.1 Implement `src/adapters/webpage.ts`
+- [x] 9. Implement the webpage adapter client
+  - [x] 9.1 Implement `src/adapters/webpage.ts`
     - Export `fetchWebpageSource(url, opts)` requesting `/api/extract?url={encodeURIComponent(url)}` with an injectable `fetch` and a 12000 ms deadline
     - Map HTTP 404 or a non-JSON body (including an SPA `index.html` with status 200) to `unavailable`, an error status with a JSON error body to `fetch-failed` carrying the sanitized message, a wrong shape to `fetch-failed`, deadline to `timeout`, and outer abort to `cancelled`. Validate string `title` and string-list `headings` and `paragraphs`, keep at most 12 headings and 40 paragraphs, and build `ExtractedSource` with kind `webpage` and the final `url`
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7_
 
-  - [ ] 9.2 Write property test for webpage response shape validation
+  - [x] 9.2 Write property test for webpage response shape validation
     - Create `tests/properties/dc22-webpage-shape.test.ts` using `arbWebpageJson`
     - **Property 22: Webpage response shape validation**
     - **Validates: Requirements 12.3, 12.6**
 
-  - [ ] 9.3 Write webpage adapter unit tests
+  - [x] 9.3 Write webpage adapter unit tests
     - Create `tests/adapters/webpage.test.ts`: request URL and encoding, success, 404, SPA `index.html` with status 200, error JSON, wrong shape, and timeout with fake timers
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 17.14_
 
