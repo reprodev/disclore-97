@@ -380,7 +380,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Include no secret, token, or private URL
     - _Requirements: 9.13, 16.7, 16.8_
 
-- [ ] 17. Final checkpoint - Verify all commands pass
+- [x] 17. Final checkpoint - Verify all commands pass
   - Run `npm test`, `npm run build`, and `npm run lint`. All three must pass, with the 24 existing test files and 111 existing tests still passing alongside the new tests. Ensure all tests pass, ask the user if questions arise.
   - _Requirements: 9.13, 17.18, 17.19_
 
