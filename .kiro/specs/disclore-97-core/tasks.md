@@ -156,7 +156,7 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - **Property 14: Restart resets the game**
     - **Validates: Requirements 12.6**
 
-- [ ] 6. Checkpoint - Ensure all tests pass
+- [x] 6. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Create the pre-baked discs
