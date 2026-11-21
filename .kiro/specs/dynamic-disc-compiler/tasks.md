@@ -33,7 +33,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - A helper that builds a base64 README payload wrapped at 60 columns
     - _Requirements: 17.3, 17.10, 17.11, 17.12, 17.13, 17.14, 17.15_
 
-  - [ ]* 1.4 Write unit tests for the helpers and generators
+  - [ ] 1.4 Write unit tests for the helpers and generators
     - Create `tests/compiler/helpers.test.ts`: `fnv1a32` and `mulberry32` give fixed known outputs and values in `[0, 1)`; `discId` handles empty identities, `C++` versus `C#`, case-insensitive repeats, and the 48-character limit; `sanitizeLine` handles `<scr<script>ipt>`, images, links, bidi characters, lone surrogates, and truncation inside a surrogate pair
     - Assert that `fc.sample(arbExtractedSource, 120)` returns at least 100 sources and that the samples include empty, long, and HTML-like inputs
     - _Requirements: 2.7, 7.1, 7.2, 7.3, 7.8, 17.1, 17.2_
@@ -327,12 +327,14 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Build a modal `Window` titled `Burn New CD-R Disc...` with a labeled multi-line input, `PresetList`, `Burn` and `Cancel` `BevelButton`s, `BurnProgress`, and a `role="alert"` error region. Disable `Burn` for empty or whitespace input
     - On Burn enter the progress state, disable the input, presets, and `Burn`, keep `Cancel` enabled, call `burn` with an `AbortController`, and apply a `minBurnMs` floor (default 800) to successes only. Cancel and Escape abort pending requests and close without mounting. On success call `onBurned(manifest)`
     - Map each error code through `ERROR_MESSAGES`, list `path: message` for `validation-failed`, show the offline burn control when `fallbackTopic` is present, show `URL sources need a connection.` and route `markdown` and `topic` inputs through the fallback while the browser reports offline, keep the input text on failure, and clear the error when the user edits the input
+    - Accept optional `fetch` and `minBurnMs` props, pass `fetch` to `burn`, and never call the global `fetch` directly, so tests make no network request
     - Request button clicks through the Audio_Module only, render all text as React text, and use no `dangerouslySetInnerHTML` or `innerHTML`
     - _Requirements: 6.3, 7.4, 11.3, 11.4, 13.1, 13.6, 13.7, 13.8, 13.9, 13.10, 13.11, 13.12, 13.13, 13.14, 13.15, 13.16, 14.1, 14.2, 14.3, 14.4, 14.6, 14.7, 16.3, 16.9_
 
   - [ ]* 14.4 Write Burn dialog component tests
     - Create `tests/components/burn.test.tsx` (jsdom) with `minBurnMs={0}` and a stub `fetch`: Preset selection, `Burn` disabled for empty and whitespace input, the `Burning CD-R at 4x...` text with a `progressbar` and disabled input, Presets, and `Burn`, a successful topic burn, an error display with the offline control, `validation-failed` error lines, Cancel during a pending `fetch` aborts the signal and mounts nothing, Escape cancels, Tab stays inside, focus returns to the opener, roles and names, typing clears the error, and the offline message
-    - _Requirements: 13.5, 13.6, 13.7, 13.8, 13.9, 13.10, 13.12, 13.13, 13.14, 13.16, 14.1, 14.3, 14.4, 14.7, 17.16_
+    - Also assert: the presets list has at least 2 GitHub and at least 2 topic presets and each parses to its declared kind with `parseInput`, and with the mute toggle on, burning and clicking buttons creates no audio nodes (mock context counters, as in `app.test.tsx`)
+    - _Requirements: 13.5, 13.6, 13.7, 13.8, 13.9, 13.10, 13.12, 13.13, 13.14, 13.16, 14.1, 14.3, 14.4, 14.7, 16.9, 17.16_
 
 - [ ] 15. Add the three entry points and integrate with App
   - [ ] 15.1 Add the Home card, Load Disc button, and Remove control
@@ -342,11 +344,11 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - _Requirements: 13.3, 13.4, 15.6_
 
   - [ ] 15.2 Add the File menu item and wire `DiscBrowser`
-    - Add a `Burn New Disc...` item to the File menu in `MenuBar.tsx` and `DiscBrowser.tsx`, and pass `onBurnNew` and `onRemoveDisc` down to `HomeLauncher` and `LoadDiscDialog`. The File menu item is available inside an open disc
+    - Add a `Burn New Disc...` item to the File menu items in `DiscBrowser.tsx` (`MenuBar.tsx` takes menu data and needs no change), and pass `onBurnNew` and `onRemoveDisc` down to `HomeLauncher` and `LoadDiscDialog`. The File menu item is available inside an open disc
     - _Requirements: 13.2, 13.3, 13.4, 15.6_
 
   - [ ] 15.3 Integrate burned discs, the library, and the dialog in `App.tsx`
-    - Keep `sources` as the base list and append burned discs, dropping a burned disc whose id equals a base id. Create the library only when the `sources` prop is omitted, so existing App tests never touch `localStorage`
+    - Keep `sources` as the base list and append burned discs, dropping a burned disc whose id equals a base id. Accept optional `fetch` and `storage` props on `App` (passed to `BurnDialog` and `createDiscLibrary`) so tests can inject fakes. Create the library from `storage` when given, otherwise from `getBrowserStorage()` only when the `sources` prop is omitted, so existing App tests never touch `localStorage`
     - Own the Burn dialog state, render it as the last child of `.desktop__work`, and on `onBurned(manifest)` add the disc, call `library.save`, open the disc, request the spin-up sound through the Audio_Module, and close the dialog. Show `The disc is open, but it could not be saved to this browser.` when saving fails while the disc still mounts
     - At start load stored discs through `loadDisc(m, false)` and list those that pass in the Load Disc dialog. `Remove` deletes the stored disc. Import `compileDisc` only from `src/model/compiler`, and keep the previous disc open on any failed burn
     - _Requirements: 6.2, 6.3, 6.5, 13.2, 13.3, 13.4, 13.11, 14.5, 15.1, 15.3, 15.4, 15.5, 15.6, 15.9, 15.10_
@@ -362,8 +364,8 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
 - [ ] 16. Add compliance checks and documentation
   - [ ] 16.1 Write static compliance tests in `tests/dynamic-static.test.ts`
     - Assert: `src/styles/burn.css` exists, uses `var(--font-ui)`, and has no `url(`, hex literal, non-zero radius, gradient, `backdrop-filter`, or blurred `box-shadow`
-    - Assert: compiler files (`src/model/compiler.ts`, `src/model/compile/*`, `src/model/sourceInput.ts`, `src/extract/ssrf.ts`) import nothing from `react`, `src/components`, `src/adapters`, or `src/library` and contain none of `Math.random`, `Date.now`, `new Date`, `document`, `window`, `localStorage`, and `fetch(`
-    - Assert: no `dangerouslySetInnerHTML` or `innerHTML` under `src/`, no `Authorization` in `src/adapters/*`, the only absolute `http` URLs in `src/` are `https://api.github.com` and `https://github.com/`, `functions/` and `src/extract/` contain no `process.env`, `API_KEY`, `token`, or `secret`, no `.env` file is committed, every `ALLOWED_TOKENS` name is defined in `tokens.css`, `tsconfig.json` `include` contains `functions`, and runtime dependencies stay exactly `react` and `react-dom`
+    - Assert: compiler files (`src/model/compiler.ts`, `src/model/compile/*`, `src/model/sourceInput.ts`, `src/extract/ssrf.ts`) import nothing from `react`, `src/components`, `src/adapters`, or `src/library` and contain none of `Math.random`, `Date.now`, `new Date`, `document.`, `window.`, `localStorage`, and `fetch(` (scan with comments stripped, so prose such as "HTML document" does not fail)
+    - Assert: no `dangerouslySetInnerHTML` or `innerHTML` under `src/`, no `Authorization` in `src/adapters/*`, the only absolute `http` URLs in `src/` are `https://api.github.com` and `https://github.com/`, `functions/` and `src/extract/` contain no `process.env`, `API_KEY`, `Authorization`, or `secret` (scan with comments stripped; do not scan for the bare word `token`, which a scanner may use as an identifier), no `.env` file is committed, every `ALLOWED_TOKENS` name is defined in `tokens.css`, `tsconfig.json` `include` contains `functions`, and runtime dependencies stay exactly `react` and `react-dom`
     - Assert that the `LICENSE` file is still MIT and that no external image, audio, font, or script resource is referenced
     - _Requirements: 6.5, 6.6, 7.4, 8.2, 9.11, 9.13, 16.1, 16.2, 16.4, 16.5, 16.6, 16.7, 16.8, 16.10, 17.20_
 
@@ -391,9 +393,9 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
 ```json
 {
   "waves": [
-    { "id": 0, "tasks": ["1.1", "1.2", "1.3"] },
-    { "id": 1, "tasks": ["1.4", "2.1", "2.2", "2.3", "2.4"] },
-    { "id": 2, "tasks": ["3.1"] },
+    { "id": 0, "tasks": ["1.1", "1.3"] },
+    { "id": 1, "tasks": ["1.2", "2.1", "2.2", "2.3", "2.4"] },
+    { "id": 2, "tasks": ["1.4", "3.1"] },
     { "id": 3, "tasks": ["3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"] },
     { "id": 4, "tasks": ["4"] },
     { "id": 5, "tasks": ["5.1", "6.1"] },
