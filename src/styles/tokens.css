@@ -50,6 +50,10 @@
   --color-phosphor-dim: #00A000;
   --color-crt-bg: #001800;
 
+  /* Night field for the boot splash hero */
+  --color-night: #05052A;
+  --color-night-light: #14145A;
+
   /* Torch fire */
   --color-flame: #FF8000;
   --color-flame-hot: #FFE000;

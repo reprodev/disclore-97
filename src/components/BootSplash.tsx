@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { BevelButton } from './BevelButton';
-import { InitBar, SplashArt } from './SplashArt';
+import { HeroArt, InitBar } from './SplashArt';
 import '../styles/splash.css';
 
 /** Status lines shown in order, one per quarter of the boot time. */
@@ -12,6 +12,14 @@ export const BOOT_MESSAGES = [
 ] as const;
 
 export const BOOT_DURATION_MS = 10000;
+
+/** Two-column spec strip under the progress bar. */
+const SPECS: [string, string][] = [
+  ['Audio:', 'Procedural WebAudio'],
+  ['Atlas:', 'Interactive SVG'],
+  ['Maze:', 'BFS Verified'],
+  ['Drive:', 'D: CD-ROM, 4x'],
+];
 
 export interface BootSplashProps {
   /** Called once when the splash ends, by timer, click, Enter, Escape, or Skip. */
@@ -57,24 +65,41 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashPro
 
   return (
     <div className="boot-splash" onClick={finish}>
-      <div className="boot-plaque" role="region" aria-label="DiscLore '97 boot splash">
-        <div className="splash">
-          <SplashArt />
-          <div className="splash__text">
-            <h1 className="splash__title">DiscLore '97 Multimedia Encyclopedia &mdash; 1997 Edition</h1>
-            <InitBar durationSec={delayMs / 1000} step={step} message={BOOT_MESSAGES[step]!} />
+      <div className="boot-card" role="region" aria-label="DiscLore '97 boot splash">
+        <div className="boot-card__frame">
+          <div className="boot-hero">
+            <HeroArt />
           </div>
-        </div>
-        <div className="boot-plaque__footer">
-          <span className="boot-plaque__hint">Click or press Enter to continue</span>
-          <BevelButton
-            onClick={(e) => {
-              e.stopPropagation();
-              finish();
-            }}
-          >
-            Skip
-          </BevelButton>
+
+          <div className="boot-titleblock">
+            <h1 className="boot-title">DiscLore '97</h1>
+            <p className="boot-subtitle">Multimedia Encyclopedia &bull; 1997 Edition</p>
+            <p className="boot-seal">KeepMaze Engine &bull; Procedural Audio</p>
+          </div>
+
+          <div className="boot-console">
+            <InitBar durationSec={delayMs / 1000} step={step} message={BOOT_MESSAGES[step]!} />
+            <dl className="boot-specs">
+              {SPECS.map(([label, value]) => (
+                <div key={label} className="boot-specs__row">
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="boot-footer">
+            <span className="boot-plaque__hint">Click or press Enter to continue</span>
+            <BevelButton
+              onClick={(e) => {
+                e.stopPropagation();
+                finish();
+              }}
+            >
+              Skip
+            </BevelButton>
+          </div>
         </div>
       </div>
     </div>

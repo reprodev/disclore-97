@@ -1,53 +1,127 @@
 import '../styles/splash.css';
 
-
 const C = {
-  ink: 'var(--color-bevel-edge)',
-  disc: 'var(--color-stone-light)',
-  ring1: 'var(--color-sky)',
-  ring2: 'var(--color-crimson-light)',
-  ring3: 'var(--color-gold)',
-  hub: 'var(--color-surface)',
-  hole: 'var(--color-title-bg)',
-  glare: 'var(--color-paper)',
+  night: 'var(--color-night)',
+  nightLight: 'var(--color-night-light)',
+  star: 'var(--color-paper)',
+  starGold: 'var(--color-gold-light)',
+  orbit: 'var(--color-sky-deep)',
+  sky: 'var(--color-sky)',
   gold: 'var(--color-gold)',
   goldDark: 'var(--color-gold-dark)',
   crimson: 'var(--color-crimson)',
-  stone: 'var(--color-stone-light)',
+  crimsonLight: 'var(--color-crimson-light)',
+  ink: 'var(--color-bevel-edge)',
+  stone: 'var(--color-stone)',
+  stoneLight: 'var(--color-stone-light)',
+  stoneDark: 'var(--color-stone-dark)',
+  forest: 'var(--color-forest)',
+  forestDark: 'var(--color-forest-dark)',
+  surface: 'var(--color-surface)',
+  shadow: 'var(--color-bevel-shadow)',
+  paper: 'var(--color-paper)',
+  crt: 'var(--color-crt-bg)',
+  phos: 'var(--color-phosphor)',
+  phosDim: 'var(--color-phosphor-dim)',
 };
 
-/** Original pixel-art CD-ROM next to a heraldic crest. Flat token colors only. */
-export function SplashArt() {
+const STARS: [number, number][] = [
+  [8, 8], [22, 16], [40, 6], [60, 12], [78, 5], [122, 6], [140, 12], [160, 5],
+  [178, 10], [192, 20], [12, 30], [190, 40], [72, 22], [130, 26],
+];
+
+/** Merlon blocks along a wall top. */
+function merlons(xs: number[], y: number, w: number, fill: string) {
+  return xs.map((x) => <rect key={`${x}-${y}`} x={x} y={y} width={w} height={3} fill={fill} />);
+}
+
+/**
+ * Wide original 1997 title-card illustration on a deep night field: a glowing
+ * CD-ROM inside compass and orbit rings, a castle keep silhouette on the left,
+ * and a CRT terminal on the right. Flat token colors only.
+ */
+export function HeroArt() {
   return (
     <svg
-      className="splash__art"
-      viewBox="0 0 96 56"
+      className="boot-hero__art"
+      viewBox="0 0 200 80"
       role="img"
-      aria-label="A CD-ROM disc beside a castle crest"
+      aria-label="A glowing CD-ROM disc in orbit rings between a castle keep and a CRT terminal"
       shapeRendering="crispEdges"
+      preserveAspectRatio="xMidYMid meet"
     >
-      {/* CD-ROM */}
-      <circle cx={26} cy={28} r={24} fill={C.ink} />
-      <circle cx={26} cy={28} r={22} fill={C.disc} />
-      <circle cx={26} cy={28} r={18} fill={C.ring1} />
-      <circle cx={26} cy={28} r={14} fill={C.ring2} />
-      <circle cx={26} cy={28} r={10} fill={C.ring3} />
-      <circle cx={26} cy={28} r={7} fill={C.hub} />
-      <circle cx={26} cy={28} r={3} fill={C.hole} />
-      <polygon points="12,16 20,10 22,12 14,20" fill={C.glare} />
-      <rect x={32} y={44} width={6} height={2} fill={C.glare} />
+      <rect x={0} y={0} width={200} height={80} fill={C.night} />
+      {STARS.map(([x, y]) => (
+        <rect key={`s${x}-${y}`} x={x} y={y} width={1} height={1} fill={C.star} />
+      ))}
+      <rect x={48} y={10} width={2} height={2} fill={C.starGold} />
+      <rect x={150} y={8} width={2} height={2} fill={C.starGold} />
 
-      {/* Crest */}
-      <polygon points="56,6 90,6 90,32 73,52 56,32" fill={C.goldDark} />
-      <polygon points="58,8 88,8 88,31 73,49 58,31" fill={C.gold} />
-      <polygon points="60,10 86,10 86,30 73,46 60,30" fill={C.crimson} />
-      <rect x={67} y={19} width={12} height={15} fill={C.stone} />
-      <rect x={67} y={16} width={3} height={3} fill={C.stone} />
-      <rect x={72} y={16} width={3} height={3} fill={C.stone} />
-      <rect x={77} y={16} width={2} height={3} fill={C.stone} />
-      <rect x={71} y={26} width={4} height={8} fill={C.ink} />
-      <rect x={68} y={22} width={2} height={3} fill={C.ink} />
-      <rect x={76} y={22} width={2} height={3} fill={C.ink} />
+      {/* Compass star, orbit rings, and ring ticks */}
+      <polygon points="100,2 104,36 138,40 104,44 100,78 96,44 62,40 96,36" fill={C.nightLight} />
+      <circle cx={100} cy={40} r={35} fill="none" stroke={C.orbit} />
+      <circle cx={100} cy={40} r={30} fill="none" stroke={C.nightLight} />
+      <rect x={99} y={4} width={2} height={4} fill={C.gold} />
+      <rect x={99} y={72} width={2} height={4} fill={C.gold} />
+      <rect x={63} y={39} width={4} height={2} fill={C.gold} />
+      <rect x={133} y={39} width={4} height={2} fill={C.gold} />
+
+      {/* Glowing CD-ROM: stepped flat halo, then the disc */}
+      <circle cx={100} cy={40} r={27} fill={C.nightLight} />
+      <circle cx={100} cy={40} r={24} fill={C.orbit} />
+      <circle cx={100} cy={40} r={22} fill={C.sky} />
+      <circle cx={100} cy={40} r={21} fill={C.ink} />
+      <circle cx={100} cy={40} r={20} fill={C.stoneLight} />
+      <circle cx={100} cy={40} r={17} fill={C.sky} />
+      <circle cx={100} cy={40} r={14} fill={C.crimsonLight} />
+      <circle cx={100} cy={40} r={11} fill={C.gold} />
+      <circle cx={100} cy={40} r={8} fill={C.surface} />
+      <circle cx={100} cy={40} r={3} fill={C.night} />
+      <polygon points="88,28 96,24 98,26 90,32" fill={C.paper} />
+
+      {/* Ground */}
+      <rect x={0} y={66} width={200} height={14} fill={C.forestDark} />
+      <rect x={0} y={66} width={200} height={2} fill={C.forest} />
+
+      {/* Castle keep silhouette */}
+      <rect x={6} y={48} width={60} height={18} fill={C.stoneDark} />
+      {merlons([6, 14, 22, 52, 58], 45, 4, C.stoneDark)}
+      <rect x={8} y={34} width={12} height={32} fill={C.stoneDark} />
+      {merlons([8, 12, 16], 31, 3, C.stoneDark)}
+      <rect x={52} y={34} width={12} height={32} fill={C.stoneDark} />
+      {merlons([52, 56, 60], 31, 3, C.stoneDark)}
+      <rect x={26} y={22} width={22} height={44} fill={C.stoneDark} />
+      <rect x={26} y={22} width={2} height={44} fill={C.stone} />
+      {merlons([26, 31, 36, 41, 45], 19, 3, C.stoneDark)}
+      <rect x={36} y={8} width={1} height={11} fill={C.paper} />
+      <polygon points="37,8 47,11 37,14" fill={C.crimson} />
+      <rect x={35} y={30} width={4} height={7} fill={C.gold} />
+      <rect x={30} y={44} width={3} height={5} fill={C.gold} />
+      <rect x={42} y={44} width={3} height={5} fill={C.gold} />
+      <rect x={13} y={42} width={2} height={5} fill={C.gold} />
+      <rect x={57} y={42} width={2} height={5} fill={C.gold} />
+      <rect x={33} y={54} width={8} height={12} fill={C.ink} />
+      <polygon points="33,54 37,50 41,54" fill={C.ink} />
+
+      {/* CRT terminal */}
+      <rect x={140} y={22} width={48} height={36} fill={C.surface} />
+      <rect x={140} y={22} width={48} height={1} fill={C.paper} />
+      <rect x={140} y={22} width={1} height={36} fill={C.paper} />
+      <rect x={140} y={57} width={48} height={1} fill={C.shadow} />
+      <rect x={187} y={22} width={1} height={36} fill={C.shadow} />
+      <rect x={145} y={27} width={38} height={26} fill={C.crt} />
+      <rect x={148} y={30} width={18} height={2} fill={C.phos} />
+      <rect x={148} y={35} width={26} height={2} fill={C.phosDim} />
+      <rect x={148} y={40} width={14} height={2} fill={C.phos} />
+      <rect x={148} y={45} width={22} height={2} fill={C.phosDim} />
+      <rect x={148} y={49} width={4} height={3} fill={C.phos} />
+      <rect x={156} y={58} width={16} height={4} fill={C.surface} />
+      <rect x={150} y={62} width={28} height={4} fill={C.shadow} />
+      <rect x={182} y={54} width={3} height={2} fill={C.crimsonLight} />
+
+      {/* Gold frame line */}
+      <rect x={0} y={0} width={200} height={1} fill={C.goldDark} />
+      <rect x={0} y={79} width={200} height={1} fill={C.goldDark} />
     </svg>
   );
 }
