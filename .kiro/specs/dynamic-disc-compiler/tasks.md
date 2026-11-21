@@ -191,67 +191,67 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/adapters/github.test.ts` with an injected `fetch`: success with all three responses, README missing, non-base64 README encoding, `repo-not-found`, `rate-limited` for 403 and 429, timeout with fake timers, network failure, cancel, every recorded URL starts with `https://api.github.com/`, and no `Authorization` header
     - _Requirements: 8.1, 8.2, 8.4, 8.6, 8.7, 8.8, 8.9, 8.10, 8.11, 17.14_
 
-- [ ] 8. Implement HTML extraction, the SSRF guard, the handler, and the Pages Function
-  - [ ] 8.1 Implement the SSRF_Guard in `src/extract/ssrf.ts`
+- [x] 8. Implement HTML extraction, the SSRF guard, the handler, and the Pages Function
+  - [x] 8.1 Implement the SSRF_Guard in `src/extract/ssrf.ts`
     - Export `checkTarget(url)` returning `{ ok: true }` or `{ ok: false, reason }` (`SsrfVerdict`, `SsrfReason`). Parse with the WHATWG `URL` class and check scheme, credentials, port (80, 443, or absent), blocked host names and suffixes, IPv4 ranges (including the normalized decimal, octal, hexadecimal, and short forms), and IPv6 `::`, `::1`, `fc00::/7`, `fe80::/10`, and IPv4-mapped addresses
     - Perform no network access and import nothing outside `src/extract`
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.11, 10.12_
 
-  - [ ] 8.2 Write property test for blocked IPv4 in every notation
+  - [x] 8.2 Write property test for blocked IPv4 in every notation
     - Create `tests/properties/dc14-ssrf-ipv4.test.ts`
     - **Property 14: SSRF guard blocks private IPv4 in every notation**
     - **Validates: Requirements 10.3, 10.5, 17.13**
 
-  - [ ] 8.3 Write property test for private and mapped IPv6
+  - [x] 8.3 Write property test for private and mapped IPv6
     - Create `tests/properties/dc15-ssrf-ipv6.test.ts`
     - **Property 15: SSRF guard blocks private and mapped IPv6**
     - **Validates: Requirements 10.4**
 
-  - [ ] 8.4 Write property test for scheme, credentials, and ports
+  - [x] 8.4 Write property test for scheme, credentials, and ports
     - Create `tests/properties/dc16-ssrf-scheme-port.test.ts`
     - **Property 16: SSRF guard rejects bad scheme, credentials, and ports**
     - **Validates: Requirements 10.1, 10.6, 10.7**
 
-  - [ ] 8.5 Write property test for permitted public hostnames
+  - [x] 8.5 Write property test for permitted public hostnames
     - Create `tests/properties/dc17-ssrf-public.test.ts`
     - **Property 17: SSRF guard permits public hostnames**
     - **Validates: Requirements 10.12**
 
-  - [ ] 8.6 Write SSRF guard unit tests
+  - [x] 8.6 Write SSRF guard unit tests
     - Create `tests/extract/ssrf.test.ts`: `localhost`, `LOCALHOST.`, `a.localhost`, `printer.local`, `db.internal`, one-label names, each private IPv4 range at both ends, `255.255.255.255`, `::1`, `::`, `fd00::1`, `fe80::1`, `::ffff:127.0.0.1`, `::ffff:7f00:1`, `2130706433`, `0x7f000001`, `0177.0.0.1`, `127.1`, credentials, ports 22 and 8080, `ftp:`, `file:`, `nip.io` names, and `https://example.com`
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.12, 17.12_
 
-  - [ ] 8.7 Implement the HTML_Extractor in `src/extract/htmlExtract.ts`
+  - [x] 8.7 Implement the HTML_Extractor in `src/extract/htmlExtract.ts`
     - Export `extractHtml(html)` returning `{ title, headings, paragraphs }`. Use a linear scanner with no DOM dependency: read `<title>`, `h1` to `h3`, and `p` text, decode named, decimal, and hexadecimal entities (write the numeric entity pattern as `#x` and `#[0-9]` forms so the hex scan stays green), discard `script`, `style`, `noscript`, `template`, `svg`, `iframe`, and comments, collapse whitespace, and limit output to 12 headings, 40 paragraphs, and 1200 characters per string
     - Return empty lists for input with no extractable content and never throw
     - _Requirements: 9.2, 9.3, 9.4, 9.5_
 
-  - [ ] 8.8 Write property test for HTML extraction round trip
+  - [x] 8.8 Write property test for HTML extraction round trip
     - Create `tests/properties/dc18-html-roundtrip.test.ts` using `arbHtmlDoc`
     - **Property 18: HTML extraction round trip**
     - **Validates: Requirements 9.2**
 
-  - [ ] 8.9 Write property test for discards, limits, and totality
+  - [x] 8.9 Write property test for discards, limits, and totality
     - Create `tests/properties/dc19-html-discard.test.ts` using marker text and arbitrary strings
     - **Property 19: HTML extraction discards, limits, and totality**
     - **Validates: Requirements 9.3, 9.4, 9.5**
 
-  - [ ] 8.10 Write HTML extractor unit tests
+  - [x] 8.10 Write HTML extractor unit tests
     - Create `tests/extract/htmlExtract.test.ts`: title, `h1` to `h3`, paragraphs, named, decimal, hex, invalid, and double-encoded entities, discarded elements, comments, unterminated tags, `>` inside attribute values, limits of 12 and 40, and no content
     - _Requirements: 9.2, 9.3, 9.4, 9.5, 17.11_
 
-  - [ ] 8.11 Implement `handleExtract` in `src/extract/handler.ts`
+  - [x] 8.11 Implement `handleExtract` in `src/extract/handler.ts`
     - Export `handleExtract(request, deps)` with an injectable upstream `fetch`. Answer non-`GET` with 405, a missing `url` with 400, a rejected target with 403 (reason named, no upstream content echoed, upstream `fetch` never called), and follow at most 3 redirects manually with each `Location` re-checked by `checkTarget` (403 for a rejected hop, 502 `too-many-redirects` beyond the limit)
     - Limit the upstream request to 8000 ms (504) and the body to 1 MiB (502 `too-large`), accept only `text/html` or `application/xhtml+xml` (415), map upstream failure to 502, and return JSON `{ title, headings, paragraphs, url }` with 200
     - Send a descriptive `User-Agent`, forward no cookies or credentials, and read configuration only from the supplied environment bindings. Include no key, token, or private URL
     - _Requirements: 9.1, 9.6, 9.7, 9.8, 9.9, 9.10, 9.11, 9.12, 10.8, 10.9, 10.10_
 
-  - [ ] 8.12 Add `functions/api/extract.ts` and the `tsconfig.json` include
+  - [x] 8.12 Add `functions/api/extract.ts` and the `tsconfig.json` include
     - Export `onRequest` that adapts the Pages `Request` and `env` to `handleExtract` and contains no other logic
     - Add `"functions"` to the `include` array of `tsconfig.json` so `npm run build` type-checks it, and confirm the app builds with `functions/` absent from the deployment
     - _Requirements: 9.1, 9.10, 9.11, 9.13_
 
-  - [ ] 8.13 Write handler unit tests
+  - [x] 8.13 Write handler unit tests
     - Create `tests/extract/handler.test.ts` with an injected upstream `fetch`: 400, 403 for the initial URL and after a redirect, 405 for `POST`, `PUT`, `DELETE`, and `HEAD`, 200, 415, 502, 504, a 3-redirect chain succeeding and a 4-redirect chain failing, a body over 1 MiB, the mock `fetch` never called for a rejected URL, and upstream headers with a `User-Agent` and no `Cookie`
     - _Requirements: 9.1, 9.6, 9.7, 9.8, 9.9, 9.10, 9.12, 10.8, 10.9, 10.10, 17.15_
 

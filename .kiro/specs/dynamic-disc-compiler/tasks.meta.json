@@ -35,6 +35,22 @@
     "7.2 Write property test for README decoding": {
       "status": "passed",
       "lastRunTimestamp": 1795299828158
+    },
+    "8.2 Write property test for blocked IPv4 in every notation": {
+      "status": "passed",
+      "lastRunTimestamp": 1795300270538
+    },
+    "8.4 Write property test for scheme, credentials, and ports": {
+      "status": "passed",
+      "lastRunTimestamp": 1795300276372
+    },
+    "8.3 Write property test for private and mapped IPv6": {
+      "status": "passed",
+      "lastRunTimestamp": 1795300278085
+    },
+    "8.8 Write property test for HTML extraction round trip": {
+      "status": "passed",
+      "lastRunTimestamp": 1795300307689
     }
   },
   "executionHistory": {
@@ -506,6 +522,169 @@
         "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
         "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
         "timestamp": 1795299848504
+      }
+    ],
+    "8.1 Implement the SSRF_Guard in `src/extract/ssrf.ts`": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300136819
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300212366
+      }
+    ],
+    "8.7 Implement the HTML_Extractor in `src/extract/htmlExtract.ts`": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300137442
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300211563
+      }
+    ],
+    "8.2 Write property test for blocked IPv4 in every notation": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300215498
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300282961
+      }
+    ],
+    "8.3 Write property test for private and mapped IPv6": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300215582
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300283722
+      }
+    ],
+    "8.4 Write property test for scheme, credentials, and ports": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300216132
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300284236
+      }
+    ],
+    "8.5 Write property test for permitted public hostnames": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300216932
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300285030
+      }
+    ],
+    "8.6 Write SSRF guard unit tests": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300217353
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300285827
+      }
+    ],
+    "8.8 Write property test for HTML extraction round trip": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300286377
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300351533
+      }
+    ],
+    "8.9 Write property test for discards, limits, and totality": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300287177
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300350996
+      }
+    ],
+    "8.10 Write HTML extractor unit tests": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300287721
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300350197
+      }
+    ],
+    "8.11 Implement `handleExtract` in `src/extract/handler.ts`": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300288312
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300352207
+      }
+    ],
+    "8.12 Add `functions/api/extract.ts` and the `tsconfig.json` include": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300355568
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300387241
+      }
+    ],
+    "8.13 Write handler unit tests": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300355642
+      },
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300387833
+      }
+    ],
+    "8. Implement HTML extraction, the SSRF guard, the handler, and the Pages Function": [
+      {
+        "executionId": "b32991fe-468a-4681-acff-5d1b8adac060",
+        "chatSessionId": "sess_d287b91a-e4fc-48e4-a55a-5941483c4003",
+        "timestamp": 1795300387876
       }
     ]
   }
