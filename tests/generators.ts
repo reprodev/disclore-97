@@ -518,7 +518,7 @@ const optionalKeys = { requiredKeys: [] as never[] };
  * headings from a small pool, very long strings, and optional description,
  * languages, author, and facts (omitted rather than undefined).
  */
-export const arbExtractedSource: fc.Arbitrary<ExtractedSource> = fc
+const arbGeneratedSource: fc.Arbitrary<ExtractedSource> = fc
   .record({
     kind: arbKind,
     title: arbTextVariant,
@@ -536,6 +536,16 @@ export const arbExtractedSource: fc.Arbitrary<ExtractedSource> = fc
     ),
   })
   .map((g) => buildSource(g.kind, g.title, g.headings, g.paragraphs, g.source, g.opt));
+
+/** Fully empty source: empty title, headings, and paragraphs; metadata kept valid. */
+const arbEmptySource: fc.Arbitrary<ExtractedSource> = fc
+  .record({ kind: arbKind, source: arbSourceLabel })
+  .map((g) => buildSource(g.kind, '', [], [], g.source, {}));
+
+export const arbExtractedSource: fc.Arbitrary<ExtractedSource> = fc.oneof(
+  { weight: 1, arbitrary: arbEmptySource },
+  { weight: 9, arbitrary: arbGeneratedSource },
+);
 
 /** Thin sources: 0 to 4 headings, 0 to 2 paragraphs, mostly empty strings. */
 export const arbThinSource: fc.Arbitrary<ExtractedSource> = fc

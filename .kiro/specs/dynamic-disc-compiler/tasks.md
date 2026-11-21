@@ -60,68 +60,68 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Name and describe rooms from section titles with the 6 original description templates
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8_
 
-- [ ] 3. Compose `compileDisc` and prove its guarantees
-  - [ ] 3.1 Implement `src/model/compiler.ts`
+- [x] 3. Compose `compileDisc` and prove its guarantees
+  - [x] 3.1 Implement `src/model/compiler.ts`
     - Export `compileDisc(source)`, re-export `ExtractedSource`, `SourceKind`, `SourceMetadata`, `sanitizeLine`, `sanitizeParagraph`, and `ALLOWED_TOKENS`
     - Add `normalizeSource(unknown)` that coerces runtime garbage (non-arrays, non-strings, missing metadata), sanitizes, truncates, drops empties, dedupes headings, and builds the canonical seed string. Wire normalize, sections, diagram, trivia, dungeon, and assembly in the design order, with one independent PRNG stream per stage
     - Import only `source.ts`, `manifest.ts`, and `compile/*`. Do not import `validate.ts`, and use no `Math.random`, `Date`, or browser global
     - _Requirements: 2.1, 2.10, 2.11, 6.1, 6.4, 6.5, 6.6, 7.1, 7.2, 7.3, 15.10_
 
-  - [ ] 3.2 Write property test for compiled discs always validating
+  - [x] 3.2 Write property test for compiled discs always validating
     - Create `tests/properties/dc01-validity.test.ts` with `numRuns: 200`, using `arbExtractedSource`, `arbThinSource`, and `arbHostileSource` and the existing `validateManifest`
     - **Property 1: Compiled discs always validate**
     - **Validates: Requirements 2.11, 6.1, 17.2**
 
-  - [ ] 3.3 Write property test for structural minimums and limits
+  - [x] 3.3 Write property test for structural minimums and limits
     - Create `tests/properties/dc02-structure.test.ts` with `numRuns: 200`
     - **Property 2: Structural minimums and limits**
     - **Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.8, 2.9, 4.1, 5.1, 7.3, 17.4**
 
-  - [ ] 3.4 Write property test for disc id shape
+  - [x] 3.4 Write property test for disc id shape
     - Create `tests/properties/dc03-disc-id.test.ts` and compare against the ids of `castles` and `retro-dialup`
     - **Property 3: Disc id shape**
     - **Validates: Requirements 2.7, 15.10**
 
-  - [ ] 3.5 Write property test for determinism
+  - [x] 3.5 Write property test for determinism
     - Create `tests/properties/dc04-determinism.test.ts` comparing two compiles and a compile of a deep copy
     - **Property 4: Determinism**
     - **Validates: Requirements 2.10, 5.8, 17.7**
 
-  - [ ] 3.6 Write property test for the JSON round trip
+  - [x] 3.6 Write property test for the JSON round trip
     - Create `tests/properties/dc05-json-roundtrip.test.ts` with a deep scan for `undefined`
     - **Property 5: JSON round trip**
     - **Validates: Requirements 6.4, 17.9**
 
-  - [ ] 3.7 Write property test for diagram geometry, references, and colors
+  - [x] 3.7 Write property test for diagram geometry, references, and colors
     - Create `tests/properties/dc06-diagram.test.ts`, loading defined color names from `src/styles/tokens.css`
     - **Property 6: Diagram geometry, references, and colors**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 7.5, 17.5**
 
-  - [ ] 3.8 Write property test for trivia integrity
+  - [x] 3.8 Write property test for trivia integrity
     - Create `tests/properties/dc07-trivia.test.ts`
     - **Property 7: Trivia integrity**
     - **Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 17.5**
 
-  - [ ] 3.9 Write property test for solvable dungeons with no orphans
+  - [x] 3.9 Write property test for solvable dungeons with no orphans
     - Create `tests/properties/dc08-dungeon.test.ts` using the existing `solveDungeon`
     - **Property 8: Dungeons are solvable with no orphans**
     - **Validates: Requirements 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 17.6**
 
-  - [ ] 3.10 Write property test for sanitization of hostile text
+  - [x] 3.10 Write property test for sanitization of hostile text
     - Create `tests/properties/dc09-sanitize.test.ts` using `arbHostileSource`
     - **Property 9: Sanitization of hostile text**
     - **Validates: Requirements 7.1, 7.2, 7.3, 7.6, 7.8, 17.8**
 
-  - [ ] 3.11 Write property test for source attribution
+  - [x] 3.11 Write property test for source attribution
     - Create `tests/properties/dc10-attribution.test.ts`
     - **Property 10: Source attribution**
     - **Validates: Requirements 2.12, 7.7**
 
-  - [ ] 3.12 Write compiler unit tests
+  - [x] 3.12 Write compiler unit tests
     - Create `tests/compiler/compiler.test.ts`: a fixed small source with key-field snapshot checks, the empty source, a source with more than 12 headings, the hotspot-to-section modulo mapping, and every `ALLOWED_TOKENS` name defined in `tokens.css`
     - _Requirements: 2.1, 2.5, 2.6, 3.6, 3.9, 7.5_
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 5. Implement URL parsing and classification

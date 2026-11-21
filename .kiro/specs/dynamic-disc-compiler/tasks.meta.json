@@ -1,5 +1,34 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "3.2 Write property test for compiled discs always validating": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298437336
+    },
+    "3.6 Write property test for the JSON round trip": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298441321
+    },
+    "3.3 Write property test for structural minimums and limits": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298441863
+    },
+    "3.7 Write property test for diagram geometry, references, and colors": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298490549
+    },
+    "3.9 Write property test for solvable dungeons with no orphans": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298491193
+    },
+    "3.11 Write property test for source attribution": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298496520
+    },
+    "3.10 Write property test for sanitization of hostile text": {
+      "status": "passed",
+      "lastRunTimestamp": 1795298529362
+    }
+  },
   "executionHistory": {
     "1.1 Create `src/model/source.ts` and the `src/model/compile/` helpers": [
       {
@@ -109,6 +138,169 @@
         "executionId": "31f6e706-90bc-4e3e-a258-318b990ce9a7",
         "chatSessionId": "sess_5a430491-e0e5-49df-a70c-3bf92dc2afc6",
         "timestamp": 1795298195750
+      }
+    ],
+    "3.1 Implement `src/model/compiler.ts`": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298333438
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298402721
+      }
+    ],
+    "3.2 Write property test for compiled discs always validating": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298405151
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298447813
+      }
+    ],
+    "3.3 Write property test for structural minimums and limits": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298405695
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298448121
+      }
+    ],
+    "3.4 Write property test for disc id shape": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298406496
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298448911
+      }
+    ],
+    "3.5 Write property test for determinism": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298407004
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298449467
+      }
+    ],
+    "3.6 Write property test for the JSON round trip": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298407506
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298450008
+      }
+    ],
+    "3.7 Write property test for diagram geometry, references, and colors": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298452225
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298537813
+      }
+    ],
+    "3.8 Write property test for trivia integrity": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298452784
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298538363
+      }
+    ],
+    "3.9 Write property test for solvable dungeons with no orphans": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298453565
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298536540
+      }
+    ],
+    "3.10 Write property test for sanitization of hostile text": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298454124
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298539120
+      }
+    ],
+    "3.11 Write property test for source attribution": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298454610
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298537018
+      }
+    ],
+    "3.12 Write compiler unit tests": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298539595
+      },
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298585637
+      }
+    ],
+    "3. Compose `compileDisc` and prove its guarantees": [
+      {
+        "executionId": "c2abf339-f90d-4584-ada4-0e5542d16748",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298585689
+      }
+    ],
+    "4. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "03f7d1f4-55e7-4fe9-abb2-9ffa3904ed4c",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298709595
+      },
+      {
+        "executionId": "03f7d1f4-55e7-4fe9-abb2-9ffa3904ed4c",
+        "chatSessionId": "sess_37ceb4ae-9262-4a01-b00d-74fcac1ebd8e",
+        "timestamp": 1795298838277
       }
     ]
   }
