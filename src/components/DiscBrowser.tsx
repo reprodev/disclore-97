@@ -5,6 +5,7 @@ import type { View } from '../model/nav';
 import { BevelButton } from './BevelButton';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
+import { DiscCover } from './DiscCover';
 import { MenuBar } from './MenuBar';
 import { NavToolbar } from './NavToolbar';
 import { PixelIcon } from './PixelIcon';
@@ -138,15 +139,12 @@ export function DiscBrowser({
           />
           <div className="disc-main">
             {main ?? (
-              <div className="disc-welcome">
-                <h2 className="disc-welcome__title">Welcome</h2>
-                <p>
-                  This disc has {disc.sections.length} sections, {disc.diagrams.length}{' '}
-                  {disc.diagrams.length === 1 ? 'diagram' : 'diagrams'}, and {disc.dungeons.length}{' '}
-                  {disc.dungeons.length === 1 ? 'dungeon' : 'dungeons'}.
-                </p>
-                <p>Choose a topic from the contents on the left, or use Find in Disc to search.</p>
-              </div>
+              <DiscCover
+                disc={disc}
+                onOpenArticle={onSelectSection}
+                onOpenDiagram={onSelectDiagram}
+                onOpenKeepMaze={onSelectDungeon}
+              />
             )}
           </div>
         </div>
@@ -155,27 +153,35 @@ export function DiscBrowser({
     );
   };
 
-  return (
-    <div className="disc-browser">
-      <ul className="disc-list" aria-label="Discs">
-        {discs.map((disc) => (
-          <li key={disc.disc_id} className="disc-list-item">
-            <BevelButton
-              className="disc-open"
-              aria-pressed={disc.disc_id === openDiscId}
-              onClick={() => handleOpen(disc.disc_id)}
-            >
-              <PixelIcon name="cd" size={32} />
-              <span className="disc-text">
-                <span className="disc-title">{disc.title}</span>
-                <span className="disc-tagline">{disc.tagline}</span>
-              </span>
-            </BevelButton>
-          </li>
-        ))}
-      </ul>
+  if (open) {
+    return <div className="disc-browser disc-browser--open">{renderOpen(open)}</div>;
+  }
 
-      {open ? renderOpen(open) : null}
+  return (
+    <div className="disc-browser disc-browser--select">
+      <Window title="DiscLore '97 - Select a CD-ROM" className="disc-select-window">
+        <div className="disc-select">
+          <p className="disc-select__prompt">Insert a disc to begin.</p>
+          {discs.length === 0 ? <p className="disc-select__empty">No discs are available.</p> : null}
+          <ul className="disc-list" aria-label="Discs">
+            {discs.map((disc) => (
+              <li key={disc.disc_id} className="disc-list-item">
+                <BevelButton
+                  className="disc-open"
+                  aria-pressed={disc.disc_id === openDiscId}
+                  onClick={() => handleOpen(disc.disc_id)}
+                >
+                  <PixelIcon name="cd" size={32} />
+                  <span className="disc-text">
+                    <span className="disc-title">{disc.title}</span>
+                    <span className="disc-tagline">{disc.tagline}</span>
+                  </span>
+                </BevelButton>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Window>
     </div>
   );
 }

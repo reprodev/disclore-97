@@ -1,10 +1,29 @@
 /* Open-disc workspace: toolbar, breadcrumb, contents sidebar + main pane, status bar. */
 
+.disc-window {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 1120px;
+  box-sizing: border-box;
+}
+
 .disc-window .window-content {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
+}
+
+/* Fixed-height chrome never shrinks, so it stays visible at any window height. */
+.disc-window .window-title-bar,
+.disc-window .window-menubar,
+.nav-toolbar,
+.breadcrumb,
+.status-bar {
+  flex: 0 0 auto;
 }
 
 /* Navigation toolbar */
@@ -90,10 +109,9 @@
 
 /* Sidebar + main pane */
 .disc-workspace {
+  flex: 1 1 auto;
   display: flex;
   gap: 4px;
-  height: 540px;
-  max-height: 64vh;
   padding: 2px;
   min-height: 0;
 }
@@ -121,16 +139,88 @@
   margin: 0 auto;
 }
 
-.disc-welcome {
-  padding: 12px 16px;
+/* Cover page: a 1997 CD-ROM title screen on paper. */
+.disc-cover {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 16px;
+  background: var(--color-parchment);
   font-family: var(--font-serif);
+  color: var(--color-ink);
 }
 
-.disc-welcome__title {
-  margin: 0 0 8px;
+.disc-cover__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 24px 20px;
+  text-align: center;
+  background: var(--color-paper);
+  border: 3px double var(--color-bevel-shadow);
+  outline: 1px solid var(--color-bevel-edge);
+  outline-offset: 2px;
+}
+
+.disc-cover__kicker {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-bevel-shadow);
+}
+
+.disc-cover__title {
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: 1.4em;
+  font-size: 2em;
+  line-height: 1.15;
   color: var(--color-title-bg);
+}
+
+.disc-cover__tagline {
+  margin: 0;
+  max-width: 460px;
+  font-size: 1.05em;
+  font-style: italic;
+  color: var(--color-crimson);
+}
+
+.disc-cover__rule {
+  width: 60%;
+  margin: 8px 0;
+  border: none;
+  border-top: 3px double var(--color-bevel-shadow);
+}
+
+.disc-cover__stats {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.disc-cover__launch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(320px, 100%);
+  margin-top: 10px;
+}
+
+.disc-cover__button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.disc-cover__fine {
+  margin: 10px 0 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-bevel-shadow);
 }
 
 .disc-find {

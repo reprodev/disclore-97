@@ -1,8 +1,36 @@
 .disc-browser {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   font-family: var(--font-ui);
+}
+
+/* No disc open: a centered selection window. */
+.disc-browser--select {
+  align-items: center;
+  justify-content: center;
+}
+
+.disc-select-window {
+  width: min(560px, 100%);
+  max-height: 100%;
+}
+
+.disc-select {
+  padding: 10px;
+  overflow: auto;
+}
+
+.disc-select__prompt,
+.disc-select__empty {
+  margin: 0 0 8px;
+  font-size: 12px;
+}
+
+/* Disc open: the disc window fills the workspace. */
+.disc-browser--open {
+  align-items: center;
 }
 
 .disc-list,

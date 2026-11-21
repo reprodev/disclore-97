@@ -5,7 +5,8 @@ import '../styles/window.css';
 
 export interface WindowProps {
   title: string;
-  onClose: () => void;
+  /** When omitted, the title bar has no close button. */
+  onClose?: () => void;
   menuBar?: ReactNode;
   children?: ReactNode;
   className?: string;

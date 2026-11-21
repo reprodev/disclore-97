@@ -1,22 +1,36 @@
-body {
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+body {
   background: var(--color-desktop);
 }
 
+/* The desktop is exactly one viewport tall. The workspace takes the space above the taskbar. */
 .desktop {
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
   box-sizing: border-box;
-  padding: 12px 12px 48px;
+  overflow: hidden;
   background: var(--color-desktop);
 }
 
 .desktop__work {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 1040px;
+  gap: 6px;
+  box-sizing: border-box;
+  padding: 8px 8px 6px;
+  overflow: hidden;
 }
-
 .app-not-found {
   margin: 0;
   padding: 4px 8px;
@@ -32,25 +46,32 @@ body {
   image-rendering: pixelated;
 }
 
-/* CD-ROM spin-up progress bar: 16 navy blocks that fill in, then the bar collapses. */
+/* CD-ROM spin-up progress bar: compact single row of 16 navy blocks, then it collapses to zero height. */
 .spinup {
+  flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  height: 40px;
-  margin: 2px 2px 4px;
-  padding: 3px 6px;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 24px;
+  margin: 0 2px;
+  padding: 2px 6px;
   overflow: hidden;
   font-family: var(--font-ui);
   font-size: 11px;
   color: var(--color-bevel-edge);
   background: var(--color-surface);
-  border: var(--bevel-w) solid;
+  border: 1px solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
   animation: spinup-hide 2.2s steps(1, end) forwards;
 }
 
+.spinup > span {
+  white-space: nowrap;
+}
+
 .spinup__track {
+  flex: 1 1 auto;
   display: flex;
   gap: 2px;
   padding: 2px;
@@ -61,7 +82,7 @@ body {
 
 .spinup__block {
   flex: 1 1 0;
-  height: 10px;
+  height: 8px;
   visibility: hidden;
   background: var(--color-title-bg);
   animation: spinup-block 0.01s steps(1, end) both;
@@ -73,10 +94,11 @@ body {
   }
 }
 
+/* End state: zero height, no border, and a negative bottom margin that cancels the parent's flex gap. */
 @keyframes spinup-hide {
   to {
     height: 0;
-    margin: 0;
+    margin: 0 2px -2px;
     padding: 0;
     border-width: 0;
     visibility: hidden;
@@ -85,11 +107,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .spinup {
-    animation: none;
-  }
-
-  .spinup__block {
-    animation: none;
-    visibility: visible;
+    display: none;
   }
 }
