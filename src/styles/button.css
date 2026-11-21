@@ -1,0 +1,27 @@
+.bevel-button {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-bevel-edge);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  box-shadow: none;
+  padding: 4px 12px;
+  min-width: 75px;
+  cursor: default;
+}
+
+.bevel-button:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+.bevel-button[data-pressed="true"] {
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+  padding: 5px 11px 3px 13px;
+}
+
+.bevel-button:disabled {
+  color: var(--color-bevel-shadow);
+  text-shadow: 1px 1px 0 var(--color-bevel-hi);
+}

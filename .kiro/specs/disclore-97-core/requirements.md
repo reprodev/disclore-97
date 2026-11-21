@@ -103,6 +103,9 @@ This spec covers the core: repository hygiene and design tokens, the `DiscManife
 11. IF the Maze_Solver finds one or more Orphan_Rooms, THEN THE Manifest_Validator SHALL return an orphan-room error listing each Orphan_Room identifier.
 12. WHEN the App receives a manifest from any source other than the pre-baked discs, THE App SHALL pass the manifest through the Manifest_Validator before rendering and display the error list in place of the disc when validation fails.
 13. FOR ALL valid DiscManifest values, serializing to JSON, parsing, and validating SHALL produce a DiscManifest deep-equal to the original (round-trip property).
+14. THE App SHALL accept a manifest from outside the pre-baked discs only through the `loadDisc` function. This spec provides no file-picker, paste, or URL import interface, and the source of such a manifest is limited to code and tests that call `loadDisc`.
+15. THE Manifest_Validator SHALL set on each error a `code` field naming the error kind (`missing-field`, `wrong-type`, `duplicate-id`, `coordinate-range`, `dangling-reference`, `index-range`, `missing-room`, `unsolvable-dungeon`, or `orphan-room`), so that callers and tests can identify the error kind without parsing the message.
+16. THE Diagram shape descriptors SHALL be one of `rect`, `circle`, `line`, or `polygon`, each with numeric geometry fields and optional `fill` and `stroke` strings, and THE Manifest_Validator SHALL return a `wrong-type` error for any other shape kind.
 
 ### Requirement 6: Pre-Baked Discs
 
@@ -168,6 +171,9 @@ This spec covers the core: repository hygiene and design tokens, the `DiscManife
 11. WHEN the pointer rests on or keyboard focus enters a target element with tooltip text, THE Tooltip component SHALL display the text on the tooltip fill color with a 1px solid outer-edge border.
 12. WHEN the pointer leaves or focus leaves the target element, THE Tooltip component SHALL hide the text.
 13. THE Win95_Components SHALL be operable by keyboard and expose accessible roles and names for buttons, menus, and windows.
+14. WHILE a menu is open, THE MenuBar component SHALL move focus between items with the Up and Down arrow keys and between top-level menus with the Left and Right arrow keys.
+15. WHEN a Win95_Components control has keyboard focus, THE Win95_Components SHALL display a visible focus indicator built from Design_Tokens.
+16. WHEN the pointer enters or focus enters a Tooltip target, THE Tooltip component SHALL display the text without a delay.
 
 ### Requirement 10: Disc Browser and Article Viewer
 
@@ -206,6 +212,11 @@ This spec covers the core: repository hygiene and design tokens, the `DiscManife
 5. WHEN the player enters the Throne_Room, THE KeepMaze_UI SHALL display a victory message with the number of moves taken and the number of incorrect answers.
 6. WHEN the player activates the restart control, THE KeepMaze_UI SHALL return the player to the Entrance and reset the move and incorrect-answer counts to 0.
 7. THE KeepMaze_UI SHALL present Trivia_Questions in an order that avoids repeating a question until all questions of the disc have been presented.
+8. WHEN the player selects an Exit, THE KeepMaze_UI SHALL draw exactly one Trivia_Question for that selection, and the Exit SHALL remain locked until that question is answered correctly.
+9. WHEN the player selects an incorrect answer, THE KeepMaze_UI SHALL close the question without counting a move, and selecting the same Exit again SHALL draw the next question in the order defined by criterion 7.
+10. THE KeepMaze_UI SHALL count a move only when the player passes through an Exit after a correct answer.
+11. WHEN all Trivia_Questions of the disc have been presented, THE KeepMaze_UI SHALL start a new cycle through them, so a disc with fewer questions than Exits remains playable.
+12. IF the disc has no Trivia_Questions, THEN THE KeepMaze_UI SHALL disable the start control and display a message that the dungeon needs trivia questions.
 
 ### Requirement 13: Procedural Audio Module
 
@@ -223,3 +234,5 @@ This spec covers the core: repository hygiene and design tokens, the `DiscManife
 8. WHEN the user activates the Mute_Toggle, THE Audio_Module SHALL switch between muted and unmuted states and the App SHALL display the current state in a control reachable from every screen.
 9. WHEN the Mute_Toggle is enabled during playback of a Sound_Effect, THE Audio_Module SHALL silence that Sound_Effect within 50 ms.
 10. THE Audio_Module SHALL expose a function for each Sound_Effect so that components call the Audio_Module and construct no audio nodes themselves.
+11. THE Audio_Module SHALL start each App session unmuted, and THE App SHALL NOT persist the mute state across page reloads.
+12. WHEN the Mute_Toggle is enabled during playback, THE Audio_Module SHALL set master gain to 0 and stop all active nodes synchronously, which satisfies the 50 ms limit of criterion 9 and can be verified without timing measurement.

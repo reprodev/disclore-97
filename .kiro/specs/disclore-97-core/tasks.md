@@ -179,23 +179,32 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/discs.test.ts`: for each disc, `validateManifest` returns zero errors, every hotspot is in `0..100` and references an existing section, every trivia question cites an existing section, every dungeon has a BFS path from `entrance` to `throne_room` and zero orphans, content minimums hold, and `loadDisc` rejects an invalid non-pre-baked manifest with errors
     - _Requirements: 5.12, 6.3, 6.4, 8.1, 8.2, 8.3_
 
-- [ ] 8. Build the Win95 component set
-  - [ ] 8.1 Implement Window, TitleBar, and BevelButton
+- [x] 8. Build the Win95 component set
+  - [x] 8.1 Implement Window, TitleBar, and BevelButton
     - `src/components/Window.tsx` (`role="dialog"`, `aria-labelledby`, optional MenuBar slot, outset bevel content area), `TitleBar.tsx` (navy bar, white title text, close button with `aria-label="Close"` that calls `onClose`), and `BevelButton.tsx` (native `<button>`, outset when resting, inset when pressed, calls `playClick()` then `onClick`, ignores activation and uses the shadow color when disabled)
     - Put component styles in `src/styles/window.css` and `src/styles/button.css`, using only token variables
-    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.13_
+    - Show a visible focus indicator on the button and close button using token variables
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.13, 9.15_
 
-  - [ ] 8.2 Implement MenuBar
+  - [x] 8.2 Implement MenuBar
     - `src/components/MenuBar.tsx` with `role="menubar"`, `menu`, and `menuitem`, the sans-serif token, arrow-key navigation, Enter and Space activation, item callback then close, and Escape to close. Styles in `src/styles/menubar.css`
-    - _Requirements: 9.8, 9.9, 9.10, 9.13_
+    - Arrow keys: Up and Down move between items, Left and Right move between top-level menus (Requirement 9.14)
+    - _Requirements: 9.8, 9.9, 9.10, 9.13, 9.14, 9.15_
 
-  - [ ] 8.3 Implement Tooltip
+  - [x] 8.3 Implement Tooltip
     - `src/components/Tooltip.tsx` showing on `pointerenter` and `focus`, hiding on `pointerleave` and `blur`, with `aria-describedby`, tooltip fill, and a 1px solid outer-edge border. Styles in `src/styles/tooltip.css`
-    - _Requirements: 9.11, 9.12, 9.13_
+    - Display with no delay
+    - _Requirements: 9.11, 9.12, 9.13, 9.16_
 
-  - [ ]* 8.4 Write Win95 component tests
+  - [x] 8.4 Write Win95 component tests
     - Create `tests/components/win95.test.tsx`: Window close callback, BevelButton pressed and disabled behavior and click sound request (mocked audio module), MenuBar item selection and Escape, Tooltip show and hide on pointer and focus, roles, names, and keyboard operation
     - _Requirements: 9.3, 9.5, 9.6, 9.7, 9.9, 9.10, 9.11, 9.12, 9.13_
+
+  - [x] 8.5 Add stylesheet and keyboard-navigation checks for the Win95 components
+    - Extend `tests/components/win95.test.tsx` or add `tests/components/win95-styles.test.ts`. Read `button.css`, `window.css`, `menubar.css`, and `tooltip.css` as text and assert: they use only `var(--...)` for colors, the disabled button rule uses the bevel shadow token, `menubar.css` uses the sans-serif font token, the tooltip rule uses the tooltip fill token and `1px solid` with the outer-edge token, and each interactive component has a `:focus-visible` rule built from tokens
+    - Add MenuBar tests for ArrowUp/ArrowDown item movement with wrap, ArrowLeft/ArrowRight menu switching, and Space activation. Add a Tooltip test that the text shows synchronously on `pointerenter` (no timer)
+    - If a check fails, fix the component or stylesheet minimally
+    - _Requirements: 9.4, 9.7, 9.8, 9.11, 9.14, 9.15, 9.16_
 
 - [ ] 9. Build the viewers and game UI
   - [ ] 9.1 Implement DiscBrowser and ArticleViewer
@@ -208,27 +217,27 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
   - [ ] 9.3 Implement KeepMazeUI
-    - `KeepMazeUI.tsx` using `gameReducer` and the question queue. HUD in the sans-serif token with room name, description, exits, moves, and incorrect count. Show the pending question, call `playTorch()` on room entry and `playDoorUnlock()` on a correct answer. On a wrong answer show the cited section title and a link that opens it in the Article_Viewer. Show the victory message with moves and incorrect count, and a restart control. Disable Start with a message when the disc has no trivia questions
-    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7_
+    - `KeepMazeUI.tsx` using `gameReducer` and the question queue. HUD in the sans-serif token with room name, description, exits, moves, and incorrect count. Show the pending question, call `playTorch()` on room entry and `playDoorUnlock()` on a correct answer. On a wrong answer show the cited section title and a link that opens it in the Article_Viewer. Show the victory message with moves and incorrect count, and a restart control. Each exit selection draws one question and the exit stays locked until answered correctly. A wrong answer closes the question with no move counted, and selecting the exit again draws the next question. The queue cycles when exhausted, so discs with fewer questions than exits still play. Disable Start with a message when the disc has no trivia questions
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 12.10, 12.11, 12.12_
 
   - [ ] 9.4 Implement MuteToggle and ErrorList
-    - `MuteToggle.tsx`: a BevelButton with `aria-pressed` bound to `subscribeMuted`/`toggleMuted`, showing the current state
+    - MuteToggle.tsx: a BevelButton with `aria-pressed` bound to `subscribeMuted`/`toggleMuted`, showing the current state. The App starts unmuted and does not persist the state
     - `ErrorList.tsx`: renders `path: message` for each `ValidationError`
-    - _Requirements: 5.12, 13.8_
+    - _Requirements: 5.12, 5.15, 13.8, 13.11_
 
-  - [ ]* 9.5 Write viewer and game UI component tests
-    - Create `tests/components/viewers.test.tsx`: DiscBrowser listing and spin-up request, ArticleViewer scroll reset and not-found message, HotspotViewer tooltip and navigation, KeepMazeUI flow (correct answer, wrong answer with section link, victory counts, restart), MuteToggle state display, ErrorList output
-    - _Requirements: 5.12, 10.1, 10.2, 10.4, 10.5, 10.6, 11.3, 11.4, 12.1, 12.3, 12.4, 12.5, 12.6, 13.8_
+  - [ ] 9.5 Write viewer and game UI component tests
+    - Create `tests/components/viewers.test.tsx`: DiscBrowser listing and spin-up request, ArticleViewer scroll reset and not-found message, HotspotViewer tooltip and navigation, KeepMazeUI flow (correct answer, wrong answer with section link and no move counted, retry draws the next question, victory counts, restart, no-trivia disabled start), MuteToggle state display, ErrorList output
+    - _Requirements: 5.12, 10.1, 10.2, 10.4, 10.5, 10.6, 11.3, 11.4, 12.1, 12.3, 12.4, 12.5, 12.6, 12.8, 12.9, 12.10, 12.12, 13.8_
 
 - [ ] 10. Wire the App together
   - [ ] 10.1 Implement `App.tsx` and `main.tsx`
     - `App` holds `{ discId, view }` with views `section`, `diagram`, and `keepmaze`, and a `selectSection` that leaves the state unchanged and reports not-found for unknown ids
-    - Render DiscBrowser, the Window with ArticleViewer, HotspotViewer, or KeepMazeUI, and MuteToggle in the shell so it shows on every screen. Pass hotspot and wrong-answer section links to section navigation. Load pre-baked discs through `loadDisc` and show `ErrorList` in place of any disc that fails validation
-    - _Requirements: 5.12, 10.2, 10.3, 10.4, 10.6, 11.4, 12.4, 13.8_
+    - Render DiscBrowser, the Window with ArticleViewer, HotspotViewer, or KeepMazeUI, and MuteToggle in the shell so it shows on every screen. Pass hotspot and wrong-answer section links to section navigation. Load every disc through `loadDisc` (no import UI in this spec; Requirement 5.14) and show `ErrorList` in place of any disc that fails validation
+    - _Requirements: 5.12, 5.14, 10.2, 10.3, 10.4, 10.6, 11.4, 12.4, 13.8, 13.11_
 
   - [ ]* 10.2 Write App integration tests
-    - Create `tests/components/app.test.tsx`: open a disc, read a section, follow a hotspot, play a KeepMaze round to victory, toggle mute and confirm no audio nodes on a mock context, and render ErrorList for an invalid injected manifest
-    - _Requirements: 5.12, 10.2, 10.4, 11.4, 12.5, 13.7, 13.8_
+    - Create `tests/components/app.test.tsx`: open a disc, read a section, follow a hotspot, play a KeepMaze round to victory, confirm the session starts unmuted, toggle mute and confirm no audio nodes on a mock context, and render ErrorList for an invalid injected manifest
+    - _Requirements: 5.12, 10.2, 10.4, 11.4, 12.5, 13.7, 13.8, 13.11_
 
 - [ ] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
@@ -255,7 +264,7 @@ Property tests live under `tests/properties/` with one file per property, and ea
     { "id": 4, "tasks": ["3.3", "3.4", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "5.4", "5.5", "5.6"] },
     { "id": 5, "tasks": ["6"] },
     { "id": 6, "tasks": ["7.1", "7.2", "8.1", "8.2", "8.3"] },
-    { "id": 7, "tasks": ["7.3", "8.4", "9.2", "9.3", "9.4"] },
+    { "id": 7, "tasks": ["7.3", "8.4", "8.5", "9.2", "9.3", "9.4"] },
     { "id": 8, "tasks": ["7.4", "9.1"] },
     { "id": 9, "tasks": ["9.5", "10.1"] },
     { "id": 10, "tasks": ["10.2"] },

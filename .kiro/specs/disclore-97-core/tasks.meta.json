@@ -511,6 +511,73 @@
         "chatSessionId": "sess_2ce42f3e-2e5a-4187-aa62-a83504648ee9",
         "timestamp": 1795281568445
       }
+    ],
+    "8.1 Implement Window, TitleBar, and BevelButton": [
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795281844781
+      },
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282297583
+      }
+    ],
+    "8.2 Implement MenuBar": [
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795281845115
+      },
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282298204
+      }
+    ],
+    "8.3 Implement Tooltip": [
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795281845242
+      },
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282298588
+      }
+    ],
+    "8.4 Write Win95 component tests": [
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282300365
+      },
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282394706
+      }
+    ],
+    "8. Build the Win95 component set": [
+      {
+        "executionId": "9da46c11-ee28-445e-9653-633baffd42fa",
+        "chatSessionId": "sess_4a17d9a9-ec97-4be3-b0d8-18f22e6fb5e7",
+        "timestamp": 1795282394744
+      }
+    ],
+    "8.5 Add stylesheet and keyboard-navigation checks for the Win95 components": [
+      {
+        "executionId": "9246c8d7-193e-44a7-9cab-bd7770e7d8ad",
+        "chatSessionId": "sess_24ce1bbf-f034-49e9-9a68-fb4cf91c1f62",
+        "timestamp": 1795282655009
+      },
+      {
+        "executionId": "9246c8d7-193e-44a7-9cab-bd7770e7d8ad",
+        "chatSessionId": "sess_24ce1bbf-f034-49e9-9a68-fb4cf91c1f62",
+        "timestamp": 1795282698720
+      }
     ]
   }
 }

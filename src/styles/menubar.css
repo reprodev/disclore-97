@@ -1,0 +1,67 @@
+.menubar {
+  display: flex;
+  background: var(--color-surface);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  border-bottom: 1px solid var(--color-bevel-shadow);
+  border-radius: 0;
+}
+
+.menubar__entry {
+  position: relative;
+}
+
+.menubar__top {
+  font: inherit;
+  color: var(--color-bevel-edge);
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface);
+  border-radius: 0;
+  padding: 2px 8px;
+  cursor: default;
+}
+
+.menubar__top:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -3px;
+}
+.menubar__item:focus-visible {
+  outline: 1px dotted var(--color-title-text);
+  outline-offset: -2px;
+}
+.menubar__top:hover {
+  border-color: var(--color-bevel-hi) var(--color-bevel-shadow) var(--color-bevel-shadow) var(--color-bevel-hi);
+}
+
+.menubar__top[aria-expanded='true'] {
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.menubar__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  min-width: 140px;
+  padding: 2px;
+  background: var(--color-surface);
+  font-family: var(--font-ui);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.menubar__item {
+  padding: 3px 20px 3px 12px;
+  color: var(--color-bevel-edge);
+  white-space: nowrap;
+  cursor: default;
+  outline: none;
+}
+
+.menubar__item:hover,
+.menubar__item:focus {
+  background: var(--color-title-bg);
+  color: var(--color-title-text);
+}
