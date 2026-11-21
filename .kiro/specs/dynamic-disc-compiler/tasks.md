@@ -67,57 +67,57 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Import only `source.ts`, `manifest.ts`, and `compile/*`. Do not import `validate.ts`, and use no `Math.random`, `Date`, or browser global
     - _Requirements: 2.1, 2.10, 2.11, 6.1, 6.4, 6.5, 6.6, 7.1, 7.2, 7.3, 15.10_
 
-  - [ ]* 3.2 Write property test for compiled discs always validating
+  - [ ] 3.2 Write property test for compiled discs always validating
     - Create `tests/properties/dc01-validity.test.ts` with `numRuns: 200`, using `arbExtractedSource`, `arbThinSource`, and `arbHostileSource` and the existing `validateManifest`
     - **Property 1: Compiled discs always validate**
     - **Validates: Requirements 2.11, 6.1, 17.2**
 
-  - [ ]* 3.3 Write property test for structural minimums and limits
+  - [ ] 3.3 Write property test for structural minimums and limits
     - Create `tests/properties/dc02-structure.test.ts` with `numRuns: 200`
     - **Property 2: Structural minimums and limits**
     - **Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.8, 2.9, 4.1, 5.1, 7.3, 17.4**
 
-  - [ ]* 3.4 Write property test for disc id shape
+  - [ ] 3.4 Write property test for disc id shape
     - Create `tests/properties/dc03-disc-id.test.ts` and compare against the ids of `castles` and `retro-dialup`
     - **Property 3: Disc id shape**
     - **Validates: Requirements 2.7, 15.10**
 
-  - [ ]* 3.5 Write property test for determinism
+  - [ ] 3.5 Write property test for determinism
     - Create `tests/properties/dc04-determinism.test.ts` comparing two compiles and a compile of a deep copy
     - **Property 4: Determinism**
     - **Validates: Requirements 2.10, 5.8, 17.7**
 
-  - [ ]* 3.6 Write property test for the JSON round trip
+  - [ ] 3.6 Write property test for the JSON round trip
     - Create `tests/properties/dc05-json-roundtrip.test.ts` with a deep scan for `undefined`
     - **Property 5: JSON round trip**
     - **Validates: Requirements 6.4, 17.9**
 
-  - [ ]* 3.7 Write property test for diagram geometry, references, and colors
+  - [ ] 3.7 Write property test for diagram geometry, references, and colors
     - Create `tests/properties/dc06-diagram.test.ts`, loading defined color names from `src/styles/tokens.css`
     - **Property 6: Diagram geometry, references, and colors**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 7.5, 17.5**
 
-  - [ ]* 3.8 Write property test for trivia integrity
+  - [ ] 3.8 Write property test for trivia integrity
     - Create `tests/properties/dc07-trivia.test.ts`
     - **Property 7: Trivia integrity**
     - **Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 17.5**
 
-  - [ ]* 3.9 Write property test for solvable dungeons with no orphans
+  - [ ] 3.9 Write property test for solvable dungeons with no orphans
     - Create `tests/properties/dc08-dungeon.test.ts` using the existing `solveDungeon`
     - **Property 8: Dungeons are solvable with no orphans**
     - **Validates: Requirements 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 17.6**
 
-  - [ ]* 3.10 Write property test for sanitization of hostile text
+  - [ ] 3.10 Write property test for sanitization of hostile text
     - Create `tests/properties/dc09-sanitize.test.ts` using `arbHostileSource`
     - **Property 9: Sanitization of hostile text**
     - **Validates: Requirements 7.1, 7.2, 7.3, 7.6, 7.8, 17.8**
 
-  - [ ]* 3.11 Write property test for source attribution
+  - [ ] 3.11 Write property test for source attribution
     - Create `tests/properties/dc10-attribution.test.ts`
     - **Property 10: Source attribution**
     - **Validates: Requirements 2.12, 7.7**
 
-  - [ ]* 3.12 Write compiler unit tests
+  - [ ] 3.12 Write compiler unit tests
     - Create `tests/compiler/compiler.test.ts`: a fixed small source with key-field snapshot checks, the empty source, a source with more than 12 headings, the hotspot-to-section modulo mapping, and every `ALLOWED_TOKENS` name defined in `tokens.css`
     - _Requirements: 2.1, 2.5, 2.6, 3.6, 3.9, 7.5_
 
@@ -130,22 +130,22 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Perform no network access, throw nothing, and import nothing from React or browser globals
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 1.10_
 
-  - [ ]* 5.2 Write property test for GitHub URL classification
+  - [ ] 5.2 Write property test for GitHub URL classification
     - Create `tests/properties/dc11-github-url.test.ts` using `arbGithubUrl`
     - **Property 11: GitHub URL classification**
     - **Validates: Requirements 1.1, 1.8**
 
-  - [ ]* 5.3 Write property test for classification partition, trim invariance, and purity
+  - [ ] 5.3 Write property test for classification partition, trim invariance, and purity
     - Create `tests/properties/dc12-classification.test.ts` and stub `globalThis.fetch` to fail the test if called
     - **Property 12: Classification partition, trim invariance, and purity**
     - **Validates: Requirements 1.2, 1.3, 1.4, 1.9, 1.10**
 
-  - [ ]* 5.4 Write property test for input error codes
+  - [ ] 5.4 Write property test for input error codes
     - Create `tests/properties/dc13-input-errors.test.ts`
     - **Property 13: Input error codes**
     - **Validates: Requirements 1.5, 1.6, 1.7**
 
-  - [ ]* 5.5 Write parser unit tests
+  - [ ] 5.5 Write parser unit tests
     - Create `tests/compiler/sourceInput.test.ts`: each kind, each error code, `www.`, `.git`, sub-path, `Rust: a language` stays a topic, `javascript:alert(1)` is `unsupported-scheme`, `https://github.com/owner` is `invalid-github-url`, and `http://` falls back to topic
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 17.10_
 
@@ -162,16 +162,16 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Perform no network access
     - _Requirements: 11.1, 11.2, 11.5, 11.6, 11.7, 7.8_
 
-  - [ ]* 6.3 Write property test for fallback validity
+  - [ ] 6.3 Write property test for fallback validity
     - Create `tests/properties/dc20-fallback.test.ts` running `parseInput`, the fallback adapter, and `compileDisc` on `arbMarkdown` and `arbTopic`, with planted fenced code, HTML block, and image markers that must not reach the paragraphs
     - **Property 20: Markdown and topic fallback produces valid discs**
     - **Validates: Requirements 11.6, 11.7, 17.3**
 
-  - [ ]* 6.4 Write fallback unit tests
+  - [ ] 6.4 Write fallback unit tests
     - Create `tests/adapters/markdown.test.ts`: heading levels, lists, tables, fences, images, empty input, and a 20000-character input that finishes under 50 ms (best of three runs)
     - _Requirements: 11.1, 11.2, 11.5, 11.6_
 
-  - [ ]* 6.5 Write error message unit tests
+  - [ ] 6.5 Write error message unit tests
     - Create `tests/adapters/errors.test.ts`: for every `BurnErrorCode` the message is non-empty and contains no `<` or `>`, and `FALLBACK_CODES` matches the six codes of Requirement 11.3
     - _Requirements: 11.3, 14.2, 14.6_
 
@@ -182,12 +182,12 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - `decodeReadme` decodes base64 to bytes and UTF-8 text, limited to 100000 characters. Take README headings and paragraphs through `parseMarkdown`. Fetch no URL found in the README
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10, 8.11, 8.12_
 
-  - [ ]* 7.2 Write property test for README decoding
+  - [ ] 7.2 Write property test for README decoding
     - Create `tests/properties/dc21-readme-decode.test.ts` with `// @vitest-environment node`
     - **Property 21: README decoding round trip and limit**
     - **Validates: Requirements 8.3, 8.12**
 
-  - [ ]* 7.3 Write GitHub adapter unit tests
+  - [ ] 7.3 Write GitHub adapter unit tests
     - Create `tests/adapters/github.test.ts` with an injected `fetch`: success with all three responses, README missing, non-base64 README encoding, `repo-not-found`, `rate-limited` for 403 and 429, timeout with fake timers, network failure, cancel, every recorded URL starts with `https://api.github.com/`, and no `Authorization` header
     - _Requirements: 8.1, 8.2, 8.4, 8.6, 8.7, 8.8, 8.9, 8.10, 8.11, 17.14_
 
@@ -197,27 +197,27 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Perform no network access and import nothing outside `src/extract`
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.11, 10.12_
 
-  - [ ]* 8.2 Write property test for blocked IPv4 in every notation
+  - [ ] 8.2 Write property test for blocked IPv4 in every notation
     - Create `tests/properties/dc14-ssrf-ipv4.test.ts`
     - **Property 14: SSRF guard blocks private IPv4 in every notation**
     - **Validates: Requirements 10.3, 10.5, 17.13**
 
-  - [ ]* 8.3 Write property test for private and mapped IPv6
+  - [ ] 8.3 Write property test for private and mapped IPv6
     - Create `tests/properties/dc15-ssrf-ipv6.test.ts`
     - **Property 15: SSRF guard blocks private and mapped IPv6**
     - **Validates: Requirements 10.4**
 
-  - [ ]* 8.4 Write property test for scheme, credentials, and ports
+  - [ ] 8.4 Write property test for scheme, credentials, and ports
     - Create `tests/properties/dc16-ssrf-scheme-port.test.ts`
     - **Property 16: SSRF guard rejects bad scheme, credentials, and ports**
     - **Validates: Requirements 10.1, 10.6, 10.7**
 
-  - [ ]* 8.5 Write property test for permitted public hostnames
+  - [ ] 8.5 Write property test for permitted public hostnames
     - Create `tests/properties/dc17-ssrf-public.test.ts`
     - **Property 17: SSRF guard permits public hostnames**
     - **Validates: Requirements 10.12**
 
-  - [ ]* 8.6 Write SSRF guard unit tests
+  - [ ] 8.6 Write SSRF guard unit tests
     - Create `tests/extract/ssrf.test.ts`: `localhost`, `LOCALHOST.`, `a.localhost`, `printer.local`, `db.internal`, one-label names, each private IPv4 range at both ends, `255.255.255.255`, `::1`, `::`, `fd00::1`, `fe80::1`, `::ffff:127.0.0.1`, `::ffff:7f00:1`, `2130706433`, `0x7f000001`, `0177.0.0.1`, `127.1`, credentials, ports 22 and 8080, `ftp:`, `file:`, `nip.io` names, and `https://example.com`
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.12, 17.12_
 
@@ -226,17 +226,17 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Return empty lists for input with no extractable content and never throw
     - _Requirements: 9.2, 9.3, 9.4, 9.5_
 
-  - [ ]* 8.8 Write property test for HTML extraction round trip
+  - [ ] 8.8 Write property test for HTML extraction round trip
     - Create `tests/properties/dc18-html-roundtrip.test.ts` using `arbHtmlDoc`
     - **Property 18: HTML extraction round trip**
     - **Validates: Requirements 9.2**
 
-  - [ ]* 8.9 Write property test for discards, limits, and totality
+  - [ ] 8.9 Write property test for discards, limits, and totality
     - Create `tests/properties/dc19-html-discard.test.ts` using marker text and arbitrary strings
     - **Property 19: HTML extraction discards, limits, and totality**
     - **Validates: Requirements 9.3, 9.4, 9.5**
 
-  - [ ]* 8.10 Write HTML extractor unit tests
+  - [ ] 8.10 Write HTML extractor unit tests
     - Create `tests/extract/htmlExtract.test.ts`: title, `h1` to `h3`, paragraphs, named, decimal, hex, invalid, and double-encoded entities, discarded elements, comments, unterminated tags, `>` inside attribute values, limits of 12 and 40, and no content
     - _Requirements: 9.2, 9.3, 9.4, 9.5, 17.11_
 
@@ -251,7 +251,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Add `"functions"` to the `include` array of `tsconfig.json` so `npm run build` type-checks it, and confirm the app builds with `functions/` absent from the deployment
     - _Requirements: 9.1, 9.10, 9.11, 9.13_
 
-  - [ ]* 8.13 Write handler unit tests
+  - [ ] 8.13 Write handler unit tests
     - Create `tests/extract/handler.test.ts` with an injected upstream `fetch`: 400, 403 for the initial URL and after a redirect, 405 for `POST`, `PUT`, `DELETE`, and `HEAD`, 200, 415, 502, 504, a 3-redirect chain succeeding and a 4-redirect chain failing, a body over 1 MiB, the mock `fetch` never called for a rejected URL, and upstream headers with a `User-Agent` and no `Cookie`
     - _Requirements: 9.1, 9.6, 9.7, 9.8, 9.9, 9.10, 9.12, 10.8, 10.9, 10.10, 17.15_
 
@@ -261,12 +261,12 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Map HTTP 404 or a non-JSON body (including an SPA `index.html` with status 200) to `unavailable`, an error status with a JSON error body to `fetch-failed` carrying the sanitized message, a wrong shape to `fetch-failed`, deadline to `timeout`, and outer abort to `cancelled`. Validate string `title` and string-list `headings` and `paragraphs`, keep at most 12 headings and 40 paragraphs, and build `ExtractedSource` with kind `webpage` and the final `url`
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7_
 
-  - [ ]* 9.2 Write property test for webpage response shape validation
+  - [ ] 9.2 Write property test for webpage response shape validation
     - Create `tests/properties/dc22-webpage-shape.test.ts` using `arbWebpageJson`
     - **Property 22: Webpage response shape validation**
     - **Validates: Requirements 12.3, 12.6**
 
-  - [ ]* 9.3 Write webpage adapter unit tests
+  - [ ] 9.3 Write webpage adapter unit tests
     - Create `tests/adapters/webpage.test.ts`: request URL and encoding, success, 404, SPA `index.html` with status 200, error JSON, wrong shape, and timeout with fake timers
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 17.14_
 
@@ -279,12 +279,12 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - On `ok: false` return `{ code: 'validation-failed', validation: errors }`. Wrap the whole body in `try`: adapter exceptions become `fetch-failed` and compiler exceptions become `validation-failed`. Return `cancelled` when `signal.aborted` after any `await`. Attach `fallbackTopic` (repo name or page host) to errors in `FALLBACK_CODES`. All messages come from `ERROR_MESSAGES` and contain no angle brackets
     - _Requirements: 6.2, 6.3, 11.3, 11.4, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6_
 
-  - [ ]* 11.2 Write property test for burn never throwing and never yielding an invalid disc
+  - [ ] 11.2 Write property test for burn never throwing and never yielding an invalid disc
     - Create `tests/properties/dc23-burn-total.test.ts` with `// @vitest-environment node`, arbitrary input strings, and `arbFetchBehavior`
     - **Property 23: Burn never throws and never yields an invalid disc**
     - **Validates: Requirements 6.3, 14.5**
 
-  - [ ]* 11.3 Write burn orchestrator unit tests
+  - [ ] 11.3 Write burn orchestrator unit tests
     - Create `tests/adapters/burn.test.ts`: `loadDisc` is called with `prebaked` equal to `false` (spy), a manifest that fails validation yields `validation-failed` with the error list and mounts nothing, an adapter that throws yields `fetch-failed`, cancel yields `cancelled`, each fallback code carries `fallbackTopic`, `burnFallback` produces a valid disc, and `markdown` and `topic` inputs make no `fetch` call
     - _Requirements: 6.2, 6.3, 11.3, 11.4, 14.3, 14.4, 14.5_
 
@@ -294,17 +294,17 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - `save` replaces a same-id disc, keeps at most 10 discs by evicting the oldest, and on a quota error evicts the oldest and retries once. `load` runs every stored manifest through `loadDisc(m, false)`, skips and removes values that are not valid JSON, not a version 1 envelope, or invalid. `remove(disc_id)` deletes one disc. Every call is wrapped so a throwing `Storage` never escapes. Store only manifests
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 15.7, 15.8, 15.9_
 
-  - [ ]* 12.2 Write property test for library round trip, capacity, and replacement
+  - [ ] 12.2 Write property test for library round trip, capacity, and replacement
     - Create `tests/properties/dc24-library-roundtrip.test.ts` with an in-memory `Storage` fake and compiled manifests
     - **Property 24: Library round trip, capacity, and replacement**
     - **Validates: Requirements 15.2, 15.8, 15.9**
 
-  - [ ]* 12.3 Write property test for corrupt entries
+  - [ ] 12.3 Write property test for corrupt entries
     - Create `tests/properties/dc25-library-corrupt.test.ts`
     - **Property 25: Library skips and removes corrupt entries**
     - **Validates: Requirements 15.4**
 
-  - [ ]* 12.4 Write library unit tests
+  - [ ] 12.4 Write library unit tests
     - Create `tests/library/discLibrary.test.ts`: key prefix and envelope shape, a `Storage` fake that throws on every method, a fake that throws a quota error only on `setItem`, remove, and no tokens or credentials in stored values
     - _Requirements: 15.1, 15.2, 15.4, 15.5, 15.6, 15.7, 17.17_
 
@@ -331,7 +331,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Request button clicks through the Audio_Module only, render all text as React text, and use no `dangerouslySetInnerHTML` or `innerHTML`
     - _Requirements: 6.3, 7.4, 11.3, 11.4, 13.1, 13.6, 13.7, 13.8, 13.9, 13.10, 13.11, 13.12, 13.13, 13.14, 13.15, 13.16, 14.1, 14.2, 14.3, 14.4, 14.6, 14.7, 16.3, 16.9_
 
-  - [ ]* 14.4 Write Burn dialog component tests
+  - [ ] 14.4 Write Burn dialog component tests
     - Create `tests/components/burn.test.tsx` (jsdom) with `minBurnMs={0}` and a stub `fetch`: Preset selection, `Burn` disabled for empty and whitespace input, the `Burning CD-R at 4x...` text with a `progressbar` and disabled input, Presets, and `Burn`, a successful topic burn, an error display with the offline control, `validation-failed` error lines, Cancel during a pending `fetch` aborts the signal and mounts nothing, Escape cancels, Tab stays inside, focus returns to the opener, roles and names, typing clears the error, and the offline message
     - Also assert: the presets list has at least 2 GitHub and at least 2 topic presets and each parses to its declared kind with `parseInput`, and with the mute toggle on, burning and clicking buttons creates no audio nodes (mock context counters, as in `app.test.tsx`)
     - _Requirements: 13.5, 13.6, 13.7, 13.8, 13.9, 13.10, 13.12, 13.13, 13.14, 13.16, 14.1, 14.3, 14.4, 14.7, 16.9, 17.16_
@@ -353,11 +353,11 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - At start load stored discs through `loadDisc(m, false)` and list those that pass in the Load Disc dialog. `Remove` deletes the stored disc. Import `compileDisc` only from `src/model/compiler`, and keep the previous disc open on any failed burn
     - _Requirements: 6.2, 6.3, 6.5, 13.2, 13.3, 13.4, 13.11, 14.5, 15.1, 15.3, 15.4, 15.5, 15.6, 15.9, 15.10_
 
-  - [ ]* 15.4 Write entry point component tests
+  - [ ] 15.4 Write entry point component tests
     - Create `tests/components/burn-entry.test.tsx`: the Home card, the File menu item inside an open disc, and the Load Disc dialog button each open the Burn dialog, and the Load Disc button closes the Load Disc dialog first
     - _Requirements: 13.2, 13.3, 13.4, 17.16_
 
-  - [ ]* 15.5 Write App integration tests for mounting and the library
+  - [ ] 15.5 Write App integration tests for mounting and the library
     - Create `tests/components/burn-app.test.tsx`: a successful burn mounts the disc and requests the spin-up sound, a failed burn keeps the previous disc, discs are restored at start from a fake `Storage`, `Remove` deletes a stored disc, a throwing `Storage` shows the not-saved notice while the disc still mounts, and existing `sources` prop tests never read `localStorage`
     - _Requirements: 6.3, 13.11, 15.3, 15.5, 15.6, 17.16, 17.17_
 
