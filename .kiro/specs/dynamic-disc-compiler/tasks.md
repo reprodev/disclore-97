@@ -273,20 +273,25 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
 - [x] 10. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Implement burn orchestration with the loadDisc gate
-  - [ ] 11.1 Implement `src/adapters/burn.ts`
+- [x] 11. Implement burn orchestration with the loadDisc gate
+  - [x] 11.1 Implement `src/adapters/burn.ts`
     - Export `burn(input, { signal, fetch, onStage })` and `burnFallback(fallbackTopic, opts)`. Run `parseInput`, pick the adapter by kind (`markdown` and `topic` skip `fetching`), run `compileDisc`, then call `loadDisc(manifest, false)` from `src/discs/loader.ts` and mount only on `ok: true`
     - On `ok: false` return `{ code: 'validation-failed', validation: errors }`. Wrap the whole body in `try`: adapter exceptions become `fetch-failed` and compiler exceptions become `validation-failed`. Return `cancelled` when `signal.aborted` after any `await`. Attach `fallbackTopic` (repo name or page host) to errors in `FALLBACK_CODES`. All messages come from `ERROR_MESSAGES` and contain no angle brackets
     - _Requirements: 6.2, 6.3, 11.3, 11.4, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6_
 
-  - [ ] 11.2 Write property test for burn never throwing and never yielding an invalid disc
+  - [x] 11.2 Write property test for burn never throwing and never yielding an invalid disc
     - Create `tests/properties/dc23-burn-total.test.ts` with `// @vitest-environment node`, arbitrary input strings, and `arbFetchBehavior`
     - **Property 23: Burn never throws and never yields an invalid disc**
     - **Validates: Requirements 6.3, 14.5**
 
-  - [ ] 11.3 Write burn orchestrator unit tests
+  - [x] 11.3 Write burn orchestrator unit tests
     - Create `tests/adapters/burn.test.ts`: `loadDisc` is called with `prebaked` equal to `false` (spy), a manifest that fails validation yields `validation-failed` with the error list and mounts nothing, an adapter that throws yields `fetch-failed`, cancel yields `cancelled`, each fallback code carries `fallbackTopic`, `burnFallback` produces a valid disc, and `markdown` and `topic` inputs make no `fetch` call
     - _Requirements: 6.2, 6.3, 11.3, 11.4, 14.3, 14.4, 14.5_
+
+  - [x] 11.4 Stabilize dc09-sanitize under full-suite parallel load
+
+    - In `tests/properties/dc09-sanitize.test.ts`, add `// @vitest-environment node` at the top and pass a 15000 ms timeout to the `it(...)` block so it does not hit Vitest's 5000 ms default timeout when the full suite runs in parallel
+    - Run `npm test`, `npm run build` and `npm run lint`
 
 - [ ] 12. Implement the localStorage disc library
   - [ ] 12.1 Implement `src/library/discLibrary.ts`
@@ -405,15 +410,16 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     { "id": 9, "tasks": ["8.12", "8.13", "9.1"] },
     { "id": 10, "tasks": ["9.2", "9.3"] },
     { "id": 11, "tasks": ["10"] },
-    { "id": 12, "tasks": ["11.1", "12.1"] },
-    { "id": 13, "tasks": ["11.2", "11.3", "12.2", "12.3", "12.4"] },
-    { "id": 14, "tasks": ["13"] },
-    { "id": 15, "tasks": ["14.1", "14.2"] },
-    { "id": 16, "tasks": ["14.3", "15.1"] },
-    { "id": 17, "tasks": ["14.4", "15.2"] },
-    { "id": 18, "tasks": ["15.3"] },
-    { "id": 19, "tasks": ["15.4", "15.5", "16.1", "16.2"] },
-    { "id": 20, "tasks": ["17"] }
+    { "id": 12, "tasks": ["11.1", "11.4"] },
+    { "id": 13, "tasks": ["12.1"] },
+    { "id": 14, "tasks": ["11.2", "11.3", "12.2", "12.3", "12.4"] },
+    { "id": 15, "tasks": ["13"] },
+    { "id": 16, "tasks": ["14.1", "14.2"] },
+    { "id": 17, "tasks": ["14.3", "15.1"] },
+    { "id": 18, "tasks": ["14.4", "15.2"] },
+    { "id": 19, "tasks": ["15.3"] },
+    { "id": 20, "tasks": ["15.4", "15.5", "16.1", "16.2"] },
+    { "id": 21, "tasks": ["17"] }
   ]
 }
 ```

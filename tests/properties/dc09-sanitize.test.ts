@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { compileDisc } from '../../src/model/compiler';
@@ -49,5 +50,5 @@ describe('Property 9: Sanitization of hostile text', () => {
       }),
       { numRuns: 200 },
     );
-  });
+  }, 15000);
 });

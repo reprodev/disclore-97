@@ -51,6 +51,10 @@
     "8.8 Write property test for HTML extraction round trip": {
       "status": "passed",
       "lastRunTimestamp": 1795300307689
+    },
+    "11.2 Write property test for burn never throwing and never yielding an invalid disc": {
+      "status": "passed",
+      "lastRunTimestamp": 1795301097123
     }
   },
   "executionHistory": {
@@ -740,6 +744,61 @@
         "executionId": "770f6da7-bad4-41fd-878b-ca132f6bccf2",
         "chatSessionId": "sess_069b46c3-354b-4e5f-8bed-23a3eaf3807e",
         "timestamp": 1795300838598
+      }
+    ],
+    "11.1 Implement `src/adapters/burn.ts`": [
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795300992478
+      },
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301050506
+      }
+    ],
+    "11.2 Write property test for burn never throwing and never yielding an invalid disc": [
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301050966
+      },
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301136902
+      }
+    ],
+    "11.3 Write burn orchestrator unit tests": [
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301054023
+      },
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301137363
+      }
+    ],
+    "11. Implement burn orchestration with the loadDisc gate": [
+      {
+        "executionId": "dd131fe4-10e9-42eb-ab09-c8d7f485b947",
+        "chatSessionId": "sess_81f082b6-3f3f-4d7a-96ae-6df84b3a77b4",
+        "timestamp": 1795301137411
+      }
+    ],
+    "11.4 Stabilize dc09-sanitize under full-suite parallel load": [
+      {
+        "executionId": "bda18064-d690-4c00-b570-83399f6df40d",
+        "chatSessionId": "sess_eb1b12b7-1608-4b92-847d-aa3b11d6b9c8",
+        "timestamp": 1795301378288
+      },
+      {
+        "executionId": "bda18064-d690-4c00-b570-83399f6df40d",
+        "chatSessionId": "sess_eb1b12b7-1608-4b92-847d-aa3b11d6b9c8",
+        "timestamp": 1795301422554
       }
     ]
   }
