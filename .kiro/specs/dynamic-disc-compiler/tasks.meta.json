@@ -31,6 +31,10 @@
     "5.3 Write property test for classification partition, trim invariance, and purity": {
       "status": "passed",
       "lastRunTimestamp": 1795299079437
+    },
+    "7.2 Write property test for README decoding": {
+      "status": "passed",
+      "lastRunTimestamp": 1795299828158
     }
   },
   "executionHistory": {
@@ -449,6 +453,59 @@
         "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
         "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
         "timestamp": 1795299541492
+      }
+    ],
+    "7.1 Implement `src/adapters/github.ts`": [
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299739159
+      },
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299799939
+      }
+    ],
+    "7.2 Write property test for README decoding": [
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299800447
+      },
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299848406
+      },
+      {
+        "executionId": "6f8ae11b-53a9-4c6f-831e-6f2107e4edb7",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299949347
+      },
+      {
+        "executionId": "6f8ae11b-53a9-4c6f-831e-6f2107e4edb7",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299979625
+      }
+    ],
+    "7.3 Write GitHub adapter unit tests": [
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299801004
+      },
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299848464
+      }
+    ],
+    "7. Implement the GitHub adapter": [
+      {
+        "executionId": "f419e890-0dd0-4a8f-9efd-ae178c36bc61",
+        "chatSessionId": "sess_09991c57-f65f-4491-9590-8da32459bbe5",
+        "timestamp": 1795299848504
       }
     ]
   }

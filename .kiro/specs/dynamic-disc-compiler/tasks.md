@@ -175,19 +175,19 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/adapters/errors.test.ts`: for every `BurnErrorCode` the message is non-empty and contains no `<` or `>`, and `FALLBACK_CODES` matches the six codes of Requirement 11.3
     - _Requirements: 11.3, 14.2, 14.6_
 
-- [ ] 7. Implement the GitHub adapter
-  - [ ] 7.1 Implement `src/adapters/github.ts`
+- [x] 7. Implement the GitHub adapter
+  - [x] 7.1 Implement `src/adapters/github.ts`
     - Export `fetchGithubSource(owner, repo, opts)` and `decodeReadme(content)`. Request the repository first with only the `Accept: application/vnd.github+json` header, then languages and README in parallel as best effort. Send no `Authorization` header
     - Map 404 to `repo-not-found`, 403 or 429 to `rate-limited`, deadline (8000 ms) to `timeout`, throws to `network`, and outer abort to `cancelled`. Build `ExtractedSource` with kind `github`, URL `https://github.com/{owner}/{repo}`, facts (stars, license, default branch, topics), and languages
     - `decodeReadme` decodes base64 to bytes and UTF-8 text, limited to 100000 characters. Take README headings and paragraphs through `parseMarkdown`. Fetch no URL found in the README
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10, 8.11, 8.12_
 
-  - [ ] 7.2 Write property test for README decoding
+  - [x] 7.2 Write property test for README decoding
     - Create `tests/properties/dc21-readme-decode.test.ts` with `// @vitest-environment node`
     - **Property 21: README decoding round trip and limit**
     - **Validates: Requirements 8.3, 8.12**
 
-  - [ ] 7.3 Write GitHub adapter unit tests
+  - [x] 7.3 Write GitHub adapter unit tests
     - Create `tests/adapters/github.test.ts` with an injected `fetch`: success with all three responses, README missing, non-base64 README encoding, `repo-not-found`, `rate-limited` for 403 and 429, timeout with fake timers, network failure, cancel, every recorded URL starts with `https://api.github.com/`, and no `Authorization` header
     - _Requirements: 8.1, 8.2, 8.4, 8.6, 8.7, 8.8, 8.9, 8.10, 8.11, 17.14_
 
