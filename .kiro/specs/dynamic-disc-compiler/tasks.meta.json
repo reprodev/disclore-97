@@ -55,6 +55,14 @@
     "11.2 Write property test for burn never throwing and never yielding an invalid disc": {
       "status": "passed",
       "lastRunTimestamp": 1795301097123
+    },
+    "12.2 Write property test for library round trip, capacity, and replacement": {
+      "status": "passed",
+      "lastRunTimestamp": 1795301656333
+    },
+    "12.3 Write property test for corrupt entries": {
+      "status": "passed",
+      "lastRunTimestamp": 1795301660710
     }
   },
   "executionHistory": {
@@ -799,6 +807,61 @@
         "executionId": "bda18064-d690-4c00-b570-83399f6df40d",
         "chatSessionId": "sess_eb1b12b7-1608-4b92-847d-aa3b11d6b9c8",
         "timestamp": 1795301422554
+      }
+    ],
+    "12.1 Implement `src/library/discLibrary.ts`": [
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301541499
+      },
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301582847
+      }
+    ],
+    "12.2 Write property test for library round trip, capacity, and replacement": [
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301583653
+      },
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301685103
+      }
+    ],
+    "12.3 Write property test for corrupt entries": [
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301584149
+      },
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301685660
+      }
+    ],
+    "12.4 Write library unit tests": [
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301584614
+      },
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301686190
+      }
+    ],
+    "12. Implement the localStorage disc library": [
+      {
+        "executionId": "74b51fe5-4533-4ce7-aed6-dde8b54d6622",
+        "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
+        "timestamp": 1795301686236
       }
     ]
   }

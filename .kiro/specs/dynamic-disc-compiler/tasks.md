@@ -293,23 +293,23 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - In `tests/properties/dc09-sanitize.test.ts`, add `// @vitest-environment node` at the top and pass a 15000 ms timeout to the `it(...)` block so it does not hit Vitest's 5000 ms default timeout when the full suite runs in parallel
     - Run `npm test`, `npm run build` and `npm run lint`
 
-- [ ] 12. Implement the localStorage disc library
-  - [ ] 12.1 Implement `src/library/discLibrary.ts`
+- [x] 12. Implement the localStorage disc library
+  - [x] 12.1 Implement `src/library/discLibrary.ts`
     - Export `createDiscLibrary(storage)` and `getBrowserStorage()` (returns `undefined` when `localStorage` is unavailable or throws). Store one key per disc, `disclore97.disc.<disc_id>`, as a versioned envelope with a sequence number
     - `save` replaces a same-id disc, keeps at most 10 discs by evicting the oldest, and on a quota error evicts the oldest and retries once. `load` runs every stored manifest through `loadDisc(m, false)`, skips and removes values that are not valid JSON, not a version 1 envelope, or invalid. `remove(disc_id)` deletes one disc. Every call is wrapped so a throwing `Storage` never escapes. Store only manifests
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 15.7, 15.8, 15.9_
 
-  - [ ] 12.2 Write property test for library round trip, capacity, and replacement
+  - [x] 12.2 Write property test for library round trip, capacity, and replacement
     - Create `tests/properties/dc24-library-roundtrip.test.ts` with an in-memory `Storage` fake and compiled manifests
     - **Property 24: Library round trip, capacity, and replacement**
     - **Validates: Requirements 15.2, 15.8, 15.9**
 
-  - [ ] 12.3 Write property test for corrupt entries
+  - [x] 12.3 Write property test for corrupt entries
     - Create `tests/properties/dc25-library-corrupt.test.ts`
     - **Property 25: Library skips and removes corrupt entries**
     - **Validates: Requirements 15.4**
 
-  - [ ] 12.4 Write library unit tests
+  - [x] 12.4 Write library unit tests
     - Create `tests/library/discLibrary.test.ts`: key prefix and envelope shape, a `Storage` fake that throws on every method, a fake that throws a quota error only on `setItem`, remove, and no tokens or credentials in stored values
     - _Requirements: 15.1, 15.2, 15.4, 15.5, 15.6, 15.7, 17.17_
 
