@@ -26,6 +26,17 @@ Correctness properties from the design are tested as property-based tests with [
 
 For the full development story, see [docs/BUILD-STORY.md](docs/BUILD-STORY.md).
 
+## Pre-Baked Discs
+
+Two original discs ship with the app. Both are typed `DiscManifest` objects in `src/discs/`.
+
+| Disc | Sections | Diagrams / hotspots | Trivia questions | Dungeons |
+| --- | --- | --- | --- | --- |
+| DiscLore '97: Ancient Castles & Keeps | 5 | 1 diagram, 4 hotspots | 6 | 1 (10 rooms) |
+| DiscLore '97: Retro Computing & Dial-Up Era | 7 | 1 diagram, 4 hotspots | 6 | 1 (10 rooms) |
+
+- **Castles:** the dungeon is "The Keep of Many Stairs". The diagram is a castle cross-section.
+- **Retro:** the dungeon is "The Cursor Catacombs". The diagram is a dial-up home setup.
 ## Getting started
 
 Requires Node.js and npm.

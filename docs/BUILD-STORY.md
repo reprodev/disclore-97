@@ -70,3 +70,56 @@ The last checkpoint ran the whole suite and build:
 - **Lint:** ESLint is clean.
 
 The result is a static site that can be deployed to Cloudflare Pages with `npm run build` and the `dist` output directory.
+
+## Appendix A: Architecture at a glance
+
+```mermaid
+graph TD
+    UI["UI: Win95 components<br/>DiscBrowser, ArticleViewer, HotspotViewer, KeepMazeUI"]
+    Audio["Audio module<br/>only code using AudioContext"]
+    Model["Pure model<br/>manifest, validate, solver, game, questionQueue"]
+    UI --> Model
+    UI --> Audio
+```
+
+## Appendix B: The 16 property tests
+
+Each file in `tests/properties/` checks one correctness property from the design with fast-check.
+
+| File | Property |
+| --- | --- |
+| p01-result-shape | Validator result shape |
+| p02-round-trip | Manifest JSON round trip |
+| p03-missing-fields | Missing or mistyped fields are reported by path |
+| p04-duplicate-ids | Duplicate identifiers are rejected |
+| p05-coordinates | Out-of-range hotspot coordinates are rejected |
+| p06-dangling | Dangling references are rejected |
+| p07-index-range | Answer index out of range is rejected |
+| p08-missing-room | Missing entrance or throne room is rejected |
+| p09-unsolvable-orphans | Unsolvable and orphaned dungeons are reported (plus an "iff" check that the validator agrees with the solver) |
+| p10-partition | Reachable rooms and orphans partition the rooms |
+| p11-shortest-path | The solver path is valid and minimal, and empty when unreachable |
+| p12-correct-answer | A correct answer moves the player to the exit destination |
+| p13-incorrect-answer | An incorrect answer keeps the player in place |
+| p14-restart | Restart yields the entrance, 0 moves, 0 incorrect answers, and no pending question |
+| p15-no-repeat | Questions do not repeat until all are used |
+| p16-muted-silent | Muted audio is silent |
+
+## Appendix C: Commit progression
+
+From `git log --oneline`, oldest first:
+
+1. `c71cd1b` Add steering rules.
+2. `e46932a`, `36dd294`, `abf18de` Add the spec: requirements, design, tasks.
+3. `caf66cf` Scaffold the Vite, React, and TypeScript app, with Win95 tokens and static tests.
+4. `5129928` Add manifest types and the BFS solver, with property tests.
+5. `303ed61` Add the runtime validator, with property tests.
+6. `242f65f` Add the procedural WebAudio module with mute.
+7. `f4df8f6` Add the question queue and game reducer, with property tests.
+8. `55f05f9` Mark Checkpoint 6 complete.
+9. `713e20d` Add the two pre-baked discs, the loader, and invariant tests.
+10. `8c9e0f4` Add Win95 chrome components, token CSS, and accessibility tests.
+11. `7ce6534` Add the disc browser, article viewer, hotspot viewer, and KeepMaze UI.
+12. `71bc46a` Wire the app shell, mute toggle, and `loadDisc` validation, with integration tests.
+13. `749dece` Complete the final checkpoint.
+14. `06a3562`, `5e0cc63` Add the README and this build story.
