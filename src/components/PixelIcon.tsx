@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home';
+export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home' | 'castle' | 'computer' | 'notepad';
 
 /** Palette letters used in the pixel maps below. Every color is a shared token. */
 const PALETTE: Record<string, string> = {
@@ -20,6 +20,11 @@ const PALETTE: Record<string, string> = {
   G: 'var(--color-forest)',
   p: 'var(--color-parchment)',
   x: 'var(--color-crimson-light)',
+  S: 'var(--color-stone)',
+  D: 'var(--color-stone-dark)',
+  L: 'var(--color-stone-light)',
+  T: 'var(--color-crt-bg)',
+  P: 'var(--color-phosphor)',
 };
 
 const SIZE = 16;
@@ -78,6 +83,51 @@ const BACK_ARROW = [
 
 const MAPS: Record<IconName, string[]> = {
   cd: cdMap(),
+  castle: centered([
+    '.....S.S.S......',
+    '.....SSSSSS.....',
+    '.S.S.SSSSSS.S.S.',
+    '.SSSSSSyySSSSSS.',
+    '.SSkSSSSSSSSkSS.',
+    '.SSSSSSSSSSSSSS.',
+    '.SSSSSSSSSSSSSS.',
+    '.SSSSSSSSSSSSSS.',
+    '.SSSSSkkkkSSSSS.',
+    '.SSSSSkWWkSSSSS.',
+    '.SSSSSkWWkSSSSS.',
+    '.DDDDDkWWkDDDDD.',
+  ]),
+  computer: centered([
+    '..kkkkkkkkkkkk..',
+    '..kssssssssssk..',
+    '..kskTTTTTTksk..',
+    '..kskTPPPTTksk..',
+    '..kskTTTTTTksk..',
+    '..kskTPPPPTksk..',
+    '..kskTTTTTTksk..',
+    '..kskkkkkkkksk..',
+    '..kssssssssssk..',
+    '..kkkkkkkkkkkk..',
+    '....kssssssk....',
+    '..kssssssssssk..',
+    '..kkkkkkkkkkkk..',
+  ]),
+  notepad: centered([
+    '...kkkkkkkkkk...',
+    '...kbbbbbbbbk...',
+    '...kwwwwwwwwk...',
+    '...kwggggggwk...',
+    '...kwwwwwwwwk...',
+    '...kwggggggwk...',
+    '...kwwwwwwwwk...',
+    '...kwgggggwwk...',
+    '...kwwwwwwwwk...',
+    '...kwggggggwk...',
+    '...kwwwwwwwwk...',
+    '...kwgggwwwwk...',
+    '...kwwwwwwwwk...',
+    '...kkkkkkkkkk...',
+  ]),
   back: centered(BACK_ARROW),
   forward: centered(BACK_ARROW.map((r) => [...r].reverse().join(''))),
   home: centered([

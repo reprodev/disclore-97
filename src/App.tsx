@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { ArticleViewer } from './components/ArticleViewer';
+import { DesktopIcons } from './components/DesktopIcons';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
 import { HotspotViewer } from './components/HotspotViewer';
 import { KeepMazeUI } from './components/KeepMazeUI';
+import { NotepadWindow } from './components/NotepadWindow';
 import { Taskbar } from './components/Taskbar';
 import type { ActiveWindowInfo } from './components/Taskbar';
 import { prebakedDiscs } from './discs';
@@ -42,6 +44,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   const [shell, setShell] = useState<Shell>(initialShell);
   const [notFound, setNotFound] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
+  const [readMeOpen, setReadMeOpen] = useState(false);
   const { nav, history } = shell;
 
   const { discs, failures } = useMemo(() => {
@@ -118,6 +121,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   return (
     <div className="desktop">
       <div className="desktop__work app-shell">
+        <DesktopIcons discs={discs} onOpenDisc={openDisc} onOpenReadMe={() => setReadMeOpen(true)} />
         <DiscBrowser
           discs={discs}
           openDiscId={nav.discId}
@@ -144,6 +148,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
         {failures.map((errors, i) => (
           <ErrorList key={i} errors={errors} />
         ))}
+        {readMeOpen ? <NotepadWindow onClose={() => setReadMeOpen(false)} /> : null}
       </div>
       <Taskbar
         discs={discs}

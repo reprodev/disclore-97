@@ -10,6 +10,7 @@ import { MenuBar } from './MenuBar';
 import { NavToolbar } from './NavToolbar';
 import { PixelIcon } from './PixelIcon';
 import { SpinUpBar } from './SpinUpBar';
+import { SplashBanner } from './SplashBanner';
 import { StatusBar } from './StatusBar';
 import { Window } from './Window';
 import '../styles/browser.css';
@@ -171,6 +172,7 @@ export function DiscBrowser({
     <div className="disc-browser disc-browser--select">
       <Window title="DiscLore '97 - Select a CD-ROM" className="disc-select-window">
         <div className="disc-select">
+          <SplashBanner />
           <p className="disc-select__prompt">Insert a disc to begin.</p>
           {discs.length === 0 ? <p className="disc-select__empty">No discs are available.</p> : null}
           <ul className="disc-list" aria-label="Discs">

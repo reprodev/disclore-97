@@ -1,0 +1,88 @@
+/* Desktop shortcut icons: a left column on the teal desktop. */
+.desktop-icons {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 88px;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 2px 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-paper);
+  background: none;
+  border: none;
+  cursor: default;
+}
+
+.desktop-icon:focus-visible {
+  outline: none;
+}
+
+.desktop-icon__label {
+  max-width: 84px;
+  padding: 1px 3px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  border: 1px solid transparent;
+}
+
+/* Selected: navy label with a dotted frame, like a Win95 desktop icon. */
+.desktop-icon[data-selected="true"] .desktop-icon__label,
+.desktop-icon:focus-visible .desktop-icon__label {
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border: 1px dotted var(--color-paper);
+}
+
+.desktop-icon[data-selected="true"] .pixel-icon {
+  opacity: 0.75;
+}
+
+/* ReadMe.txt Notepad dialog, placed over the workspace. */
+.window.notepad-window {
+  position: absolute;
+  top: 24px;
+  left: 120px;
+  z-index: 6;
+  width: 440px;
+  max-width: calc(100% - 136px);
+  height: 340px;
+  max-height: calc(100% - 48px);
+}
+
+.notepad-window .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.notepad-window__text {
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  resize: none;
+  padding: 4px 6px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: none;
+}
+
+.notepad-window__text:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -3px;
+}

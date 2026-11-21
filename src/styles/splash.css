@@ -1,0 +1,69 @@
+/* 1997 AutoPlay splash header inside the disc selection window. */
+.splash {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.splash__art {
+  flex: 0 0 auto;
+  width: 120px;
+  height: auto;
+  background: var(--color-crt-bg);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.splash__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.splash__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--color-gold);
+}
+
+.splash__init {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+.splash__bar {
+  padding: 2px;
+  background: var(--color-paper);
+  border: 1px solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.splash__track {
+  display: flex;
+  gap: 2px;
+}
+
+.splash__block {
+  flex: 1 1 0;
+  height: 8px;
+  visibility: hidden;
+  background: var(--color-title-bg);
+  animation: spinup-block 0.01s steps(1, end) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash__block {
+    animation: none;
+    visibility: visible;
+  }
+}
