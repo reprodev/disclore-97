@@ -24,6 +24,8 @@ The spec lives in `.kiro/specs/disclore-97-core/`.
 
 Correctness properties from the design are tested as property-based tests with [Vitest](https://vitest.dev) and [fast-check](https://fast-check.dev), with one test file per property. Unit and component tests cover specific examples and edge cases. The suite has 24 test files and 111 tests.
 
+For the full development story, see [docs/BUILD-STORY.md](docs/BUILD-STORY.md).
+
 ## Getting started
 
 Requires Node.js and npm.
