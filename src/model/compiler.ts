@@ -131,7 +131,7 @@ export function compileDisc(source: ExtractedSource): DiscManifest {
   const ids = createIdAllocator();
 
   const planned = planSections(src, undefined, ids);
-  const diagram = buildDiagram(planned.sections, planned.title, stream(seed, 'diagram'));
+  const diagram = buildDiagram(planned.sections, planned.title, stream(seed, 'diagram'), src.metadata.kind);
   const trivia = buildTrivia(planned.sections, seed, stream(seed, 'trivia'), ids);
   const dungeon = buildDungeon(planned.sections, planned.title, stream(seed, 'dungeon'), ids);
 

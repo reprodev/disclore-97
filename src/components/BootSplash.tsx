@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { playChime } from '../audio/audio';
 import { BevelButton } from './BevelButton';
 import { HeroArt, InitBar } from './SplashArt';
 import '../styles/splash.css';
@@ -39,20 +40,22 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashPro
   doneRef.current = onDone;
   const [step, setStep] = useState(0);
 
-  const finish = () => {
+  /** The chime plays only for a user gesture, never for the auto-advance timer. */
+  const finish = (userInitiated = false) => {
     if (finished.current) return;
     finished.current = true;
+    if (userInitiated) playChime();
     doneRef.current();
   };
 
   useEffect(() => {
     const quarter = delayMs / BOOT_MESSAGES.length;
-    const timer = window.setTimeout(finish, delayMs);
+    const timer = window.setTimeout(() => finish(), delayMs);
     const ticker = window.setInterval(() => setStep((s) => Math.min(s + 1, BOOT_MESSAGES.length - 1)), quarter);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === 'Escape') {
         e.preventDefault();
-        finish();
+        finish(true);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -64,7 +67,7 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashPro
   }, [delayMs]);
 
   return (
-    <div className="boot-splash" onClick={finish}>
+    <div className="boot-splash" onClick={() => finish(true)}>
       <div className="boot-card" role="region" aria-label="DiscLore '97 boot splash">
         <div className="boot-card__frame">
           <div className="boot-hero">
@@ -94,7 +97,7 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashPro
             <BevelButton
               onClick={(e) => {
                 e.stopPropagation();
-                finish();
+                finish(true);
               }}
             >
               Skip

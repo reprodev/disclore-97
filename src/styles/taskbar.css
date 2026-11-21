@@ -162,3 +162,43 @@
   border-top: 1px solid var(--color-bevel-shadow);
   border-bottom: 1px solid var(--color-bevel-hi);
 }
+
+/* Tray: Drive D: indicator, Mute, and the clock, each in the sunken tray frame. */
+.taskbar__tray {
+  gap: 6px;
+  padding: 1px 6px;
+}
+
+.taskbar__drive {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.75;
+}
+
+.taskbar__drive[data-active="true"] {
+  opacity: 1;
+}
+
+.taskbar__led {
+  width: 4px;
+  height: 4px;
+  background: var(--color-bevel-shadow);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.taskbar__drive[data-active="true"] .taskbar__led {
+  background: var(--color-phosphor);
+}
+
+.taskbar__clock {
+  min-width: 36px;
+  text-align: right;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-bevel-edge);
+}
+
+.taskbar__tabs {
+  gap: 2px;
+}

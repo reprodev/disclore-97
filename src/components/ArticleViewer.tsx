@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { playPageFlip } from '../audio/audio';
-import type { Section } from '../model/manifest';
+import type { Diagram, Section } from '../model/manifest';
 import { relatedSections } from '../model/topics';
+import { BevelButton } from './BevelButton';
+import { CiteDialog } from './CiteDialog';
 import { Plate } from './Plate';
 import '../styles/article.css';
 
@@ -11,10 +13,24 @@ export interface ArticleViewerProps {
   sectionId: string;
   /** Opens another section. When omitted, the See Also strip is not shown. */
   onSelectSection?: (sectionId: string) => void;
+  /** Title of the open disc. When given, the Cite / Print Preview button is shown. */
+  discTitle?: string;
+  /** Diagrams of the open disc. With onShowInDiagram, enables the Show in Diagram button. */
+  diagrams?: Diagram[];
+  /** Opens a diagram with the hotspot for the active section highlighted. */
+  onShowInDiagram?: (diagramId: string, sectionId: string) => void;
 }
 
-export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleViewerProps) {
+export function ArticleViewer({
+  sections,
+  sectionId,
+  onSelectSection,
+  discTitle,
+  diagrams,
+  onShowInDiagram,
+}: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
+  const [citeOpen, setCiteOpen] = useState(false);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
 
@@ -22,6 +38,11 @@ export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleV
     if (ref.current) ref.current.scrollTop = 0;
     if (found) playPageFlip();
   }, [sectionId, found]);
+
+  // A dialog for the previous article must not stay open on the next one.
+  useEffect(() => {
+    setCiteOpen(false);
+  }, [sectionId]);
 
   if (!section) {
     return (
@@ -34,37 +55,36 @@ export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleV
   const related = onSelectSection ? relatedSections(sections, sectionId) : [];
   const facts = section.facts ?? [];
   const timeline = section.timeline ?? [];
+  const diagramLink = onShowInDiagram
+    ? (diagrams ?? []).find((d) => d.hotspots.some((h) => h.section_id === sectionId))
+    : undefined;
+  const canCite = discTitle !== undefined;
 
   return (
     <article ref={ref} className="article-viewer">
       <h1 className="article-title">{section.title}</h1>
+      {diagramLink || canCite ? (
+        <div className="article-tools" role="group" aria-label="Article tools">
+          {diagramLink ? (
+            <BevelButton onClick={() => onShowInDiagram?.(diagramLink.diagram_id, sectionId)}>
+              Show in Diagram
+            </BevelButton>
+          ) : null}
+          {canCite ? <BevelButton onClick={() => setCiteOpen(true)}>Cite / Print Preview</BevelButton> : null}
+        </div>
+      ) : null}
       <aside className="article-aside">
         <Plate kind={section.plate} caption={`Plate: ${section.title}`} />
-        {facts.length > 0 || timeline.length > 0 ? (
+        {facts.length > 0 ? (
           <div className="article-callout">
-            {facts.length > 0 ? (
-              <section aria-label="Quick Facts">
-                <h2 className="article-callout__title">Quick Facts</h2>
-                <ul className="article-callout__list">
-                  {facts.map((f, i) => (
-                    <li key={i}>{f}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-            {timeline.length > 0 ? (
-              <section aria-label="Timeline">
-                <h2 className="article-callout__title">Timeline</h2>
-                <dl className="article-timeline">
-                  {timeline.map((t, i) => (
-                    <div key={i} className="article-timeline__row">
-                      <dt>{t.when}</dt>
-                      <dd>{t.event}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-            ) : null}
+            <section aria-label="Quick Facts">
+              <h2 className="article-callout__title">Quick Facts</h2>
+              <ul className="article-callout__list">
+                {facts.map((f, i) => (
+                  <li key={i}>{f}</li>
+                ))}
+              </ul>
+            </section>
           </div>
         ) : null}
       </aside>
@@ -73,6 +93,20 @@ export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleV
           {p}
         </p>
       ))}
+      {timeline.length > 0 ? (
+        <section className="article-chrono" aria-label="Chronology">
+          <h2 className="article-chrono__title">Chronology</h2>
+          <ol className="article-chrono__strip">
+            {timeline.map((t, i) => (
+              <li key={i} className="article-chrono__stop">
+                <span className="article-chrono__when">{t.when}</span>
+                <span className="article-chrono__tick" aria-hidden="true" />
+                <span className="article-chrono__event">{t.event}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
       {onSelectSection && related.length > 0 ? (
         <nav className="article-seealso" aria-label="See Also">
           <h2 className="article-seealso__title">See Also</h2>
@@ -93,6 +127,9 @@ export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleV
             ))}
           </ul>
         </nav>
+      ) : null}
+      {citeOpen && discTitle !== undefined ? (
+        <CiteDialog section={section} discTitle={discTitle} onClose={() => setCiteOpen(false)} />
       ) : null}
     </article>
   );

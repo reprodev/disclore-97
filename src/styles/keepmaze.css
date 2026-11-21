@@ -199,3 +199,163 @@
   stroke-width: 1px;
   stroke-dasharray: 2 2;
 }
+
+/* Torchlight pulse: a flat amber wash that steps down once on every room entry. */
+.keepmaze__view {
+  position: relative;
+}
+
+.keepmaze__torch {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  left: 2px;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--color-flame);
+  opacity: 0;
+  animation: torch-step 0.45s steps(3, end) 1;
+}
+
+@keyframes torch-step {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keepmaze__torch {
+    animation: none;
+    display: none;
+  }
+}
+
+/* Peek Hint: a tooltip-yellow note under the question. */
+.keepmaze__peek-button {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+.keepmaze__peek {
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: var(--color-paper);
+  border: 1px dashed var(--color-bevel-edge);
+}
+
+.keepmaze__peek-title {
+  margin: 0 0 2px;
+  font-weight: bold;
+  color: var(--color-crimson);
+}
+
+.keepmaze__peek-text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* Victory Certificate: parchment sheet, double gold border, crimson seal. */
+.certificate {
+  box-sizing: border-box;
+  padding: 4px;
+  background: var(--color-tooltip-bg);
+  border: 6px double var(--color-gold-dark);
+  outline: 1px solid var(--color-bevel-edge);
+  color: var(--color-ink);
+}
+
+.certificate__inner {
+  position: relative;
+  box-sizing: border-box;
+  padding: 8px 64px 8px 12px;
+  text-align: center;
+  font-family: var(--font-serif);
+  border: 1px solid var(--color-crimson);
+}
+
+.certificate__kicker {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-gold-dark);
+}
+
+.certificate__title {
+  margin: 2px 0 4px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-crimson);
+}
+
+.certificate__line {
+  margin: 2px 0;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.certificate__dungeon {
+  margin: 2px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-title-bg);
+}
+
+.certificate__stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 6px 0;
+}
+
+.certificate__stat dt {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.certificate__stat dd {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.certificate__result {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-bevel-shadow);
+}
+
+.certificate__seal {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 48px;
+  height: 48px;
+}
+
+.certificate__seal-star {
+  fill: var(--color-crimson);
+  stroke: var(--color-crimson-dark);
+  stroke-width: 1px;
+}
+
+.certificate__seal-ring {
+  fill: var(--color-crimson);
+  stroke: var(--color-gold);
+  stroke-width: 2px;
+}
+
+.certificate__seal-text {
+  fill: var(--color-gold);
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: bold;
+}

@@ -190,6 +190,16 @@ export function playDoorUnlock(): void {
   });
 }
 
+/** Disc-ready chime: a quick rising C major arpeggio, ending on a held top note. */
+export function playChime(): void {
+  play((c, t) => {
+    tone(c, 'triangle', 523.25, 523.25, t, 0.14, 0.4);
+    tone(c, 'triangle', 659.25, 659.25, t + 0.1, 0.14, 0.4);
+    tone(c, 'triangle', 783.99, 783.99, t + 0.2, 0.14, 0.4);
+    tone(c, 'sine', 1046.5, 1046.5, t + 0.3, 0.5, 0.35);
+  });
+}
+
 export function setMuted(m: boolean): void {
   const changed = muted !== m;
   muted = m;

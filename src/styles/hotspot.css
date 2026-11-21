@@ -56,3 +56,10 @@
   stroke-dasharray: 2 1;
   stroke-width: 2px;
 }
+
+/* Hotspot for the article the reader just came from: crimson frame, no animation. */
+.hotspot-button--active rect {
+  fill: var(--color-gold-light);
+  stroke: var(--color-crimson);
+  stroke-width: 2.5px;
+}

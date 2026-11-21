@@ -21,15 +21,21 @@ All sound effects are generated live, and no audio files are used. Use the Sound
 
 export interface NotepadWindowProps {
   onClose: () => void;
+  /** When provided, the title bar has a Minimize button. */
+  onMinimize?: () => void;
+  /** Hides the window while keeping it open (its taskbar tab stays). */
+  minimized?: boolean;
 }
 
-/** A small Notepad-style About dialog. Draggable and closable. */
-export function NotepadWindow({ onClose }: NotepadWindowProps) {
+/** A small Notepad-style About dialog. Draggable, closable, and minimizable to the taskbar. */
+export function NotepadWindow({ onClose, onMinimize, minimized }: NotepadWindowProps) {
   return (
     <Window
       title="ReadMe.txt - Notepad"
       className="notepad-window"
       onClose={onClose}
+      onMinimize={onMinimize}
+      minimized={minimized}
       draggable
       menuBar={<MenuBar menus={[{ label: 'File', items: [{ label: 'Exit', onSelect: onClose }] }]} />}
     >

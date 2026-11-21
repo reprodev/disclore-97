@@ -67,7 +67,19 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   const [notFound, setNotFound] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
   const [readMeOpen, setReadMeOpen] = useState(false);
+  const [readMeMinimized, setReadMeMinimized] = useState(false);
+  /** Section whose hotspot is highlighted after "Show in Diagram". Cleared by any other navigation. */
+  const [diagramFocus, setDiagramFocus] = useState<string | null>(null);
   const { nav, history } = shell;
+
+  const openReadMe = () => {
+    setReadMeMinimized(false);
+    setReadMeOpen(true);
+  };
+  const closeReadMe = () => {
+    setReadMeOpen(false);
+    setReadMeMinimized(false);
+  };
 
   const [library] = useState(() =>
     createDiscLibrary(storage ?? (sources === undefined ? getBrowserStorage() : undefined)),
@@ -100,6 +112,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   const disc = discs.find((d) => d.disc_id === nav.discId);
 
   const openDisc = (discId: string) => {
+    setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
     setLastDiscId(discId);
@@ -119,12 +132,14 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     if (nav.discId === discId) closeDisc();
   };
   const closeDisc = () => {
+    setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
     setShell(initialShell);
   };
   /** Visits a view and records it in the history. */
   const visit = (view: View | null) => {
+    setDiagramFocus(null);
     setNotFound(null);
     setShell((s) => {
       const h = pushView(s.history, view);
@@ -132,6 +147,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     });
   };
   const move = (step: (h: History) => History) => {
+    setDiagramFocus(null);
     setNotFound(null);
     setShell((s) => {
       const h = step(s.history);
@@ -146,6 +162,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
       setNotFound(mode === 'diagram' ? 'No interactive diagrams are available.' : 'No KeepMaze dungeons are available.');
       return;
     }
+    setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
     setLastDiscId(target.disc.disc_id);
@@ -153,6 +170,12 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
       nav: { discId: target.disc.disc_id, view: target.view },
       history: pushView(initialHistory, target.view),
     });
+  };
+
+  /** Opens a diagram and highlights the hotspot that cites `sectionId`. */
+  const showInDiagram = (diagram_id: string, sectionId: string) => {
+    visit({ kind: 'diagram', diagram_id });
+    setDiagramFocus(sectionId); // after visit, which clears it
   };
 
   const goSection = (sectionId: string) => {
@@ -169,11 +192,20 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   if (disc && nav.view) {
     const v = nav.view;
     if (v.kind === 'section') {
-      main = <ArticleViewer sections={disc.sections} sectionId={v.section_id} onSelectSection={goSection} />;
+      main = (
+        <ArticleViewer
+          sections={disc.sections}
+          sectionId={v.section_id}
+          onSelectSection={goSection}
+          discTitle={disc.title}
+          diagrams={disc.diagrams}
+          onShowInDiagram={showInDiagram}
+        />
+      );
     } else if (v.kind === 'diagram') {
       const diagram = disc.diagrams.find((d) => d.diagram_id === v.diagram_id);
       if (diagram) {
-        main = <HotspotViewer diagram={diagram} onNavigate={goSection} />;
+        main = <HotspotViewer diagram={diagram} onNavigate={goSection} highlightSectionId={diagramFocus} />;
       }
     } else {
       const dungeon = disc.dungeons.find((d) => d.dungeon_id === v.dungeon_id);
@@ -201,7 +233,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   return (
     <div className="desktop">
       <div className="desktop__work app-shell">
-        <DesktopIcons discs={discs} onOpenDisc={openDisc} onOpenReadMe={() => setReadMeOpen(true)} />
+        <DesktopIcons discs={discs} onOpenDisc={openDisc} onOpenReadMe={openReadMe} />
         <DiscBrowser
           discs={discs}
           openDiscId={nav.discId}
@@ -220,7 +252,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           minimized={minimized}
           onMinimize={() => setMinimized(true)}
           onQuickJump={quickJump}
-          onOpenReadMe={() => setReadMeOpen(true)}
+          onOpenReadMe={openReadMe}
           onReplaySplash={() => setStage('splash')}
           onBurnNew={() => setBurnOpen(true)}
           onRemoveDisc={removeDisc}
@@ -239,7 +271,13 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
             The disc is open, but it could not be saved to this browser.
           </p>
         ) : null}
-        {readMeOpen ? <NotepadWindow onClose={() => setReadMeOpen(false)} /> : null}
+        {readMeOpen ? (
+          <NotepadWindow
+            onClose={closeReadMe}
+            onMinimize={() => setReadMeMinimized(true)}
+            minimized={readMeMinimized}
+          />
+        ) : null}
         {burnOpen ? (
           <BurnDialog
             onBurned={onBurned}
@@ -255,6 +293,10 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
         onToggleActive={() => setMinimized((m) => !m)}
         onOpenDisc={openDisc}
         onCloseAll={closeDisc}
+        readMeOpen={readMeOpen}
+        readMeMinimized={readMeMinimized}
+        onToggleReadMe={() => setReadMeMinimized((m) => !m)}
+        driveActive={disc !== undefined}
       />
     </div>
   );

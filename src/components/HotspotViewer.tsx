@@ -8,6 +8,8 @@ export interface HotspotViewerProps {
   diagram: Diagram;
   /** Called with the hotspot's section_id. */
   onNavigate: (sectionId: string) => void;
+  /** Hotspots that cite this section are drawn highlighted. */
+  highlightSectionId?: string | null;
 }
 
 function renderShape(shape: Shape, i: number) {
@@ -33,7 +35,7 @@ function renderShape(shape: Shape, i: number) {
  * Tooltip renders HTML, so hotspots sit in an overlay positioned by percent
  * rather than inside the shapes SVG.
  */
-export function HotspotViewer({ diagram, onNavigate }: HotspotViewerProps) {
+export function HotspotViewer({ diagram, onNavigate, highlightSectionId }: HotspotViewerProps) {
   const activate = (sectionId: string) => {
     playPageFlip();
     onNavigate(sectionId);
@@ -65,7 +67,11 @@ export function HotspotViewer({ diagram, onNavigate }: HotspotViewerProps) {
                   role="button"
                   tabIndex={0}
                   aria-label={h.label}
-                  className="hotspot-button"
+                  className={
+                    highlightSectionId && h.section_id === highlightSectionId
+                      ? 'hotspot-button hotspot-button--active'
+                      : 'hotspot-button'
+                  }
                   data-x={h.x}
                   data-y={h.y}
                   onClick={() => activate(h.section_id)}

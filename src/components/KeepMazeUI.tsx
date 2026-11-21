@@ -18,6 +18,16 @@ export interface KeepMazeUIProps {
   rng?: () => number;
 }
 
+const PEEK_MAX = 160;
+
+/** First sentence of a paragraph, capped so a hint stays a hint. */
+function firstSentence(text: string): string {
+  const t = text.trim();
+  const m = /^[\s\S]*?[.!?](?=\s|$)/.exec(t);
+  const s = m ? m[0] : t;
+  return s.length > PEEK_MAX ? `${s.slice(0, PEEK_MAX - 3).trimEnd()}...` : s;
+}
+
 export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: KeepMazeUIProps) {
   const questions = disc.trivia;
   const rngRef = useRef(rng);
@@ -32,6 +42,8 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
   );
   const [started, setStarted] = useState(false);
   const [visited, setVisited] = useState<string[]>(() => [state.roomId]);
+  /** Question whose Peek Hint is open. A new question starts with the hint closed. */
+  const [peekId, setPeekId] = useState<string | null>(null);
 
   // Remember every room entered, for the mini-map.
   useEffect(() => {
@@ -49,6 +61,8 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
   const scene = (
     <div className="keepmaze__scene">
       <div className="keepmaze__view">
+        {/* Remounts on every room change, which replays the one-shot CSS torchlight pulse. */}
+        {started ? <span key={state.roomId} className="keepmaze__torch" aria-hidden="true" /> : null}
         <DungeonViewport
           locked={locked}
           victory={state.won}
@@ -87,13 +101,36 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
     return (
       <div className="keepmaze">
         {scene}
-        <div className="keepmaze__hud">
-          <p className="keepmaze__room">{room?.name ?? 'Throne Room'}</p>
-          <p className="keepmaze__message" role="status">
-            Victory! You reached the throne room in {state.moves} moves with {state.incorrect}{' '}
-            incorrect answers.
-          </p>
-        </div>
+        <section className="certificate" aria-label="Victory Certificate">
+          <div className="certificate__inner">
+            <p className="certificate__kicker">DiscLore '97 &bull; KeepMaze</p>
+            <h2 className="certificate__title">Certificate of Victory</h2>
+            <p className="certificate__line">This certifies that the bearer has conquered</p>
+            <p className="certificate__dungeon">{dungeon.title}</p>
+            <p className="certificate__line">and was seated in the {room?.name ?? 'Throne Room'}.</p>
+            <dl className="certificate__stats">
+              <div className="certificate__stat">
+                <dt>Moves</dt>
+                <dd>{state.moves}</dd>
+              </div>
+              <div className="certificate__stat">
+                <dt>Incorrect answers</dt>
+                <dd>{state.incorrect}</dd>
+              </div>
+            </dl>
+            <p className="keepmaze__message certificate__result" role="status">
+              Victory! You reached the throne room in {state.moves} moves with {state.incorrect}{' '}
+              incorrect answers.
+            </p>
+            <svg className="certificate__seal" viewBox="0 0 48 48" role="img" aria-label="Crimson seal">
+              <polygon className="certificate__seal-star" points="24,1 30,12 42,8 36,19 47,24 36,29 42,40 30,36 24,47 18,36 6,40 12,29 1,24 12,19 6,8 18,12" />
+              <circle className="certificate__seal-ring" cx="24" cy="24" r="12" />
+              <text className="certificate__seal-text" x="24" y="24" textAnchor="middle" dominantBaseline="central">
+                97
+              </text>
+            </svg>
+          </div>
+        </section>
         <BevelButton onClick={restart}>Restart</BevelButton>
       </div>
     );
@@ -103,6 +140,7 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
     ? disc.sections.find((s) => s.section_id === state.lastWrong?.section_id)
     : undefined;
   const pending = state.pending;
+  const peekSection = pending ? disc.sections.find((s) => s.section_id === pending.question.section_id) : undefined;
 
   const answer = (index: number) => {
     if (!pending) return;
@@ -158,6 +196,21 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
               </li>
             ))}
           </ul>
+          <BevelButton
+            className="keepmaze__peek-button"
+            aria-expanded={peekId === pending.question.question_id}
+            onClick={() =>
+              setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id))
+            }
+          >
+            Peek Hint
+          </BevelButton>
+          {peekId === pending.question.question_id && peekSection ? (
+            <div className="keepmaze__peek" role="note" aria-label="Hint preview">
+              <p className="keepmaze__peek-title">{peekSection.title}</p>
+              <p className="keepmaze__peek-text">{firstSentence(peekSection.paragraphs[0] ?? '')}</p>
+            </div>
+          ) : null}
         </div>
       )}
 
