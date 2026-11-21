@@ -51,60 +51,60 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/solver.test.ts`: a 500-room dungeon solves in under 100 ms, a cycle terminates, a missing entrance gives all rooms as orphans, and directed edges are respected
     - _Requirements: 7.5, 7.6, 7.7_
 
-- [ ] 3. Implement the manifest validator
-  - [ ] 3.1 Create shared fast-check generators in `tests/generators.ts`
+- [x] 3. Implement the manifest validator
+  - [x] 3.1 Create shared fast-check generators in `tests/generators.ts`
     - `arbDungeon` with random directed exits, cycles, self-loops, exits to unknown rooms, and sometimes missing `entrance` or `throne_room`
     - `arbManifest` that builds a valid manifest by construction (references drawn from generated ids, coordinates in range, a solvable dungeon with no orphans, JSON-safe values)
     - Mutation helpers that apply one defect to a valid manifest (delete or retype a field, duplicate an id, set a coordinate, repoint a reference, change `correct_index`, remove a reserved room, cut paths, add orphans)
     - _Requirements: 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10_
 
-  - [ ] 3.2 Implement `validateManifest` in `src/model/validate.ts`
+  - [x] 3.2 Implement `validateManifest` in `src/model/validate.ts`
     - Pass 1: shape and type checks that collect `missing-field` and `wrong-type` errors with field paths and stop descending into mistyped nodes. A non-object input returns one error at path `$`
     - Pass 2 on well-typed data: duplicate ids per scope, hotspot coordinates (`Number.isFinite` and `0..100`), hotspot and trivia `section_id` references, `correct_index` range, `entrance` and `throne_room` presence, exit destinations, then `unsolvable-dungeon` and `orphan-room` errors using `solveDungeon` (the orphan error lists every orphan id)
     - Collect all errors, never throw, and return the original manifest on success
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11_
 
-  - [ ]* 3.3 Write property test for validator result shape
+  - [x] 3.3 Write property test for validator result shape
     - Create `tests/properties/p01-result-shape.test.ts` using `fc.anything()` and mutated manifests
     - **Property 1: Validator result shape**
     - **Validates: Requirements 5.1**
 
-  - [ ]* 3.4 Write property test for JSON round trip
+  - [x] 3.4 Write property test for JSON round trip
     - Create `tests/properties/p02-round-trip.test.ts`
     - **Property 2: Manifest JSON round trip**
     - **Validates: Requirements 5.13, 8.10**
 
-  - [ ]* 3.5 Write property test for missing or mistyped fields
+  - [x] 3.5 Write property test for missing or mistyped fields
     - Create `tests/properties/p03-missing-fields.test.ts`
     - **Property 3: Missing or mistyped fields are reported by path**
     - **Validates: Requirements 5.2**
 
-  - [ ]* 3.6 Write property test for duplicate identifiers
+  - [x] 3.6 Write property test for duplicate identifiers
     - Create `tests/properties/p04-duplicate-ids.test.ts`
     - **Property 4: Duplicate identifiers are rejected**
     - **Validates: Requirements 5.3**
 
-  - [ ]* 3.7 Write property test for hotspot coordinate range
+  - [x] 3.7 Write property test for hotspot coordinate range
     - Create `tests/properties/p05-coordinates.test.ts`
     - **Property 5: Out-of-range hotspot coordinates are rejected**
     - **Validates: Requirements 5.4, 8.8**
 
-  - [ ]* 3.8 Write property test for dangling references
+  - [x] 3.8 Write property test for dangling references
     - Create `tests/properties/p06-dangling.test.ts`
     - **Property 6: Dangling references are rejected**
     - **Validates: Requirements 5.5, 5.6, 5.9, 8.9**
 
-  - [ ]* 3.9 Write property test for answer index range
+  - [x] 3.9 Write property test for answer index range
     - Create `tests/properties/p07-index-range.test.ts`
     - **Property 7: Answer index out of range is rejected**
     - **Validates: Requirements 5.7**
 
-  - [ ]* 3.10 Write property test for missing entrance or throne room
+  - [x] 3.10 Write property test for missing entrance or throne room
     - Create `tests/properties/p08-missing-room.test.ts`
     - **Property 8: Missing entrance or throne room is rejected**
     - **Validates: Requirements 5.8**
 
-  - [ ]* 3.11 Write property test for unsolvable and orphaned dungeons
+  - [x] 3.11 Write property test for unsolvable and orphaned dungeons
     - Create `tests/properties/p09-unsolvable-orphans.test.ts`
     - **Property 9: Unsolvable and orphaned dungeons are reported**
     - **Validates: Requirements 5.10, 5.11**

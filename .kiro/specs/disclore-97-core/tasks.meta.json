@@ -7,6 +7,30 @@
     "2.4 Write property test for shortest path validity and minimality": {
       "status": "passed",
       "lastRunTimestamp": 1795278904261
+    },
+    "3.3 Write property test for validator result shape": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279517203
+    },
+    "3.5 Write property test for missing or mistyped fields": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279653906
+    },
+    "3.6 Write property test for duplicate identifiers": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279692657
+    },
+    "3.8 Write property test for dangling references": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279792140
+    },
+    "3.9 Write property test for answer index range": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279830131
+    },
+    "3.11 Write property test for unsolvable and orphaned dungeons": {
+      "status": "passed",
+      "lastRunTimestamp": 1795279914138
     }
   },
   "executionHistory": {
@@ -128,6 +152,155 @@
         "executionId": "5cd342af-e0b8-4b0e-9aa2-60c0f42a0a6c",
         "chatSessionId": "sess_35df32f4-6164-4021-925d-dc96b638bb84",
         "timestamp": 1795279145748
+      }
+    ],
+    "3.1 Create shared fast-check generators in `tests/generators.ts`": [
+      {
+        "executionId": "2f47320e-00d9-4470-9572-ce32ee2d5750",
+        "chatSessionId": "sess_db2750d8-84bd-43ab-bb4d-be6a5b494df5",
+        "timestamp": 1795279331163
+      },
+      {
+        "executionId": "2f47320e-00d9-4470-9572-ce32ee2d5750",
+        "chatSessionId": "sess_db2750d8-84bd-43ab-bb4d-be6a5b494df5",
+        "timestamp": 1795279458186
+      }
+    ],
+    "3.2 Implement `validateManifest` in `src/model/validate.ts`": [
+      {
+        "executionId": "2f47320e-00d9-4470-9572-ce32ee2d5750",
+        "chatSessionId": "sess_db2750d8-84bd-43ab-bb4d-be6a5b494df5",
+        "timestamp": 1795279331593
+      },
+      {
+        "executionId": "2f47320e-00d9-4470-9572-ce32ee2d5750",
+        "chatSessionId": "sess_db2750d8-84bd-43ab-bb4d-be6a5b494df5",
+        "timestamp": 1795279458645
+      }
+    ],
+    "3. Implement the manifest validator": [
+      {
+        "executionId": "2f47320e-00d9-4470-9572-ce32ee2d5750",
+        "chatSessionId": "sess_db2750d8-84bd-43ab-bb4d-be6a5b494df5",
+        "timestamp": 1795279458683
+      }
+    ],
+    "3.3 Write property test for validator result shape": [
+      {
+        "executionId": "d25da1c0-1bf1-4826-89ae-301a87d37d25",
+        "chatSessionId": "sess_6e745806-3c64-4e49-aa51-658c7606c774",
+        "timestamp": 1795279489382
+      },
+      {
+        "executionId": "d25da1c0-1bf1-4826-89ae-301a87d37d25",
+        "chatSessionId": "sess_6e745806-3c64-4e49-aa51-658c7606c774",
+        "timestamp": 1795279521818
+      }
+    ],
+    "3.4 Write property test for JSON round trip": [
+      {
+        "executionId": "acd963f3-22fa-4ae6-971b-9ca54d16b40c",
+        "chatSessionId": "sess_1f51521f-7580-48f6-aa78-d31a37a864f5",
+        "timestamp": 1795279576127
+      },
+      {
+        "executionId": "acd963f3-22fa-4ae6-971b-9ca54d16b40c",
+        "chatSessionId": "sess_1f51521f-7580-48f6-aa78-d31a37a864f5",
+        "timestamp": 1795279606628
+      }
+    ],
+    "3.5 Write property test for missing or mistyped fields": [
+      {
+        "executionId": "7d480cd9-4e26-4267-95a7-5ba177f57e1f",
+        "chatSessionId": "sess_ce4c66fb-a58d-4272-b026-fbfb7ea14d13",
+        "timestamp": 1795279632834
+      },
+      {
+        "executionId": "7d480cd9-4e26-4267-95a7-5ba177f57e1f",
+        "chatSessionId": "sess_ce4c66fb-a58d-4272-b026-fbfb7ea14d13",
+        "timestamp": 1795279658846
+      }
+    ],
+    "3.6 Write property test for duplicate identifiers": [
+      {
+        "executionId": "e4cea45d-23b2-4c2a-ae17-570c2cccc8ef",
+        "chatSessionId": "sess_3e29717c-cbce-4485-bf1d-a4999494c79a",
+        "timestamp": 1795279675907
+      },
+      {
+        "executionId": "e4cea45d-23b2-4c2a-ae17-570c2cccc8ef",
+        "chatSessionId": "sess_3e29717c-cbce-4485-bf1d-a4999494c79a",
+        "timestamp": 1795279697646
+      }
+    ],
+    "3.7 Write property test for hotspot coordinate range": [
+      {
+        "executionId": "5018293a-134e-4cef-9fff-2dc7aacc6f95",
+        "chatSessionId": "sess_13bdc1ff-a76c-4bb5-a475-8cd278b45452",
+        "timestamp": 1795279711238
+      },
+      {
+        "executionId": "5018293a-134e-4cef-9fff-2dc7aacc6f95",
+        "chatSessionId": "sess_13bdc1ff-a76c-4bb5-a475-8cd278b45452",
+        "timestamp": 1795279745083
+      }
+    ],
+    "3.8 Write property test for dangling references": [
+      {
+        "executionId": "89a91964-cb6c-4085-bf73-2bd423a4d967",
+        "chatSessionId": "sess_71d26dfb-62b2-462a-8621-08eb71d74d24",
+        "timestamp": 1795279755748
+      },
+      {
+        "executionId": "89a91964-cb6c-4085-bf73-2bd423a4d967",
+        "chatSessionId": "sess_71d26dfb-62b2-462a-8621-08eb71d74d24",
+        "timestamp": 1795279797997
+      }
+    ],
+    "3.9 Write property test for answer index range": [
+      {
+        "executionId": "e26772f4-7c52-4140-9022-e592f2f8fcf6",
+        "chatSessionId": "sess_ffecd533-a288-4966-9d82-94d5468d6709",
+        "timestamp": 1795279812503
+      },
+      {
+        "executionId": "e26772f4-7c52-4140-9022-e592f2f8fcf6",
+        "chatSessionId": "sess_ffecd533-a288-4966-9d82-94d5468d6709",
+        "timestamp": 1795279834462
+      }
+    ],
+    "3.10 Write property test for missing entrance or throne room": [
+      {
+        "executionId": "bde1a364-fee6-4166-a7fd-4df815a2729d",
+        "chatSessionId": "sess_bf9a6108-e801-4ca3-ab60-0ff75d173b44",
+        "timestamp": 1795279843402
+      },
+      {
+        "executionId": "bde1a364-fee6-4166-a7fd-4df815a2729d",
+        "chatSessionId": "sess_bf9a6108-e801-4ca3-ab60-0ff75d173b44",
+        "timestamp": 1795279875335
+      }
+    ],
+    "3.11 Write property test for unsolvable and orphaned dungeons": [
+      {
+        "executionId": "8282a6aa-783e-4c24-ab1b-997aaf1a5827",
+        "chatSessionId": "sess_a667da57-4a16-4fb3-958d-8dd3ba3f6f29",
+        "timestamp": 1795279887528
+      },
+      {
+        "executionId": "8282a6aa-783e-4c24-ab1b-997aaf1a5827",
+        "chatSessionId": "sess_a667da57-4a16-4fb3-958d-8dd3ba3f6f29",
+        "timestamp": 1795279919341
+      },
+      {
+        "executionId": "7d77e9fe-ff69-4947-8bdc-bef5993af022",
+        "chatSessionId": "sess_a667da57-4a16-4fb3-958d-8dd3ba3f6f29",
+        "timestamp": 1795280053086
+      },
+      {
+        "executionId": "7d77e9fe-ff69-4947-8bdc-bef5993af022",
+        "chatSessionId": "sess_a667da57-4a16-4fb3-958d-8dd3ba3f6f29",
+        "timestamp": 1795280090714
       }
     ]
   }
