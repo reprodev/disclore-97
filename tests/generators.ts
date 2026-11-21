@@ -17,6 +17,7 @@
  */
 import fc from 'fast-check';
 import { ENTRANCE_ROOM_ID, THRONE_ROOM_ID } from '../src/model/manifest';
+import type { ExtractedSource } from '../src/model/source';
 import type {
   DiscManifest,
   Diagram,
@@ -395,3 +396,226 @@ export function addOrphans(m: DiscManifest, pick: number, count: number): Mutati
   }
   return { ...mutation(copy, ['dungeons', d]), dungeonIndex: d, orphanIds };
 }
+
+// ---------------------------------------------------------------------------
+// Dynamic disc compiler: source generators
+// ---------------------------------------------------------------------------
+
+/** Grapheme-cluster strings (emoji, combining marks). */
+export const arbTextGrapheme: fc.Arbitrary<string> = fc.string({ unit: 'grapheme', maxLength: 40 });
+
+/** Full Unicode strings including odd code points and lone surrogates. */
+export const arbTextBinary: fc.Arbitrary<string> = fc.string({ unit: 'binary', maxLength: 40 });
+
+const HTML_PIECES = [
+  '<b>',
+  '</b>',
+  '<div class="x">',
+  '<scr<script>ipt>',
+  '<script>alert(1)</script>',
+  '<img src=x onerror=alert(1)>',
+  '<!-- c -->',
+  '&amp;',
+  '&lt;',
+  '&#60;',
+  '&#x3C;',
+  '&nbsp;',
+  '<a href="javascript:void(0)">',
+  'text',
+  ' ',
+];
+
+/** HTML-like fragments: tags, nested script tags, entities, comments. */
+export const arbTextHtml: fc.Arbitrary<string> = fc
+  .array(fc.constantFrom(...HTML_PIECES), { minLength: 1, maxLength: 8 })
+  .map((parts) => parts.join(''));
+
+const MARKDOWN_PIECES = [
+  '# Heading',
+  '## Sub heading',
+  '[link](http://example.com)',
+  '![img](http://img.example/p.png)',
+  '```\ncode\n```',
+  '**bold**',
+  '_em_',
+  '`code`',
+  '- item',
+  '1. item',
+  '> quote',
+  '| a | b |',
+  'plain',
+];
+
+/** Markdown-like fragments: links, images, fences, headings. */
+export const arbTextMarkdown: fc.Arbitrary<string> = fc
+  .array(fc.constantFrom(...MARKDOWN_PIECES), { minLength: 1, maxLength: 6 })
+  .map((parts) => parts.join('\n'));
+
+/** Runs of spaces, tabs, newlines, and Unicode spaces, optionally around a word. */
+export const arbTextWhitespace: fc.Arbitrary<string> = fc
+  .array(fc.constantFrom(' ', '\t', '\n', '\r\n', '\u00a0', '\u2003', '\u3000'), { minLength: 1, maxLength: 30 })
+  .chain((ws) => fc.constantFrom('', 'word').map((w) => ws.join('') + w + ws.join('')));
+
+/** Strings of control characters (C0, DEL, C1) and bidi/zero-width marks. */
+export const arbTextControl: fc.Arbitrary<string> = fc
+  .array(fc.constantFrom('\u0000', '\u0007', '\u001b', '\u007f', '\u0085', '\u009f', '\u200b', '\u202e', '\u2066', '\ufeff'), {
+    minLength: 1,
+    maxLength: 12,
+  })
+  .map((parts) => parts.join(''));
+
+/** A 5000-character string. */
+export const arbTextLong: fc.Arbitrary<string> = fc.constantFrom('abc ', 'word\n', 'x').map((s) => s.repeat(Math.ceil(5000 / s.length)).slice(0, 5000));
+
+/** Union of all text variants, plus ordinary and empty strings. */
+export const arbTextVariant: fc.Arbitrary<string> = fc.oneof(
+  { weight: 4, arbitrary: fc.string({ maxLength: 40 }) },
+  { weight: 1, arbitrary: fc.constant('') },
+  { weight: 1, arbitrary: arbTextGrapheme },
+  { weight: 1, arbitrary: arbTextBinary },
+  { weight: 2, arbitrary: arbTextHtml },
+  { weight: 2, arbitrary: arbTextMarkdown },
+  { weight: 1, arbitrary: arbTextWhitespace },
+  { weight: 1, arbitrary: arbTextControl },
+  { weight: 1, arbitrary: arbTextLong },
+);
+
+const HEADING_POOL = ['Overview', 'Usage', 'Install', 'License'];
+
+const arbHeading: fc.Arbitrary<string> = fc.oneof(
+  { weight: 2, arbitrary: fc.constantFrom(...HEADING_POOL) },
+  { weight: 2, arbitrary: arbTextVariant },
+);
+
+const arbKind = fc.constantFrom('github' as const, 'webpage' as const, 'markdown' as const, 'topic' as const);
+
+const arbSourceLabel: fc.Arbitrary<string> = fc.oneof(
+  fc.constantFrom('https://github.com/o/r', 'https://example.com/page', 'Topic: Lighthouses', 'Pasted Markdown', ''),
+  arbTextVariant,
+);
+
+/** Build a source record, omitting optional metadata fields instead of setting undefined. */
+function buildSource(
+  kind: 'github' | 'webpage' | 'markdown' | 'topic',
+  title: string,
+  headings: string[],
+  paragraphs: string[],
+  source: string,
+  opt: { description?: string; languages?: string[]; author?: string; facts?: string[] },
+): ExtractedSource {
+  const metadata: ExtractedSource['metadata'] = { kind, source };
+  if (opt.description !== undefined) metadata.description = opt.description;
+  if (opt.languages !== undefined) metadata.languages = opt.languages;
+  if (opt.author !== undefined) metadata.author = opt.author;
+  if (opt.facts !== undefined) metadata.facts = opt.facts;
+  return { title, headings, paragraphs, metadata };
+}
+
+const optionalKeys = { requiredKeys: [] as never[] };
+
+/**
+ * Arbitrary extracted source: all four kinds, empty strings and lists, duplicate
+ * headings from a small pool, very long strings, and optional description,
+ * languages, author, and facts (omitted rather than undefined).
+ */
+export const arbExtractedSource: fc.Arbitrary<ExtractedSource> = fc
+  .record({
+    kind: arbKind,
+    title: arbTextVariant,
+    headings: fc.array(arbHeading, { maxLength: 20 }),
+    paragraphs: fc.array(arbTextVariant, { maxLength: 30 }),
+    source: arbSourceLabel,
+    opt: fc.record(
+      {
+        description: arbTextVariant,
+        languages: fc.array(arbTextVariant, { maxLength: 5 }),
+        author: arbTextVariant,
+        facts: fc.array(arbTextVariant, { maxLength: 6 }),
+      },
+      optionalKeys,
+    ),
+  })
+  .map((g) => buildSource(g.kind, g.title, g.headings, g.paragraphs, g.source, g.opt));
+
+/** Thin sources: 0 to 4 headings, 0 to 2 paragraphs, mostly empty strings. */
+export const arbThinSource: fc.Arbitrary<ExtractedSource> = fc
+  .record({
+    kind: arbKind,
+    title: fc.constantFrom('', 'T'),
+    headings: fc.array(fc.constantFrom('', 'Overview', 'Usage'), { maxLength: 4 }),
+    paragraphs: fc.array(fc.constantFrom('', 'Short.'), { maxLength: 2 }),
+    source: fc.constantFrom('', 'Topic: x', 'https://github.com/o/r'),
+  })
+  .map((g) => buildSource(g.kind, g.title, g.headings, g.paragraphs, g.source, {}));
+
+const HOSTILE_FRAGMENTS = [
+  '<script>alert(1)</script>',
+  'javascript:',
+  'onerror=',
+  '![x](http://img.example/p.png)',
+  '[label](http://link.example)',
+  '\u0000\u0007\u001b\u007f\u009f',
+];
+
+/** Wraps arbitrary text with at least one hostile fragment, so every string carries one. */
+const arbHostileString: fc.Arbitrary<string> = fc
+  .record({
+    pre: fc.string({ maxLength: 10 }),
+    frag: fc.constantFrom(...HOSTILE_FRAGMENTS),
+    post: fc.string({ maxLength: 10 }),
+    extra: fc.constantFrom(...HOSTILE_FRAGMENTS),
+  })
+  .map((g) => `${g.pre}${g.frag}${g.post}${g.extra}`);
+
+/** Sources whose every string (title, headings, paragraphs, metadata) contains hostile content. */
+export const arbHostileSource: fc.Arbitrary<ExtractedSource> = fc
+  .record({
+    kind: arbKind,
+    title: arbHostileString,
+    headings: fc.array(arbHostileString, { maxLength: 12 }),
+    paragraphs: fc.array(arbHostileString, { maxLength: 15 }),
+    source: arbHostileString,
+    opt: fc.record(
+      {
+        description: arbHostileString,
+        languages: fc.array(arbHostileString, { maxLength: 4 }),
+        author: arbHostileString,
+        facts: fc.array(arbHostileString, { maxLength: 4 }),
+      },
+      optionalKeys,
+    ),
+  })
+  .map((g) => buildSource(g.kind, g.title, g.headings, g.paragraphs, g.source, g.opt));
+
+const MD_BLOCKS = [
+  '```\nfenced code\n```',
+  '<div>\nhtml block\n</div>',
+  '- list item\n- another',
+  '1. first\n2. second',
+  '| a | b |\n|---|---|\n| 1 | 2 |',
+  '![alt](http://img.example/p.png)',
+  'A plain paragraph of prose about the subject.',
+  'Another paragraph with [a link](http://example.com) inside.',
+  '',
+];
+
+/** Markdown documents with fences, HTML blocks, lists, tables, and headings of levels 1 to 6. */
+export const arbMarkdown: fc.Arbitrary<string> = fc
+  .array(
+    fc.oneof(
+      fc.tuple(fc.integer({ min: 1, max: 6 }), fc.string({ maxLength: 20 })).map(([n, t]) => `${'#'.repeat(n)} ${t}`),
+      fc.constantFrom(...MD_BLOCKS),
+    ),
+    { maxLength: 15 },
+  )
+  .map((blocks) => blocks.join('\n\n'));
+
+/** Single-line topic strings. */
+export const arbTopic: fc.Arbitrary<string> = fc
+  .oneof(
+    fc.string({ maxLength: 60 }),
+    fc.constantFrom('Lighthouses', 'Rust: a language', 'C++', 'C#', 'The History of Tea'),
+    arbTextGrapheme,
+    arbTextHtml,
+  )
+  .map((s) => s.replace(/[\r\n\u2028\u2029]+/g, ' '));

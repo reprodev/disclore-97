@@ -10,8 +10,8 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
 
 ## Tasks
 
-- [ ] 1. Add source types, pure helpers, and fast-check generators
-  - [ ] 1.1 Create `src/model/source.ts` and the `src/model/compile/` helpers
+- [x] 1. Add source types, pure helpers, and fast-check generators
+  - [x] 1.1 Create `src/model/source.ts` and the `src/model/compile/` helpers
     - `source.ts`: export `SourceKind`, `SourceMetadata`, and `ExtractedSource`. Omit optional fields instead of setting them to `undefined`
     - `compile/prng.ts`: export `fnv1a32`, `mulberry32`, and `stream(seed, salt)` using integer arithmetic only
     - `compile/ids.ts`: export `slug`, `hash4`, and `discId(kind, identity)` so the id starts with its Source_Kind, matches `^(github|webpage|markdown|topic)(-[a-z0-9]+)+$`, and is at most 48 characters. Add section, diagram, trivia, dungeon, and room id helpers backed by counters
@@ -19,13 +19,13 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Import nothing from React, `src/components`, or a browser global
     - _Requirements: 2.7, 2.9, 2.10, 6.5, 6.6, 7.1, 7.2, 7.3, 7.6, 7.8, 15.10_
 
-  - [ ] 1.2 Add fast-check source generators to `tests/generators.ts`
+  - [x] 1.2 Add fast-check source generators to `tests/generators.ts`
     - Append without changing existing exports: `arbText` variants (grapheme, binary Unicode, HTML-like, Markdown-like, whitespace runs, control characters, a 5000-character string), `arbExtractedSource`, `arbThinSource`, `arbHostileSource`, `arbMarkdown`, and `arbTopic`
     - `arbExtractedSource` covers all four kinds, empty strings, empty lists, duplicate headings drawn from a small pool, very long strings, and optional `description`, `languages`, `author`, and `facts`
     - `arbHostileSource` puts `<script>alert(1)</script>`, `javascript:`, `onerror=`, a Markdown image, a Markdown link, and control characters into every string
     - _Requirements: 17.1, 17.2, 17.3_
 
-  - [ ] 1.3 Add input, SSRF, HTML, and fetch generators in `tests/generators-io.ts`
+  - [x] 1.3 Add input, SSRF, HTML, and fetch generators in `tests/generators-io.ts`
     - `arbOwnerRepo` and `arbGithubUrl` (names from letters, digits, `-`, `_`, `.`, not only dots, with optional `www.`, `.git`, trailing slash, sub-path, query, fragment, and surrounding whitespace)
     - `arbBlockedIPv4` (pick a blocked range, then an address in it) with renderers for dotted, decimal, hexadecimal, octal, and short forms; `arbBlockedIPv6` (`fc00::/7`, `fe80::/10`, mapped blocked IPv4, `::`, `::1`); `arbPublicHost`
     - `arbHtmlDoc` (title, headings, paragraphs, inline noise tags, entity encoding, and unique marker text inside `script`, `style`, `noscript`, `template`, `svg`, `iframe`, and comments)
@@ -33,7 +33,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - A helper that builds a base64 README payload wrapped at 60 columns
     - _Requirements: 17.3, 17.10, 17.11, 17.12, 17.13, 17.14, 17.15_
 
-  - [ ] 1.4 Write unit tests for the helpers and generators
+  - [x] 1.4 Write unit tests for the helpers and generators
     - Create `tests/compiler/helpers.test.ts`: `fnv1a32` and `mulberry32` give fixed known outputs and values in `[0, 1)`; `discId` handles empty identities, `C++` versus `C#`, case-insensitive repeats, and the 48-character limit; `sanitizeLine` handles `<scr<script>ipt>`, images, links, bidi characters, lone surrogates, and truncation inside a surrogate pair
     - Assert that `fc.sample(arbExtractedSource, 120)` returns at least 100 sources and that the samples include empty, long, and HTML-like inputs
     - _Requirements: 2.7, 7.1, 7.2, 7.3, 7.8, 17.1, 17.2_
