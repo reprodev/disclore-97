@@ -383,6 +383,73 @@
         "chatSessionId": "sess_2d638b24-c0cc-4cae-b785-ca530287cad9",
         "timestamp": 1795299088493
       }
+    ],
+    "6.1 Create `src/adapters/types.ts`, `errors.ts`, and `http.ts`": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299402378
+      },
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299446062
+      }
+    ],
+    "6.2 Implement the Fallback_Adapter in `src/adapters/markdown.ts`": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299446616
+      },
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299491689
+      }
+    ],
+    "6.5 Write error message unit tests": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299449209
+      },
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299491149
+      }
+    ],
+    "6.3 Write property test for fallback validity": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299494011
+      },
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299541399
+      }
+    ],
+    "6.4 Write fallback unit tests": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299494425
+      },
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299540681
+      }
+    ],
+    "6. Implement shared adapter types and the Markdown and topic fallback": [
+      {
+        "executionId": "4e9ee028-b2e8-42c0-9f2e-5b82163a45bc",
+        "chatSessionId": "sess_8354cf74-ec23-4d0e-94c8-a1db40cc4292",
+        "timestamp": 1795299541492
+      }
     ]
   }
 }

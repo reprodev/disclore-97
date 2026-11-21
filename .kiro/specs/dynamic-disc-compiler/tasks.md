@@ -149,29 +149,29 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/compiler/sourceInput.test.ts`: each kind, each error code, `www.`, `.git`, sub-path, `Rust: a language` stays a topic, `javascript:alert(1)` is `unsupported-scheme`, `https://github.com/owner` is `invalid-github-url`, and `http://` falls back to topic
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 17.10_
 
-- [ ] 6. Implement shared adapter types and the Markdown and topic fallback
-  - [ ] 6.1 Create `src/adapters/types.ts`, `errors.ts`, and `http.ts`
+- [x] 6. Implement shared adapter types and the Markdown and topic fallback
+  - [x] 6.1 Create `src/adapters/types.ts`, `errors.ts`, and `http.ts`
     - `types.ts`: `Result<T>`, `BurnErrorCode` (the 12 codes), `BurnError`, `FetchLike`, and `AdapterOptions`
     - `errors.ts`: `ERROR_MESSAGES: Record<BurnErrorCode, string>` in plain English with no angle brackets, and `FALLBACK_CODES` (`network`, `timeout`, `rate-limited`, `repo-not-found`, `unavailable`, `fetch-failed`)
     - `http.ts`: `fetchWithDeadline(fetch, url, init, ms, outer)` that aborts on deadline or outer abort, covers body reading, clears its timer in `finally`, and maps outcomes to `cancelled`, `timeout`, or `network`
     - _Requirements: 8.9, 8.10, 8.11, 11.3, 12.5, 12.7, 14.2, 14.6_
 
-  - [ ] 6.2 Implement the Fallback_Adapter in `src/adapters/markdown.ts`
+  - [x] 6.2 Implement the Fallback_Adapter in `src/adapters/markdown.ts`
     - Export `parseMarkdown`, `markdownToSource`, and `topicToSource`. Use a single line pass that skips fenced code, HTML blocks, indented code, tables, and rules, reads `#` to `###` headings (first level-1 heading is the title), joins lines into paragraphs, treats list items as paragraphs, and strips images and links through `stripMarkdownInline`
     - `topicToSource` returns 6 template headings with study-prompt paragraphs that state no facts
     - Perform no network access
     - _Requirements: 11.1, 11.2, 11.5, 11.6, 11.7, 7.8_
 
-  - [ ] 6.3 Write property test for fallback validity
+  - [x] 6.3 Write property test for fallback validity
     - Create `tests/properties/dc20-fallback.test.ts` running `parseInput`, the fallback adapter, and `compileDisc` on `arbMarkdown` and `arbTopic`, with planted fenced code, HTML block, and image markers that must not reach the paragraphs
     - **Property 20: Markdown and topic fallback produces valid discs**
     - **Validates: Requirements 11.6, 11.7, 17.3**
 
-  - [ ] 6.4 Write fallback unit tests
+  - [x] 6.4 Write fallback unit tests
     - Create `tests/adapters/markdown.test.ts`: heading levels, lists, tables, fences, images, empty input, and a 20000-character input that finishes under 50 ms (best of three runs)
     - _Requirements: 11.1, 11.2, 11.5, 11.6_
 
-  - [ ] 6.5 Write error message unit tests
+  - [x] 6.5 Write error message unit tests
     - Create `tests/adapters/errors.test.ts`: for every `BurnErrorCode` the message is non-empty and contains no `<` or `>`, and `FALLBACK_CODES` matches the six codes of Requirement 11.3
     - _Requirements: 11.3, 14.2, 14.6_
 
