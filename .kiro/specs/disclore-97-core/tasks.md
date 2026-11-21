@@ -229,13 +229,13 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/components/viewers.test.tsx`: DiscBrowser listing and spin-up request, ArticleViewer scroll reset and not-found message, HotspotViewer tooltip and navigation, KeepMazeUI flow (correct answer, wrong answer with section link and no move counted, retry draws the next question, victory counts, restart, no-trivia disabled start), MuteToggle state display, ErrorList output
     - _Requirements: 5.12, 10.1, 10.2, 10.4, 10.5, 10.6, 11.3, 11.4, 12.1, 12.3, 12.4, 12.5, 12.6, 12.8, 12.9, 12.10, 12.12, 13.8_
 
-- [ ] 10. Wire the App together
-  - [ ] 10.1 Implement `App.tsx` and `main.tsx`
+- [x] 10. Wire the App together
+  - [x] 10.1 Implement `App.tsx` and `main.tsx`
     - `App` holds `{ discId, view }` with views `section`, `diagram`, and `keepmaze`, and a `selectSection` that leaves the state unchanged and reports not-found for unknown ids
     - Render DiscBrowser, the Window with ArticleViewer, HotspotViewer, or KeepMazeUI, and MuteToggle in the shell so it shows on every screen. Pass hotspot and wrong-answer section links to section navigation. Load every disc through `loadDisc` (no import UI in this spec; Requirement 5.14) and show `ErrorList` in place of any disc that fails validation
     - _Requirements: 5.12, 5.14, 10.2, 10.3, 10.4, 10.6, 11.4, 12.4, 13.8, 13.11_
 
-  - [ ]* 10.2 Write App integration tests
+  - [x] 10.2 Write App integration tests
     - Create `tests/components/app.test.tsx`: open a disc, read a section, follow a hotspot, play a KeepMaze round to victory, confirm the session starts unmuted, toggle mute and confirm no audio nodes on a mock context, and render ErrorList for an invalid injected manifest
     - _Requirements: 5.12, 10.2, 10.4, 11.4, 12.5, 13.7, 13.8, 13.11_
 

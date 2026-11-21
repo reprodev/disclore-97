@@ -645,6 +645,37 @@
         "chatSessionId": "sess_531a1504-c0dd-4505-b666-40e59e1e1859",
         "timestamp": 1795283152874
       }
+    ],
+    "10.1 Implement `App.tsx` and `main.tsx`": [
+      {
+        "executionId": "fe8b2a46-4318-429a-9405-51f6035ac133",
+        "chatSessionId": "sess_3ae5bf7d-9104-467e-bb61-91e523cf4cdd",
+        "timestamp": 1795283372306
+      },
+      {
+        "executionId": "fe8b2a46-4318-429a-9405-51f6035ac133",
+        "chatSessionId": "sess_3ae5bf7d-9104-467e-bb61-91e523cf4cdd",
+        "timestamp": 1795283420125
+      }
+    ],
+    "10.2 Write App integration tests": [
+      {
+        "executionId": "fe8b2a46-4318-429a-9405-51f6035ac133",
+        "chatSessionId": "sess_3ae5bf7d-9104-467e-bb61-91e523cf4cdd",
+        "timestamp": 1795283420525
+      },
+      {
+        "executionId": "fe8b2a46-4318-429a-9405-51f6035ac133",
+        "chatSessionId": "sess_3ae5bf7d-9104-467e-bb61-91e523cf4cdd",
+        "timestamp": 1795283655806
+      }
+    ],
+    "10. Wire the App together": [
+      {
+        "executionId": "fe8b2a46-4318-429a-9405-51f6035ac133",
+        "chatSessionId": "sess_3ae5bf7d-9104-467e-bb61-91e523cf4cdd",
+        "timestamp": 1795283655875
+      }
     ]
   }
 }
