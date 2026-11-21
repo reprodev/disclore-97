@@ -366,15 +366,15 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/components/burn-app.test.tsx`: a successful burn mounts the disc and requests the spin-up sound, a failed burn keeps the previous disc, discs are restored at start from a fake `Storage`, `Remove` deletes a stored disc, a throwing `Storage` shows the not-saved notice while the disc still mounts, and existing `sources` prop tests never read `localStorage`
     - _Requirements: 6.3, 13.11, 15.3, 15.5, 15.6, 17.16, 17.17_
 
-- [ ] 16. Add compliance checks and documentation
-  - [ ] 16.1 Write static compliance tests in `tests/dynamic-static.test.ts`
+- [x] 16. Add compliance checks and documentation
+  - [x] 16.1 Write static compliance tests in `tests/dynamic-static.test.ts`
     - Assert: `src/styles/burn.css` exists, uses `var(--font-ui)`, and has no `url(`, hex literal, non-zero radius, gradient, `backdrop-filter`, or blurred `box-shadow`
     - Assert: compiler files (`src/model/compiler.ts`, `src/model/compile/*`, `src/model/sourceInput.ts`, `src/extract/ssrf.ts`) import nothing from `react`, `src/components`, `src/adapters`, or `src/library` and contain none of `Math.random`, `Date.now`, `new Date`, `document.`, `window.`, `localStorage`, and `fetch(` (scan with comments stripped, so prose such as "HTML document" does not fail)
     - Assert: no `dangerouslySetInnerHTML` or `innerHTML` under `src/`, no `Authorization` in `src/adapters/*`, the only absolute `http` URLs in `src/` are `https://api.github.com` and `https://github.com/`, `functions/` and `src/extract/` contain no `process.env`, `API_KEY`, `Authorization`, or `secret` (scan with comments stripped; do not scan for the bare word `token`, which a scanner may use as an identifier), no `.env` file is committed, every `ALLOWED_TOKENS` name is defined in `tokens.css`, `tsconfig.json` `include` contains `functions`, and runtime dependencies stay exactly `react` and `react-dom`
     - Assert that the `LICENSE` file is still MIT and that no external image, audio, font, or script resource is referenced
     - _Requirements: 6.5, 6.6, 7.4, 8.2, 9.11, 9.13, 16.1, 16.2, 16.4, 16.5, 16.6, 16.7, 16.8, 16.10, 17.20_
 
-  - [ ] 16.2 Update `README.md` and `docs/BUILD-STORY.md`
+  - [x] 16.2 Update `README.md` and `docs/BUILD-STORY.md`
     - README: describe the Burn New CD-R Disc flow, the four source kinds, the optional `functions/api/extract.ts` (local run with `npx wrangler pages dev dist`, and that the app works without it), the SSRF guard and its DNS-rebinding limit, the GitHub 60 requests per hour limit, and the `localStorage` disc library
     - BUILD-STORY: add a short note on how Spec #2 was built
     - Include no secret, token, or private URL

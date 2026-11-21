@@ -71,6 +71,15 @@ The last checkpoint ran the whole suite and build:
 
 The result is a static site that can be deployed to Cloudflare Pages with `npm run build` and the `dist` output directory.
 
+## 6. Spec #2: the dynamic disc compiler
+
+The second spec, `.kiro/specs/dynamic-disc-compiler/`, added the Burn New CD-R Disc flow. It followed the same requirements, design, tasks order as Spec #1.
+
+- **Same invariants.** Compiled discs are ordinary `DiscManifest` objects. They go through the existing validator and BFS solver, so a generated dungeon is held to the same rules as the hand-written ones.
+- **Layers kept.** Source adapters (`src/adapters/`) and the compiler (`src/model/compile/`) hold the logic. The compiler is pure and seeded, so the same source gives the same disc and property tests can cover it.
+- **Static first.** The only server code is one optional Pages Function, `functions/api/extract.ts`. Its logic lives in `src/extract/` so it can be unit tested, and the app works when the function is absent.
+- **Still dependency-light.** Runtime dependencies are still `react` and `react-dom`. A static test scans `src/` and `functions/` for secrets and unsafe HTML.
+
 ## Appendix A: Architecture at a glance
 
 ```mermaid

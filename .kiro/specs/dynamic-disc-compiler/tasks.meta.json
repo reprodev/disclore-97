@@ -997,6 +997,37 @@
         "chatSessionId": "sess_4f8e10d3-5ce7-48d3-aadd-72cb4a623935",
         "timestamp": 1795302797710
       }
+    ],
+    "16.1 Write static compliance tests in `tests/dynamic-static.test.ts`": [
+      {
+        "executionId": "8314afaa-e5ef-4f21-b44c-d726dd944d2a",
+        "chatSessionId": "sess_c9d940f7-0114-418e-8617-42ba2da4ffc3",
+        "timestamp": 1795303010501
+      },
+      {
+        "executionId": "8314afaa-e5ef-4f21-b44c-d726dd944d2a",
+        "chatSessionId": "sess_c9d940f7-0114-418e-8617-42ba2da4ffc3",
+        "timestamp": 1795303281686
+      }
+    ],
+    "16.2 Update `README.md` and `docs/BUILD-STORY.md`": [
+      {
+        "executionId": "8314afaa-e5ef-4f21-b44c-d726dd944d2a",
+        "chatSessionId": "sess_c9d940f7-0114-418e-8617-42ba2da4ffc3",
+        "timestamp": 1795303013305
+      },
+      {
+        "executionId": "8314afaa-e5ef-4f21-b44c-d726dd944d2a",
+        "chatSessionId": "sess_c9d940f7-0114-418e-8617-42ba2da4ffc3",
+        "timestamp": 1795303282186
+      }
+    ],
+    "16. Add compliance checks and documentation": [
+      {
+        "executionId": "8314afaa-e5ef-4f21-b44c-d726dd944d2a",
+        "chatSessionId": "sess_c9d940f7-0114-418e-8617-42ba2da4ffc3",
+        "timestamp": 1795303282233
+      }
     ]
   }
 }

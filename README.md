@@ -37,6 +37,34 @@ Two original discs ship with the app. Both are typed `DiscManifest` objects in `
 
 - **Castles:** the dungeon is "The Keep of Many Stairs". The diagram is a castle cross-section.
 - **Retro:** the dungeon is "The Cursor Catacombs". The diagram is a dial-up home setup.
+
+## Burn New CD-R Disc
+
+Besides the two pre-baked discs, you can compile your own disc in the browser. Choose **Burn New CD-R Disc**, pick a source, and press burn. The app fetches or reads the source, compiles it into a `DiscManifest`, runs the same validator and BFS solver as the built-in discs, and opens the result.
+
+Four source kinds are supported:
+
+- **github:** a public repository, read through the GitHub REST API.
+- **webpage:** a public web page. Pages are fetched through the optional extract function (see below).
+- **markdown:** Markdown text you paste in.
+- **topic:** a free-text topic, compiled into a disc without any network request.
+
+### Optional extract function
+
+`functions/api/extract.ts` is a Cloudflare Pages Function that fetches a web page server-side so the browser can read it. It is optional. The app builds and runs without it, and only the `webpage` source needs it. To run it locally:
+
+```bash
+npm run build
+npx wrangler pages dev dist
+```
+
+The function has an SSRF guard. It rejects non-HTTP(S) URLs and private, loopback, and link-local addresses, and it re-checks every redirect. The guard cannot fully prevent DNS rebinding, because the hostname is resolved again when the request is made. Treat it as a defense in depth, not a complete barrier.
+
+### Limits
+
+- **GitHub rate limit.** Requests are unauthenticated, so GitHub allows 60 requests per hour per IP address. When the limit is reached, the burn fails with an error and you can retry later.
+- **Disc library.** Burned discs are stored in `localStorage` in your browser, up to 10 discs. They never leave your device.
+
 ## Getting started
 
 Requires Node.js and npm.
