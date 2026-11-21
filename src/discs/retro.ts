@@ -1,4 +1,4 @@
-import type { DiscManifest } from '../model/manifest';
+import type { DiscManifest, Shape } from '../model/manifest';
 
 export const retroDisc: DiscManifest = {
   disc_id: 'retro-dialup',
@@ -7,6 +7,19 @@ export const retroDisc: DiscManifest = {
   sections: [
     {
       section_id: 'beige-box',
+      plate: 'computer',
+      facts: [
+        'Beige plastic cases were the standard look of home PCs.',
+        'CRT monitors were deep and heavy.',
+        'Hard drives were measured in megabytes.',
+        'Windows 95 launched in August 1995.',
+      ],
+      timeline: [
+        { when: '1981', event: 'IBM introduces its Personal Computer.' },
+        { when: 'Late 1980s', event: 'Low-cost PC clones fill homes and offices.' },
+        { when: 'Early 1990s', event: 'Faster 486 machines and color VGA displays become common.' },
+        { when: 'Mid 1990s', event: 'Pentium PCs with CD-ROM drives and sound cards are sold as multimedia PCs.' },
+      ],
       title: 'The Beige Box on the Desk',
       paragraphs: [
         'The typical home computer of the mid 1990s was a tower or desktop case molded from beige plastic, paired with a deep cathode ray tube monitor that took up half the desk.',
@@ -15,6 +28,19 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'modem-handshake',
+      plate: 'modem',
+      facts: [
+        'The word modem comes from modulator-demodulator.',
+        'The screech is the sound of two modems testing the line.',
+        'Each side settles on the fastest speed the line allows.',
+        'A 56k modem rarely reached its top speed in practice.',
+      ],
+      timeline: [
+        { when: '1960s', event: 'Commercial modems let computers talk over phone lines.' },
+        { when: '1980s', event: 'Home modems run at 300 to 2400 bits per second.' },
+        { when: 'Early 1990s', event: 'Speeds of 14.4 and 28.8 kilobits per second spread.' },
+        { when: 'Late 1990s', event: '56k modems arrive, first with rival designs.' },
+      ],
       title: 'The Modem Handshake',
       paragraphs: [
         'A dial-up modem turned data into audio tones so it could travel over an ordinary phone line. When it connected, the two modems exchanged a burst of whistles and static to agree on a speed.',
@@ -23,6 +49,18 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'phone-line',
+      plate: 'phone',
+      facts: [
+        'A voice line carries only a narrow band of sound.',
+        'An online modem tied up the household line.',
+        'Callers heard a busy signal.',
+        'Some families added a second line just for the modem.',
+      ],
+      timeline: [
+        { when: 'Early 1990s', event: 'Dial-up online services grow among home users.' },
+        { when: 'Mid 1990s', event: 'Many households add a second phone line.' },
+        { when: 'Late 1990s', event: 'Cable and DSL begin to offer always-on service.' },
+      ],
       title: 'One Line, One Conversation',
       paragraphs: [
         'Most homes had a single phone line. While the modem was online, the line was busy, so callers heard a busy signal and family members waited their turn.',
@@ -31,6 +69,19 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'floppy-and-cd',
+      plate: 'disc',
+      facts: [
+        'A 3.5-inch floppy held about 1.4 megabytes.',
+        'A CD-ROM held roughly 650 megabytes.',
+        'Discs were read by a laser, floppies by a magnetic head.',
+        'Multimedia encyclopedias were a popular CD-ROM product.',
+      ],
+      timeline: [
+        { when: '1970s', event: 'Floppy disks arrive as a way to share small programs.' },
+        { when: 'Mid 1980s', event: 'The CD-ROM format is defined for computer data.' },
+        { when: 'Early 1990s', event: 'Multimedia titles on CD-ROM become popular.' },
+        { when: 'Mid 1990s', event: 'CD-ROM drives become standard in new PCs.' },
+      ],
       title: 'Floppies and Shiny Discs',
       paragraphs: [
         'Programs travelled on floppy disks holding about one and a half megabytes each. Big software shipped as stacks of them, and you fed them in one at a time while a progress bar crawled.',
@@ -39,6 +90,18 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'bulletin-boards',
+      plate: 'bbs',
+      facts: [
+        'A BBS was usually one computer and one or two phone lines.',
+        'Callers used handles instead of real names.',
+        'Boards offered messages, files, and text games.',
+        'Most were run by hobbyists at home.',
+      ],
+      timeline: [
+        { when: 'Late 1970s', event: 'The first computer bulletin boards go online.' },
+        { when: '1980s', event: 'Boards multiply and begin to swap mail between systems.' },
+        { when: 'Mid 1990s', event: 'Many boards fade as internet access spreads.' },
+      ],
       title: 'Bulletin Board Systems',
       paragraphs: [
         'Before the web was common, many people dialed directly into a bulletin board, a computer run by a hobbyist in a spare room. Only one or a few callers could connect at a time.',
@@ -47,6 +110,18 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'early-web',
+      plate: 'browser',
+      facts: [
+        'Early pages used gray backgrounds and blue links.',
+        'Small images kept download times short.',
+        'Hit counters and guestbooks were popular.',
+        'Personal home pages were handmade.',
+      ],
+      timeline: [
+        { when: 'Early 1990s', event: 'The World Wide Web is created at CERN.' },
+        { when: '1993', event: 'The Mosaic browser brings images to the web.' },
+        { when: 'Mid 1990s', event: 'Netscape and Microsoft compete in the browser wars.' },
+      ],
       title: 'The Early Web',
       paragraphs: [
         'Early web pages were plain: gray backgrounds, blue underlined links, tiled textures, and small images saved to load quickly. Browsers showed a spinning logo while they waited.',
@@ -55,6 +130,18 @@ export const retroDisc: DiscManifest = {
     },
     {
       section_id: 'dos-prompt',
+      plate: 'terminal',
+      facts: [
+        'Commands were short typed words.',
+        'A blinking cursor showed where to type.',
+        'Startup files set up memory and drivers.',
+        'Many games ran directly from the prompt.',
+      ],
+      timeline: [
+        { when: '1981', event: 'MS-DOS ships with the IBM PC.' },
+        { when: '1985', event: 'Windows 1.0 offers a graphical layer on top of DOS.' },
+        { when: '1995', event: 'Windows 95 makes the prompt optional for most people.' },
+      ],
       title: 'Life at the Command Prompt',
       paragraphs: [
         'Before windows and icons became the norm, you typed commands at a blinking cursor. Listing files, copying them, and starting programs all happened through short typed words.',
@@ -68,18 +155,88 @@ export const retroDisc: DiscManifest = {
       title: 'A Dial-Up Home Setup',
       viewBox: '0 0 100 100',
       shapes: [
-        { kind: 'rect', x: 8, y: 10, width: 36, height: 30, fill: 'none', stroke: 'currentColor' },
-        { kind: 'rect', x: 13, y: 15, width: 26, height: 20, fill: 'var(--screen, none)', stroke: 'currentColor' },
-        { kind: 'rect', x: 16, y: 42, width: 20, height: 6, fill: 'none', stroke: 'currentColor' },
-        { kind: 'rect', x: 8, y: 58, width: 36, height: 14, fill: 'none', stroke: 'currentColor' },
-        { kind: 'circle', cx: 16, cy: 65, r: 2, fill: 'currentColor', stroke: 'none' },
-        { kind: 'circle', cx: 24, cy: 65, r: 2, fill: 'currentColor', stroke: 'none' },
-        { kind: 'rect', x: 58, y: 62, width: 24, height: 12, fill: 'none', stroke: 'currentColor' },
-        { kind: 'line', x1: 44, y1: 65, x2: 58, y2: 68, stroke: 'currentColor' },
-        { kind: 'line', x1: 82, y1: 68, x2: 92, y2: 50, stroke: 'currentColor' },
-        { kind: 'line', x1: 92, y1: 50, x2: 92, y2: 20, stroke: 'currentColor' },
-        { kind: 'polygon', points: [[92, 8], [98, 20], [86, 20]], fill: 'none', stroke: 'currentColor' },
-        { kind: 'line', x1: 26, y1: 48, x2: 26, y2: 58, stroke: 'currentColor' },
+        // Room wall, desk, window
+        { kind: 'rect', x: 0, y: 0, width: 100, height: 72, fill: 'var(--color-desktop)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 64, width: 100, height: 8, fill: 'var(--color-forest-dark)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 70, width: 100, height: 17, fill: 'var(--color-wood-light)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 70, width: 100, height: 1, fill: 'var(--color-gold-light)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 87, width: 100, height: 13, fill: 'var(--color-wood)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 87, width: 100, height: 2, fill: 'var(--color-wood-dark)', stroke: 'none' },
+        { kind: 'rect', x: 8, y: 91, width: 38, height: 7, fill: 'var(--color-wood-dark)', stroke: 'none' },
+        { kind: 'rect', x: 54, y: 91, width: 38, height: 7, fill: 'var(--color-wood-dark)', stroke: 'none' },
+        { kind: 'rect', x: 24, y: 93, width: 6, height: 2, fill: 'var(--color-gold)', stroke: 'none' },
+        { kind: 'rect', x: 70, y: 93, width: 6, height: 2, fill: 'var(--color-gold)', stroke: 'none' },
+        { kind: 'rect', x: 53, y: 7, width: 32, height: 32, fill: 'var(--color-wood-dark)', stroke: 'none' },
+        { kind: 'rect', x: 55, y: 9, width: 28, height: 28, fill: 'var(--color-sky)', stroke: 'none' },
+        { kind: 'rect', x: 55, y: 23, width: 28, height: 14, fill: 'var(--color-sky-light)', stroke: 'none' },
+        { kind: 'rect', x: 55, y: 32, width: 28, height: 5, fill: 'var(--color-forest)', stroke: 'none' },
+        { kind: 'circle', cx: 60, cy: 14, r: 2.5, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'circle', cx: 64, cy: 13, r: 3, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'rect', x: 52, y: 38, width: 34, height: 2, fill: 'var(--color-wood-light)', stroke: 'none' },
+        // Phone pole outside the window
+        { kind: 'rect', x: 72, y: 13, width: 2, height: 21, fill: 'var(--color-wood)', stroke: 'none' },
+        { kind: 'rect', x: 68, y: 16, width: 10, height: 1.5, fill: 'var(--color-wood-dark)', stroke: 'none' },
+        { kind: 'circle', cx: 69, cy: 15, r: 1, fill: 'var(--color-sky-deep)', stroke: 'none' },
+        { kind: 'circle', cx: 77, cy: 15, r: 1, fill: 'var(--color-sky-deep)', stroke: 'none' },
+        { kind: 'line', x1: 55, y1: 18, x2: 69, y2: 16, stroke: 'var(--color-ink)' },
+        { kind: 'line', x1: 77, y1: 16, x2: 92, y2: 20, stroke: 'var(--color-ink)' },
+        // Phone wire into the wall jack
+        { kind: 'line', x1: 92, y1: 20, x2: 92, y2: 57, stroke: 'var(--color-ink)' },
+        { kind: 'rect', x: 89.5, y: 56, width: 5, height: 6, fill: 'var(--color-parchment)', stroke: 'none' },
+        { kind: 'rect', x: 90.5, y: 58.5, width: 3, height: 2, fill: 'var(--color-ink)', stroke: 'none' },
+        // Monitor
+        { kind: 'rect', x: 7, y: 5, width: 38, height: 38, fill: 'var(--color-parchment)', stroke: 'none' },
+        { kind: 'rect', x: 7, y: 40, width: 38, height: 3, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 43, y: 5, width: 2, height: 38, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 11, y: 9, width: 30, height: 26, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 13, y: 11, width: 26, height: 22, fill: 'var(--color-crt-bg)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 13, width: 14, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 16, width: 20, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 19, width: 9, height: 1, fill: 'var(--color-phosphor-dim)', stroke: 'none' },
+        { kind: 'rect', x: 30, y: 19, width: 6, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 30, width: 12, height: 1, fill: 'var(--color-phosphor-dim)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 27, width: 16, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 32, y: 30, width: 3, height: 2, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'circle', cx: 36, cy: 41.5, r: 0.9, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 41, width: 8, height: 1, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
+        // Desktop case with drive bays
+        { kind: 'rect', x: 18, y: 43, width: 16, height: 4, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 7, y: 47, width: 38, height: 23, fill: 'var(--color-parchment)', stroke: 'none' },
+        { kind: 'rect', x: 7, y: 67, width: 38, height: 3, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 11, y: 50, width: 30, height: 7, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 13, y: 52, width: 22, height: 3, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 36, y: 53, width: 3, height: 1.5, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
+        { kind: 'rect', x: 11, y: 59, width: 30, height: 8, fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        { kind: 'rect', x: 13, y: 63, width: 11, height: 1.5, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 34, y: 61, width: 5, height: 3, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
+        { kind: 'circle', cx: 37, cy: 66, r: 0.8, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'circle', cx: 34, cy: 66, r: 0.8, fill: 'var(--color-gold)', stroke: 'none' },
+        // Keyboard and mouse
+        { kind: 'polygon', points: [[8, 85], [12, 74], [46, 74], [50, 85]], fill: 'var(--color-parchment-dark)', stroke: 'none' },
+        ...[0, 1, 2, 3, 4, 5, 6].map((i): Shape => ({ kind: 'rect', x: 14 + i * 4.4, y: 75.5, width: 3, height: 2, fill: 'var(--color-parchment)', stroke: 'none' })),
+        ...[0, 1, 2, 3, 4, 5, 6].map((i): Shape => ({ kind: 'rect', x: 12.5 + i * 4.8, y: 78.5, width: 3.4, height: 2, fill: 'var(--color-parchment)', stroke: 'none' })),
+        { kind: 'rect', x: 17, y: 81.5, width: 22, height: 2, fill: 'var(--color-parchment)', stroke: 'none' },
+        { kind: 'rect', x: 56, y: 76, width: 5, height: 7, fill: 'var(--color-parchment)', stroke: 'none' },
+        { kind: 'line', x1: 58.5, y1: 76, x2: 58.5, y2: 79, stroke: 'var(--color-parchment-dark)' },
+        { kind: 'line', x1: 56, y1: 76, x2: 46, y2: 72, stroke: 'var(--color-ink)' },
+        // Modem box with status LEDs
+        { kind: 'rect', x: 56, y: 58, width: 28, height: 14, fill: 'var(--color-stone)', stroke: 'none' },
+        { kind: 'rect', x: 56, y: 58, width: 28, height: 3, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 56, y: 70, width: 28, height: 2, fill: 'var(--color-stone-dark)', stroke: 'none' },
+        { kind: 'circle', cx: 59.5, cy: 63.5, r: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'circle', cx: 62.5, cy: 63.5, r: 1, fill: 'var(--color-gold)', stroke: 'none' },
+        { kind: 'circle', cx: 77.5, cy: 63.5, r: 1, fill: 'var(--color-crimson-light)', stroke: 'none' },
+        { kind: 'circle', cx: 81, cy: 63.5, r: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 58, y: 67, width: 6, height: 1, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
+        { kind: 'rect', x: 76, y: 67, width: 6, height: 1, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
+        { kind: 'line', x1: 56, y1: 66, x2: 45, y2: 66, stroke: 'var(--color-ink)' },
+        { kind: 'line', x1: 84, y1: 66, x2: 90, y2: 61, stroke: 'var(--color-ink)' },
+        // Telephone
+        { kind: 'rect', x: 66, y: 78, width: 22, height: 8, fill: 'var(--color-crimson)', stroke: 'none' },
+        { kind: 'rect', x: 66, y: 83, width: 22, height: 3, fill: 'var(--color-crimson-dark)', stroke: 'none' },
+        { kind: 'rect', x: 67, y: 75, width: 20, height: 3, fill: 'var(--color-crimson-light)', stroke: 'none' },
+        { kind: 'rect', x: 74, y: 80, width: 6, height: 4, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'line', x1: 88, y1: 80, x2: 91, y2: 62, stroke: 'var(--color-ink)' },
       ],
       hotspots: [
         { label: 'Computer and monitor', x: 26, y: 25, section_id: 'beige-box' },

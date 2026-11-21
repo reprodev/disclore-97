@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { isMuted, subscribeMuted, toggleMuted } from '../audio/audio';
 import { BevelButton } from './BevelButton';
+import { PixelIcon } from './PixelIcon';
 
 /** Global mute control. State lives in the audio module (unmuted at start, not persisted). */
 export function MuteToggle() {
@@ -12,8 +13,9 @@ export function MuteToggle() {
   }, []);
 
   return (
-    <BevelButton aria-pressed={muted} onClick={() => toggleMuted()}>
-      {muted ? 'Sound: Off' : 'Sound: On'}
+    <BevelButton className="mute-toggle" aria-pressed={muted} onClick={() => toggleMuted()}>
+      <PixelIcon name="speaker" muted={muted} />
+      <span>{muted ? 'Sound: Off' : 'Sound: On'}</span>
     </BevelButton>
   );
 }

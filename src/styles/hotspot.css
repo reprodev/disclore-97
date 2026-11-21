@@ -20,10 +20,10 @@
 
 .hotspot-marker {
   position: absolute;
-  left: -8px;
-  top: -8px;
-  width: 16px;
-  height: 16px;
+  left: -11px;
+  top: -11px;
+  width: 22px;
+  height: 22px;
   overflow: visible;
 }
 
@@ -33,17 +33,26 @@
 }
 
 .hotspot-button rect {
-  fill: var(--color-title-bg);
-  stroke: var(--color-bevel-hi);
-  stroke-width: 1px;
+  fill: var(--color-gold);
+  stroke: var(--color-bevel-edge);
+  stroke-width: 1.5px;
+}
+
+.hotspot-button text {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: bold;
+  fill: var(--color-bevel-edge);
+  pointer-events: none;
+  user-select: none;
 }
 
 .hotspot-button:hover rect {
-  fill: var(--color-bevel-shadow);
+  fill: var(--color-gold-light);
 }
 
 .hotspot-button:focus-visible rect {
-  stroke: var(--color-bevel-edge);
+  stroke: var(--color-crimson);
   stroke-dasharray: 2 1;
   stroke-width: 2px;
 }

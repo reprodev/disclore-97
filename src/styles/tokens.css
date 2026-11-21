@@ -1,4 +1,5 @@
 :root {
+  /* Required Win95 chrome tokens. Names and values must not change. */
   --color-surface: #C0C0C0;
   --color-title-bg: #000080;
   --color-title-text: #FFFFFF;
@@ -6,6 +7,52 @@
   --color-bevel-shadow: #808080;
   --color-bevel-edge: #000000;
   --color-tooltip-bg: #FFFFE1;
+
+  /* Desktop and paper */
+  --color-desktop: #008080;
+  --color-paper: #FFFFFF;
+  --color-ink: #000000;
+  --color-parchment: #F0E6C8;
+  --color-parchment-dark: #D8C898;
+
+  /* Flat VGA-style accents. Stone */
+  --color-stone-light: #C8C8B8;
+  --color-stone: #9C9C8C;
+  --color-stone-dark: #6C6C5C;
+
+  /* Gold */
+  --color-gold-light: #FFE860;
+  --color-gold: #FFD700;
+  --color-gold-dark: #B8860B;
+
+  /* Crimson */
+  --color-crimson-light: #D84060;
+  --color-crimson: #A00020;
+  --color-crimson-dark: #600010;
+
+  /* Forest */
+  --color-forest-light: #40A040;
+  --color-forest: #006400;
+  --color-forest-dark: #003C00;
+
+  /* Sky and water */
+  --color-sky-light: #B8E0F8;
+  --color-sky: #87CEEB;
+  --color-sky-deep: #3070C0;
+
+  /* Wood */
+  --color-wood-light: #B07840;
+  --color-wood: #8B5A2B;
+  --color-wood-dark: #583818;
+
+  /* CRT phosphor */
+  --color-phosphor: #33FF33;
+  --color-phosphor-dim: #00A000;
+  --color-crt-bg: #001800;
+
+  /* Torch fire */
+  --color-flame: #FF8000;
+  --color-flame-hot: #FFE000;
 
   --font-serif: Georgia, "Times New Roman", serif;
   --font-ui: "MS Sans Serif", Tahoma, sans-serif;

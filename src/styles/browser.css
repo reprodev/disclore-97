@@ -16,12 +16,20 @@
   margin-top: 4px;
 }
 
+/* Overrides below keep the disc button a row: icon, then title and tagline. */
 .disc-open {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.disc-text {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%;
-  text-align: left;
 }
 
 .disc-title {
@@ -38,6 +46,9 @@
 }
 
 .disc-group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-ui);
   font-size: 1em;
   font-weight: bold;
@@ -45,6 +56,9 @@
 }
 
 .disc-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   text-align: left;
 }

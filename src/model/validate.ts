@@ -91,6 +91,15 @@ export function validateManifest(input: unknown): ValidationResult {
       field(s, 'section_id', p, 'string');
       field(s, 'title', p, 'string');
       strings(arrayOf(s, 'paragraphs', p), `${p}.paragraphs`);
+      // Optional encyclopedia-layout fields: checked only when present.
+      if ('facts' in s && s.facts !== undefined) strings(arrayOf(s, 'facts', p), `${p}.facts`);
+      if ('plate' in s && s.plate !== undefined) field(s, 'plate', p, 'string');
+      if ('timeline' in s && s.timeline !== undefined) {
+        items(arrayOf(s, 'timeline', p), `${p}.timeline`, (t, tp) => {
+          field(t, 'when', tp, 'string');
+          field(t, 'event', tp, 'string');
+        });
+      }
     });
 
     items(arrayOf(root, 'diagrams', '$'), '$.diagrams', (d, p) => {

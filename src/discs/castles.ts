@@ -1,4 +1,4 @@
-import type { DiscManifest } from '../model/manifest';
+import type { DiscManifest, Shape } from '../model/manifest';
 import { validateManifest } from '../model/validate';
 
 export const castlesDisc: DiscManifest = {
@@ -8,6 +8,18 @@ export const castlesDisc: DiscManifest = {
   sections: [
     {
       section_id: 'motte-and-bailey',
+      plate: 'mound',
+      facts: [
+        'A motte is the mound; the bailey is the fenced yard beside it.',
+        'Builders piled up soil dug from the surrounding ditch.',
+        'The timber tower on top doubled as a lookout and a last refuge.',
+        'Many sites were later rebuilt in stone.',
+      ],
+      timeline: [
+        { when: 'Late 900s to 1000s', event: 'Earth-and-timber fortifications spread in northern France.' },
+        { when: 'After 1066', event: 'Norman rulers raise many motte-and-bailey castles in England.' },
+        { when: '1100s', event: 'Some timber towers on mounds are replaced by stone shell keeps.' },
+      ],
       title: 'Motte and Bailey',
       paragraphs: [
         'The earliest castles in many regions were built from earth and timber. A motte is a steep mound of packed soil, and a wooden tower on top served as the last refuge.',
@@ -17,6 +29,19 @@ export const castlesDisc: DiscManifest = {
     },
     {
       section_id: 'the-keep',
+      plate: 'tower',
+      facts: [
+        'The keep was the strongest building in the castle.',
+        'Its walls could be several paces thick.',
+        'The main door sat on an upper floor, away from battering rams.',
+        'The ground floor often held stores of food and water.',
+      ],
+      timeline: [
+        { when: 'Late 900s', event: 'Some of the first stone towers appear in France.' },
+        { when: 'Late 1000s', event: 'Norman builders raise large rectangular stone keeps.' },
+        { when: '1100s', event: 'Round and many-sided keeps appear, with no corners to undermine.' },
+        { when: '1200s', event: 'Gatehouses and wall towers take over as main strongpoints.' },
+      ],
       title: 'The Keep',
       paragraphs: [
         'The keep is the central tower of a castle. Stone keeps replaced timber towers because stone resists fire and battering.',
@@ -26,6 +51,18 @@ export const castlesDisc: DiscManifest = {
     },
     {
       section_id: 'curtain-walls',
+      plate: 'wall',
+      facts: [
+        'A curtain wall encloses the courtyard.',
+        'Crenels are the gaps in the parapet; merlons are the solid blocks.',
+        'A walkway along the top let defenders move between towers.',
+        'Towers jutting out let archers cover the wall face.',
+      ],
+      timeline: [
+        { when: '1100s', event: 'Stone curtain walls replace timber fences at many castles.' },
+        { when: '1200s', event: 'Round towers become popular for their strength.' },
+        { when: 'Late 1200s', event: 'Castles with two rings of walls, one inside the other, are built.' },
+      ],
       title: 'Curtain Walls and Towers',
       paragraphs: [
         'A curtain wall is the long defensive wall that encloses the courtyard. Towers set along it let archers shoot along the face of the wall at attackers who reached its base.',
@@ -35,6 +72,18 @@ export const castlesDisc: DiscManifest = {
     },
     {
       section_id: 'gatehouse-and-moat',
+      plate: 'gate',
+      facts: [
+        'Every visitor had to pass through the gatehouse.',
+        'A portcullis slid down in grooves to close the passage.',
+        'Murder holes in the ceiling let defenders strike from above.',
+        'A moat could be filled with water or left dry.',
+      ],
+      timeline: [
+        { when: '1000s', event: 'Early gates are timber doors set in earth banks.' },
+        { when: '1100s', event: 'Stone gate towers begin to replace them.' },
+        { when: '1200s', event: 'Large twin-towered gatehouses add portcullises and murder holes.' },
+      ],
       title: 'Gatehouse and Moat',
       paragraphs: [
         'The gatehouse was the strongest point of the outer wall, since every visitor had to pass through it. It often held a drawbridge, a portcullis and heavy double doors.',
@@ -44,6 +93,19 @@ export const castlesDisc: DiscManifest = {
     },
     {
       section_id: 'siege-and-defense',
+      plate: 'siege',
+      facts: [
+        'Starving a castle out was often easier than storming it.',
+        'A siege could last for months.',
+        'Miners dug under walls and propped the tunnel with timber.',
+        'Wells and granaries helped defenders hold out.',
+      ],
+      timeline: [
+        { when: 'Ancient times', event: 'Battering rams and tunnels are used against walled towns.' },
+        { when: '1100s', event: 'Trebuchets worked by pulling ropes are used in Europe.' },
+        { when: '1200s', event: 'Counterweight trebuchets throw much heavier stones.' },
+        { when: '1400s', event: 'Gunpowder cannons make tall, thin walls vulnerable.' },
+      ],
       title: 'Siege and Defense',
       paragraphs: [
         'Attackers rarely stormed a strong castle directly. They surrounded it and waited for supplies to run short, a siege that could last months.',
@@ -58,21 +120,114 @@ export const castlesDisc: DiscManifest = {
       title: 'Castle Cross-Section',
       viewBox: '0 0 100 100',
       shapes: [
-        { kind: 'rect', x: 0, y: 85, width: 100, height: 15, fill: 'none', stroke: 'currentColor' },
-        { kind: 'rect', x: 5, y: 50, width: 15, height: 35, fill: 'none', stroke: 'currentColor' },
-        { kind: 'rect', x: 80, y: 50, width: 15, height: 35, fill: 'none', stroke: 'currentColor' },
-        { kind: 'rect', x: 35, y: 20, width: 30, height: 65, fill: 'none', stroke: 'currentColor' },
-        { kind: 'polygon', points: [[35, 20], [50, 5], [65, 20]], fill: 'none', stroke: 'currentColor' },
-        { kind: 'line', x1: 20, y1: 65, x2: 35, y2: 65, stroke: 'currentColor' },
-        { kind: 'line', x1: 65, y1: 65, x2: 80, y2: 65, stroke: 'currentColor' },
-        { kind: 'rect', x: 43, y: 65, width: 14, height: 20, fill: 'none', stroke: 'var(--accent, currentColor)' },
-        { kind: 'circle', cx: 50, cy: 35, r: 4, fill: 'none', stroke: 'currentColor' },
+        // Sky, sun, clouds
+        { kind: 'rect', x: 0, y: 0, width: 100, height: 30, fill: 'var(--color-sky)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 30, width: 100, height: 30, fill: 'var(--color-sky-light)', stroke: 'none' },
+        { kind: 'circle', cx: 90, cy: 10, r: 6, fill: 'var(--color-gold-light)', stroke: 'none' },
+        { kind: 'circle', cx: 90, cy: 10, r: 4, fill: 'var(--color-gold)', stroke: 'none' },
+        { kind: 'circle', cx: 14, cy: 14, r: 4, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'circle', cx: 20, cy: 13, r: 5, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'circle', cx: 26, cy: 15, r: 4, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'rect', x: 12, y: 15, width: 16, height: 3, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'circle', cx: 72, cy: 24, r: 3, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'circle', cx: 77, cy: 23, r: 4, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'rect', x: 70, y: 25, width: 12, height: 2, fill: 'var(--color-paper)', stroke: 'none' },
+        { kind: 'line', x1: 34, y1: 8, x2: 36, y2: 10, stroke: 'var(--color-ink)' },
+        { kind: 'line', x1: 36, y1: 10, x2: 38, y2: 8, stroke: 'var(--color-ink)' },
+        // Distant hills
+        { kind: 'polygon', points: [[0, 60], [0, 46], [14, 40], [30, 50], [46, 42], [62, 52], [80, 41], [100, 50], [100, 60]], fill: 'var(--color-forest-light)', stroke: 'none' },
+        { kind: 'polygon', points: [[0, 72], [0, 56], [20, 51], [40, 60], [60, 54], [80, 58], [100, 54], [100, 72]], fill: 'var(--color-forest)', stroke: 'none' },
+        // Ground and moat
+        { kind: 'rect', x: 0, y: 84, width: 100, height: 16, fill: 'var(--color-forest)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 84, width: 100, height: 2, fill: 'var(--color-forest-light)', stroke: 'none' },
+        { kind: 'rect', x: 0, y: 86, width: 80, height: 7, fill: 'var(--color-sky-deep)', stroke: 'none' },
+        { kind: 'line', x1: 4, y1: 88, x2: 14, y2: 88, stroke: 'var(--color-sky)' },
+        { kind: 'line', x1: 22, y1: 91, x2: 34, y2: 91, stroke: 'var(--color-sky)' },
+        { kind: 'line', x1: 62, y1: 88, x2: 72, y2: 88, stroke: 'var(--color-sky)' },
+        // Keep (behind the wall)
+        { kind: 'rect', x: 38, y: 18, width: 24, height: 44, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 54, y: 18, width: 8, height: 44, fill: 'var(--color-stone)', stroke: 'none' },
+        { kind: 'rect', x: 37, y: 18, width: 26, height: 2, fill: 'var(--color-stone-dark)', stroke: 'none' },
+        ...[0, 1, 2, 3, 4].map((i): Shape => ({ kind: 'rect', x: 38 + i * 5.1, y: 14, width: 3.6, height: 4, fill: 'var(--color-stone-light)', stroke: 'none' })),
+        { kind: 'line', x1: 38, y1: 25, x2: 62, y2: 25, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 38, y1: 52, x2: 62, y2: 52, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 44, y1: 20, x2: 44, y2: 25, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 56, y1: 25, x2: 56, y2: 30, stroke: 'var(--color-stone-dark)' },
+        { kind: 'rect', x: 46, y: 23, width: 6, height: 9, fill: 'var(--color-stone-dark)', stroke: 'none' },
+        { kind: 'rect', x: 47, y: 24, width: 4, height: 7, fill: 'var(--color-gold-light)', stroke: 'none' },
+        { kind: 'rect', x: 47, y: 27, width: 4, height: 1, fill: 'var(--color-gold-dark)', stroke: 'none' },
+        { kind: 'rect', x: 41, y: 31, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 57, y: 31, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 41, y: 45, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 57, y: 45, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },
+        // Pennant
+        { kind: 'line', x1: 50, y1: 14, x2: 50, y2: 3, stroke: 'var(--color-wood-dark)' },
+        { kind: 'polygon', points: [[50, 3], [59, 5.5], [50, 8]], fill: 'var(--color-crimson)', stroke: 'none' },
+        { kind: 'polygon', points: [[50, 5.5], [59, 5.5], [50, 8]], fill: 'var(--color-crimson-dark)', stroke: 'none' },
+        { kind: 'circle', cx: 50, cy: 3, r: 1, fill: 'var(--color-gold)', stroke: 'none' },
+        // Curtain wall
+        { kind: 'rect', x: 20, y: 60, width: 46, height: 26, fill: 'var(--color-stone)', stroke: 'none' },
+        { kind: 'rect', x: 20, y: 60, width: 46, height: 2, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 20, y: 82, width: 46, height: 4, fill: 'var(--color-stone-dark)', stroke: 'none' },
+        ...[0, 1, 2, 3, 4, 5, 6, 7].map((i): Shape => ({ kind: 'rect', x: 20 + i * 6, y: 56, width: 3, height: 4, fill: 'var(--color-stone-light)', stroke: 'none' })),
+        { kind: 'line', x1: 20, y1: 67, x2: 40, y2: 67, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 60, y1: 67, x2: 66, y2: 67, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 20, y1: 74, x2: 40, y2: 74, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 60, y1: 74, x2: 66, y2: 74, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 28, y1: 62, x2: 28, y2: 67, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 34, y1: 67, x2: 34, y2: 74, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 26, y1: 74, x2: 26, y2: 82, stroke: 'var(--color-stone-dark)' },
+        // Left round tower
+        { kind: 'rect', x: 4, y: 44, width: 16, height: 42, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 14, y: 44, width: 6, height: 42, fill: 'var(--color-stone)', stroke: 'none' },
+        ...[4, 10, 16].map((x): Shape => ({ kind: 'rect', x, y: 40, width: 4, height: 4, fill: 'var(--color-stone-light)', stroke: 'none' })),
+        { kind: 'rect', x: 11, y: 49, width: 2, height: 6, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 11, y: 72, width: 2, height: 6, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'line', x1: 4, y1: 67, x2: 20, y2: 67, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 4, y1: 81, x2: 20, y2: 81, stroke: 'var(--color-stone-dark)' },
+        // Right round tower
+        { kind: 'rect', x: 66, y: 44, width: 14, height: 42, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 74, y: 44, width: 6, height: 42, fill: 'var(--color-stone)', stroke: 'none' },
+        ...[66, 71, 76].map((x): Shape => ({ kind: 'rect', x, y: 40, width: 4, height: 4, fill: 'var(--color-stone-light)', stroke: 'none' })),
+        { kind: 'rect', x: 71, y: 49, width: 2, height: 6, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'rect', x: 71, y: 72, width: 2, height: 6, fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'line', x1: 66, y1: 63, x2: 80, y2: 63, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 66, y1: 81, x2: 80, y2: 81, stroke: 'var(--color-stone-dark)' },
+        // Gatehouse, portcullis, drawbridge
+        { kind: 'rect', x: 41, y: 64, width: 18, height: 22, fill: 'var(--color-stone-light)', stroke: 'none' },
+        { kind: 'rect', x: 54, y: 64, width: 5, height: 22, fill: 'var(--color-stone)', stroke: 'none' },
+        ...[41, 46, 51, 55].map((x): Shape => ({ kind: 'rect', x, y: 60, width: 4, height: 4, fill: 'var(--color-stone-light)', stroke: 'none' })),
+        { kind: 'polygon', points: [[45, 86], [45, 72], [47, 69], [53, 69], [55, 72], [55, 86]], fill: 'var(--color-ink)', stroke: 'none' },
+        { kind: 'line', x1: 47.5, y1: 70, x2: 47.5, y2: 84, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 50, y1: 69, x2: 50, y2: 84, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 52.5, y1: 70, x2: 52.5, y2: 84, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 46, y1: 73, x2: 54, y2: 73, stroke: 'var(--color-stone-dark)' },
+        { kind: 'line', x1: 46, y1: 83, x2: 54, y2: 83, stroke: 'var(--color-stone-dark)' },
+        { kind: 'polygon', points: [[45, 86], [55, 86], [57, 93], [43, 93]], fill: 'var(--color-wood)', stroke: 'none' },
+        { kind: 'line', x1: 44, y1: 89, x2: 56, y2: 89, stroke: 'var(--color-wood-dark)' },
+        { kind: 'line', x1: 43.5, y1: 91.5, x2: 56.5, y2: 91.5, stroke: 'var(--color-wood-dark)' },
+        { kind: 'line', x1: 45, y1: 71, x2: 45, y2: 86, stroke: 'var(--color-wood-dark)' },
+        { kind: 'line', x1: 55, y1: 71, x2: 55, y2: 86, stroke: 'var(--color-wood-dark)' },
+        // Motte mound with timber tower and palisade
+        { kind: 'polygon', points: [[80, 86], [84, 62], [90, 56], [100, 56], [100, 86]], fill: 'var(--color-forest-dark)', stroke: 'none' },
+        { kind: 'polygon', points: [[84, 62], [90, 56], [95, 56], [89, 66]], fill: 'var(--color-forest-light)', stroke: 'none' },
+        { kind: 'rect', x: 90, y: 42, width: 9, height: 14, fill: 'var(--color-wood)', stroke: 'none' },
+        { kind: 'line', x1: 93, y1: 42, x2: 93, y2: 56, stroke: 'var(--color-wood-dark)' },
+        { kind: 'line', x1: 96, y1: 42, x2: 96, y2: 56, stroke: 'var(--color-wood-dark)' },
+        { kind: 'polygon', points: [[88, 42], [94.5, 34], [101, 42]], fill: 'var(--color-crimson-dark)', stroke: 'none' },
+        { kind: 'rect', x: 93.5, y: 47, width: 2, height: 4, fill: 'var(--color-ink)', stroke: 'none' },
+        ...[0, 1, 2, 3, 4, 5].map((i): Shape => ({ kind: 'rect', x: 82 + i * 2.2, y: 79, width: 1.4, height: 7, fill: 'var(--color-wood-light)', stroke: 'none' })),
+        // Foreground grass and flowers
+        ...[3, 14, 27, 40, 58, 72, 86, 96].map((x): Shape => ({ kind: 'rect', x, y: 95, width: 2, height: 3, fill: 'var(--color-forest-light)', stroke: 'none' })),
+        { kind: 'circle', cx: 9, cy: 97, r: 1, fill: 'var(--color-gold)', stroke: 'none' },
+        { kind: 'circle', cx: 33, cy: 98, r: 1, fill: 'var(--color-crimson-light)', stroke: 'none' },
+        { kind: 'circle', cx: 66, cy: 97, r: 1, fill: 'var(--color-gold-light)', stroke: 'none' },
       ],
       hotspots: [
         { label: 'Keep', x: 50, y: 40, section_id: 'the-keep' },
         { label: 'Curtain wall tower', x: 12, y: 60, section_id: 'curtain-walls' },
         { label: 'Gatehouse', x: 50, y: 78, section_id: 'gatehouse-and-moat' },
-        { label: 'Courtyard', x: 28, y: 75, section_id: 'motte-and-bailey' },
+        { label: 'Courtyard', x: 90, y: 66, section_id: 'motte-and-bailey' },
       ],
     },
   ],

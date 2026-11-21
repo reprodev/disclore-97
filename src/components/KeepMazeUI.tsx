@@ -2,8 +2,11 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { playDoorUnlock, playTorch } from '../audio/audio';
 import { gameReducer, initGame } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
+import { ENTRANCE_ROOM_ID } from '../model/manifest';
 import type { DiscManifest, Dungeon } from '../model/manifest';
 import { BevelButton } from './BevelButton';
+import { DungeonViewport } from './DungeonViewport';
+import { MiniMap } from './MiniMap';
 import '../styles/keepmaze.css';
 
 export interface KeepMazeUIProps {
@@ -28,6 +31,12 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
     initGame(dungeon, questions, rng),
   );
   const [started, setStarted] = useState(false);
+  const [visited, setVisited] = useState<string[]>(() => [state.roomId]);
+
+  // Remember every room entered, for the mini-map.
+  useEffect(() => {
+    setVisited((v) => (v.includes(state.roomId) ? v : [...v, state.roomId]));
+  }, [state.roomId]);
 
   // Torch sound on every room entry, including the entrance at start.
   useEffect(() => {
@@ -36,10 +45,26 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
 
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);
+  const locked = !started || state.pending !== null || state.lastWrong !== null;
+  const scene = (
+    <div className="keepmaze__scene">
+      <div className="keepmaze__view">
+        <DungeonViewport
+          locked={locked}
+          victory={state.won}
+          label={state.won ? 'Dungeon view: the way is open' : locked ? 'Dungeon view: a locked door' : 'Dungeon view: a door'}
+        />
+      </div>
+      <div className="keepmaze__map">
+        <MiniMap dungeon={dungeon} visited={visited} currentRoomId={state.roomId} />
+      </div>
+    </div>
+  );
 
   if (!started) {
     return (
       <div className="keepmaze">
+        {scene}
         <h2 className="keepmaze__room">{dungeon.title}</h2>
         <BevelButton disabled={noTrivia} onClick={() => setStarted(true)}>
           Start
@@ -55,11 +80,13 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
 
   const restart = () => {
     dispatch({ type: 'restart' });
+    setVisited([ENTRANCE_ROOM_ID]);
   };
 
   if (state.won) {
     return (
       <div className="keepmaze">
+        {scene}
         <div className="keepmaze__hud">
           <p className="keepmaze__room">{room?.name ?? 'Throne Room'}</p>
           <p className="keepmaze__message" role="status">
@@ -85,6 +112,7 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
 
   return (
     <div className="keepmaze">
+      {scene}
       <div className="keepmaze__hud">
         <p className="keepmaze__room">{room?.name ?? state.roomId}</p>
         <p className="keepmaze__message">{room?.description}</p>

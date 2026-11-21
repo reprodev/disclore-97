@@ -1,0 +1,148 @@
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: var(--color-surface);
+  border-top: var(--bevel-w) solid var(--color-bevel-hi);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-bevel-edge);
+}
+
+.taskbar__start {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-bevel-edge);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  padding: 2px 8px;
+  cursor: default;
+}
+
+.taskbar__start[data-pressed="true"] {
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+  padding: 3px 7px 1px 9px;
+}
+
+.taskbar__start:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+.taskbar__tabs {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+.taskbar__tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 1 180px;
+  min-width: 0;
+  padding: 2px 6px;
+  font-weight: bold;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+}
+
+.taskbar__tab-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskbar__tray {
+  display: flex;
+  align-items: center;
+  padding: 1px 2px;
+  border: 1px solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.mute-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 1px 6px;
+}
+
+.mute-toggle[data-pressed="true"] {
+  padding: 2px 5px 0 7px;
+}
+
+.startmenu {
+  position: absolute;
+  left: 2px;
+  bottom: 100%;
+  display: flex;
+  min-width: 260px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.startmenu__banner {
+  flex: 0 0 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 4px 0;
+  background: var(--color-title-bg);
+  color: var(--color-title-text);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: bold;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.startmenu__items {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 2px;
+}
+
+.startmenu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-align: left;
+  color: var(--color-bevel-edge);
+  background: var(--color-surface);
+  border: none;
+  cursor: default;
+}
+
+.startmenu__item:hover,
+.startmenu__item:focus-visible {
+  background: var(--color-title-bg);
+  color: var(--color-title-text);
+  outline: none;
+}
+
+.startmenu__sep {
+  margin: 2px 0;
+  border-top: 1px solid var(--color-bevel-shadow);
+  border-bottom: 1px solid var(--color-bevel-hi);
+}

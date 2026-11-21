@@ -31,11 +31,28 @@ export interface DiscManifest {
   dungeons: Dungeon[];
 }
 
-/** An article. `paragraphs` must be non-empty. */
+/** One dated entry in an article's timeline callout. */
+export interface TimelineEntry {
+  when: string;
+  event: string;
+}
+
+/**
+ * An article. `paragraphs` must be non-empty.
+ *
+ * The optional fields feed the encyclopedia layout. Omit them when unused,
+ * never set them to `undefined`.
+ */
 export interface Section {
   section_id: string;
   title: string;
   paragraphs: string[];
+  /** Short bullet facts for the Quick Facts callout. */
+  facts?: string[];
+  /** Dated entries for the Timeline callout. */
+  timeline?: TimelineEntry[];
+  /** Key of the inline SVG plate shown beside the text. Unknown keys use a default plate. */
+  plate?: string;
 }
 
 /**

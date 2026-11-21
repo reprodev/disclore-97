@@ -69,3 +69,85 @@
 .keepmaze__message {
   margin: 4px 0;
 }
+
+.keepmaze__scene {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+
+.keepmaze__view {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 2px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.keepmaze__map {
+  flex: 0 0 150px;
+  display: flex;
+  flex-direction: column;
+  padding: 2px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.viewport,
+.minimap {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.viewport__flame {
+  animation: torch-flicker 0.6s steps(2, end) infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+@keyframes torch-flicker {
+  0% {
+    transform: scale(1, 1);
+  }
+  100% {
+    transform: scale(0.92, 1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport__flame {
+    animation: none;
+  }
+}
+
+.minimap__bg {
+  fill: var(--color-crt-bg);
+}
+
+.minimap__edge {
+  stroke: var(--color-phosphor-dim);
+  stroke-width: 2px;
+}
+
+.minimap__room--visited {
+  fill: var(--color-parchment);
+  stroke: var(--color-bevel-edge);
+  stroke-width: 1px;
+}
+
+.minimap__room--current {
+  fill: var(--color-gold);
+  stroke: var(--color-crimson);
+  stroke-width: 2px;
+}
+
+.minimap__room--unknown {
+  fill: var(--color-stone-dark);
+  stroke: var(--color-phosphor-dim);
+  stroke-width: 1px;
+  stroke-dasharray: 2 2;
+}

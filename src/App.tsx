@@ -4,11 +4,13 @@ import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
 import { HotspotViewer } from './components/HotspotViewer';
 import { KeepMazeUI } from './components/KeepMazeUI';
-import { MuteToggle } from './components/MuteToggle';
+import { Taskbar } from './components/Taskbar';
+import type { ActiveWindowInfo } from './components/Taskbar';
 import { Window } from './components/Window';
 import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
 import type { DiscManifest, ValidationError } from './model/manifest';
+import './styles/desktop.css';
 
 export type View =
   | { kind: 'section'; section_id: string }
@@ -66,11 +68,13 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   };
 
   let viewWindow = null;
+  let active: ActiveWindowInfo | null = disc ? { title: disc.title, icon: 'cd' } : null;
   if (disc && nav.view) {
     const v = nav.view;
     const close = () => setNav({ ...nav, view: null });
     if (v.kind === 'section') {
       const section = disc.sections.find((s) => s.section_id === v.section_id);
+      active = { title: section?.title ?? 'Article', icon: 'book' };
       viewWindow = (
         <Window title={section?.title ?? 'Article'} onClose={close}>
           <ArticleViewer sections={disc.sections} sectionId={v.section_id} />
@@ -79,6 +83,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
     } else if (v.kind === 'diagram') {
       const diagram = disc.diagrams.find((d) => d.diagram_id === v.diagram_id);
       if (diagram) {
+        active = { title: diagram.title, icon: 'diagram' };
         viewWindow = (
           <Window title={diagram.title} onClose={close}>
             <HotspotViewer diagram={diagram} onNavigate={goSection} />
@@ -88,6 +93,7 @@ export function App({ sources = prebakedDiscs }: AppProps) {
     } else {
       const dungeon = disc.dungeons.find((d) => d.dungeon_id === v.dungeon_id);
       if (dungeon) {
+        active = { title: dungeon.title, icon: 'torch' };
         viewWindow = (
           <Window title={dungeon.title} onClose={close}>
             <KeepMazeUI
@@ -103,10 +109,8 @@ export function App({ sources = prebakedDiscs }: AppProps) {
   }
 
   return (
-    <div className="app-shell">
-      <div className="app-toolbar">
-        <MuteToggle />
-      </div>
+    <div className="desktop">
+      <div className="desktop__work app-shell">
       <DiscBrowser
         discs={discs}
         openDiscId={nav.discId}
@@ -137,6 +141,19 @@ export function App({ sources = prebakedDiscs }: AppProps) {
       {failures.map((errors, i) => (
         <ErrorList key={i} errors={errors} />
       ))}
+      </div>
+      <Taskbar
+        discs={discs}
+        active={active}
+        onOpenDisc={(discId) => {
+          setNotFound(null);
+          setNav({ discId, view: null });
+        }}
+        onCloseAll={() => {
+          setNotFound(null);
+          setNav(initialNav);
+        }}
+      />
     </div>
   );
 }

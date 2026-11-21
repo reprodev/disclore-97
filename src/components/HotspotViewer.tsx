@@ -60,7 +60,7 @@ export function HotspotViewer({ diagram, onNavigate }: HotspotViewerProps) {
         return (
           <div key={`${h.section_id}-${i}`} className="hotspot-anchor" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
             <Tooltip text={h.label}>
-              <svg className="hotspot-marker" viewBox="-6 -6 12 12" aria-hidden={false}>
+              <svg className="hotspot-marker" viewBox="-8 -8 16 16" aria-hidden={false}>
                 <g
                   role="button"
                   tabIndex={0}
@@ -71,7 +71,10 @@ export function HotspotViewer({ diagram, onNavigate }: HotspotViewerProps) {
                   onClick={() => activate(h.section_id)}
                   onKeyDown={onKeyDown}
                 >
-                  <rect x={-4} y={-4} width={8} height={8} />
+                  <rect x={-7} y={-7} width={14} height={14} />
+                  <text x={0} y={1} textAnchor="middle" dominantBaseline="central" aria-hidden="true">
+                    {i + 1}
+                  </text>
                 </g>
               </svg>
             </Tooltip>

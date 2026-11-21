@@ -1,27 +1,109 @@
 .article-viewer {
   max-height: 100%;
   overflow: auto;
-  padding: 8px 12px;
-  background: var(--color-tooltip-bg);
-  color: var(--color-bevel-edge);
+  padding: 10px 14px;
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-serif);
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
 }
 
+.article-viewer::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
 .article-title {
   font-family: var(--font-serif);
-  font-size: 1.5em;
-  margin: 0 0 8px;
+  font-size: 1.6em;
+  margin: 0 0 10px;
+  padding-bottom: 4px;
+  color: var(--color-title-bg);
+  border-bottom: 3px double var(--color-bevel-shadow);
 }
 
 .article-paragraph {
   font-family: var(--font-serif);
-  margin: 0 0 8px;
-  line-height: 1.4;
+  margin: 0 0 10px;
+  line-height: 1.45;
+  text-align: justify;
+}
+
+/* Drop cap: the first letter only, so the paragraph text stays one string. */
+.article-paragraph--lead::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 3.4em;
+  font-weight: bold;
+  line-height: 0.85;
+  padding: 2px 6px 0 0;
+  color: var(--color-crimson);
 }
 
 .article-not-found {
   font-family: var(--font-ui);
+  margin: 0;
+}
+
+.article-aside {
+  float: right;
+  width: 210px;
+  margin: 0 0 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.article-callout {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--color-tooltip-bg);
+  color: var(--color-ink);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.article-callout section + section {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-bevel-shadow);
+}
+
+.article-callout__title {
+  margin: 0 0 4px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-crimson);
+}
+
+.article-callout__list {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.article-callout__list li {
+  margin-bottom: 3px;
+}
+
+.article-timeline {
+  margin: 0;
+}
+
+.article-timeline__row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.article-timeline dt {
+  flex: 0 0 64px;
+  font-weight: bold;
+  color: var(--color-title-bg);
+}
+
+.article-timeline dd {
   margin: 0;
 }

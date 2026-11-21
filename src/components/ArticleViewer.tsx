@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { playPageFlip } from '../audio/audio';
 import type { Section } from '../model/manifest';
+import { Plate } from './Plate';
 import '../styles/article.css';
 
 export interface ArticleViewerProps {
@@ -27,11 +28,44 @@ export function ArticleViewer({ sections, sectionId }: ArticleViewerProps) {
     );
   }
 
+  const facts = section.facts ?? [];
+  const timeline = section.timeline ?? [];
+
   return (
     <article ref={ref} className="article-viewer">
       <h1 className="article-title">{section.title}</h1>
+      <aside className="article-aside">
+        <Plate kind={section.plate} caption={`Plate: ${section.title}`} />
+        {facts.length > 0 || timeline.length > 0 ? (
+          <div className="article-callout">
+            {facts.length > 0 ? (
+              <section aria-label="Quick Facts">
+                <h2 className="article-callout__title">Quick Facts</h2>
+                <ul className="article-callout__list">
+                  {facts.map((f, i) => (
+                    <li key={i}>{f}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+            {timeline.length > 0 ? (
+              <section aria-label="Timeline">
+                <h2 className="article-callout__title">Timeline</h2>
+                <dl className="article-timeline">
+                  {timeline.map((t, i) => (
+                    <div key={i} className="article-timeline__row">
+                      <dt>{t.when}</dt>
+                      <dd>{t.event}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
+          </div>
+        ) : null}
+      </aside>
       {section.paragraphs.map((p, i) => (
-        <p key={i} className="article-paragraph">
+        <p key={i} className={i === 0 ? 'article-paragraph article-paragraph--lead' : 'article-paragraph'}>
           {p}
         </p>
       ))}
