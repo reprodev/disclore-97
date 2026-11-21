@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { playPageFlip } from '../audio/audio';
 import type { Section } from '../model/manifest';
+import { relatedSections } from '../model/topics';
 import { Plate } from './Plate';
 import '../styles/article.css';
 
@@ -8,9 +9,11 @@ export interface ArticleViewerProps {
   sections: Section[];
   /** Currently selected section id. */
   sectionId: string;
+  /** Opens another section. When omitted, the See Also strip is not shown. */
+  onSelectSection?: (sectionId: string) => void;
 }
 
-export function ArticleViewer({ sections, sectionId }: ArticleViewerProps) {
+export function ArticleViewer({ sections, sectionId, onSelectSection }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
@@ -28,6 +31,7 @@ export function ArticleViewer({ sections, sectionId }: ArticleViewerProps) {
     );
   }
 
+  const related = onSelectSection ? relatedSections(sections, sectionId) : [];
   const facts = section.facts ?? [];
   const timeline = section.timeline ?? [];
 
@@ -69,6 +73,27 @@ export function ArticleViewer({ sections, sectionId }: ArticleViewerProps) {
           {p}
         </p>
       ))}
+      {onSelectSection && related.length > 0 ? (
+        <nav className="article-seealso" aria-label="See Also">
+          <h2 className="article-seealso__title">See Also</h2>
+          <ul className="article-seealso__list">
+            {related.map((r) => (
+              <li key={r.section_id}>
+                <a
+                  href={`#${r.section_id}`}
+                  className="article-seealso__link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSelectSection(r.section_id);
+                  }}
+                >
+                  {r.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
     </article>
   );
 }

@@ -1,10 +1,18 @@
+import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
+import type { View } from '../model/nav';
 import { BevelButton } from './BevelButton';
+import { Breadcrumb } from './Breadcrumb';
+import { ContentsSidebar } from './ContentsSidebar';
+import { MenuBar } from './MenuBar';
+import { NavToolbar } from './NavToolbar';
 import { PixelIcon } from './PixelIcon';
 import { SpinUpBar } from './SpinUpBar';
+import { StatusBar } from './StatusBar';
 import { Window } from './Window';
 import '../styles/browser.css';
+import '../styles/workspace.css';
 
 export interface DiscBrowserProps {
   discs: DiscManifest[];
@@ -15,6 +23,33 @@ export interface DiscBrowserProps {
   onSelectSection: (sectionId: string) => void;
   onSelectDiagram: (diagramId: string) => void;
   onSelectDungeon: (dungeonId: string) => void;
+  /** Current view in the open disc. Drives the sidebar highlight, breadcrumb, and status bar. */
+  view?: View | null;
+  /** Content for the right-hand pane. When omitted, a welcome page is shown. */
+  main?: ReactNode;
+  canBack?: boolean;
+  canForward?: boolean;
+  onBack?: () => void;
+  onForward?: () => void;
+  /** Returns to the disc home page. */
+  onHome?: () => void;
+}
+
+/** Breadcrumb trail and status-bar label for a view. */
+function describeView(disc: DiscManifest, view: View | null): { trail: string[]; label: string } {
+  if (view?.kind === 'section') {
+    const title = disc.sections.find((s) => s.section_id === view.section_id)?.title ?? view.section_id;
+    return { trail: ['Sections', title], label: `Section: ${title}` };
+  }
+  if (view?.kind === 'diagram') {
+    const title = disc.diagrams.find((d) => d.diagram_id === view.diagram_id)?.title ?? view.diagram_id;
+    return { trail: ['Diagrams', title], label: `Diagram: ${title}` };
+  }
+  if (view?.kind === 'keepmaze') {
+    const title = disc.dungeons.find((d) => d.dungeon_id === view.dungeon_id)?.title ?? view.dungeon_id;
+    return { trail: ['Dungeons', title], label: `KeepMaze: ${title}` };
+  }
+  return { trail: [], label: 'Contents' };
 }
 
 export function DiscBrowser({
@@ -25,12 +60,99 @@ export function DiscBrowser({
   onSelectSection,
   onSelectDiagram,
   onSelectDungeon,
+  view = null,
+  main,
+  canBack = false,
+  canForward = false,
+  onBack,
+  onForward,
+  onHome,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
 
   const handleOpen = (discId: string) => {
     playSpinUp();
     onOpenDisc(discId);
+  };
+
+  const renderOpen = (disc: DiscManifest) => {
+    const first = {
+      diagram: disc.diagrams[0]?.diagram_id,
+      dungeon: disc.dungeons[0]?.dungeon_id,
+    };
+    const goBack = () => onBack?.();
+    const goForward = () => onForward?.();
+    const goHome = () => onHome?.();
+    const goDiagram = first.diagram === undefined ? undefined : () => onSelectDiagram(first.diagram!);
+    const goKeepMaze = first.dungeon === undefined ? undefined : () => onSelectDungeon(first.dungeon!);
+    const { trail, label } = describeView(disc, view);
+
+    return (
+      <Window
+        title={disc.title}
+        onClose={onCloseDisc}
+        className="disc-window"
+        menuBar={
+          <MenuBar
+            menus={[
+              { label: 'File', items: [{ label: 'Close Disc', onSelect: onCloseDisc }] },
+              {
+                label: 'Go',
+                items: [
+                  { label: 'Back', onSelect: () => canBack && goBack() },
+                  { label: 'Forward', onSelect: () => canForward && goForward() },
+                  { label: 'Home', onSelect: goHome },
+                ],
+              },
+              {
+                label: 'View',
+                items: [
+                  { label: 'Diagram', onSelect: () => goDiagram?.() },
+                  { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
+                ],
+              },
+            ]}
+          />
+        }
+      >
+        <NavToolbar
+          canBack={canBack}
+          canForward={canForward}
+          onBack={goBack}
+          onForward={goForward}
+          onHome={goHome}
+          onDiscs={onCloseDisc}
+          onDiagram={goDiagram}
+          onKeepMaze={goKeepMaze}
+        />
+        <Breadcrumb discTitle={disc.title} trail={trail} onHome={goHome} />
+        <SpinUpBar key={disc.disc_id} />
+        <div className="disc-workspace">
+          <ContentsSidebar
+            key={disc.disc_id}
+            disc={disc}
+            view={view}
+            onSelectSection={onSelectSection}
+            onSelectDiagram={onSelectDiagram}
+            onSelectDungeon={onSelectDungeon}
+          />
+          <div className="disc-main">
+            {main ?? (
+              <div className="disc-welcome">
+                <h2 className="disc-welcome__title">Welcome</h2>
+                <p>
+                  This disc has {disc.sections.length} sections, {disc.diagrams.length}{' '}
+                  {disc.diagrams.length === 1 ? 'diagram' : 'diagrams'}, and {disc.dungeons.length}{' '}
+                  {disc.dungeons.length === 1 ? 'dungeon' : 'dungeons'}.
+                </p>
+                <p>Choose a topic from the contents on the left, or use Find in Disc to search.</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <StatusBar discTitle={disc.title} viewLabel={label} />
+      </Window>
+    );
   };
 
   return (
@@ -53,77 +175,7 @@ export function DiscBrowser({
         ))}
       </ul>
 
-      {open ? (
-        <Window title={open.title} onClose={onCloseDisc} className="disc-window">
-          <SpinUpBar key={open.disc_id} />
-          <nav className="disc-tree" aria-label={open.title}>
-            <section className="disc-group">
-              <h2 className="disc-group-title">
-                <PixelIcon name="book" />
-                Sections
-              </h2>
-              <ul>
-                {open.sections.map((s) => (
-                  <li key={s.section_id}>
-                    <BevelButton className="disc-entry" onClick={() => onSelectSection(s.section_id)}>
-                      <PixelIcon name="book" />
-                      <span>{s.title}</span>
-                    </BevelButton>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="disc-group">
-              <h2 className="disc-group-title">
-                <PixelIcon name="diagram" />
-                Diagrams
-              </h2>
-              <ul>
-                {open.diagrams.map((d) => (
-                  <li key={d.diagram_id}>
-                    <BevelButton className="disc-entry" onClick={() => onSelectDiagram(d.diagram_id)}>
-                      <PixelIcon name="diagram" />
-                      <span>{d.title}</span>
-                    </BevelButton>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="disc-group">
-              <h2 className="disc-group-title">
-                <PixelIcon name="key" />
-                Trivia
-              </h2>
-              <ul>
-                {open.trivia.map((q) => (
-                  <li key={q.question_id} className="disc-trivia-item">
-                    {q.prompt}
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="disc-group">
-              <h2 className="disc-group-title">
-                <PixelIcon name="torch" />
-                Dungeons
-              </h2>
-              <ul>
-                {open.dungeons.map((d) => (
-                  <li key={d.dungeon_id}>
-                    <BevelButton className="disc-entry" onClick={() => onSelectDungeon(d.dungeon_id)}>
-                      <PixelIcon name="torch" />
-                      <span>{d.title}</span>
-                    </BevelButton>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </nav>
-        </Window>
-      ) : null}
+      {open ? renderOpen(open) : null}
     </div>
   );
 }

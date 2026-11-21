@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker';
+export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home';
 
 /** Palette letters used in the pixel maps below. Every color is a shared token. */
 const PALETTE: Record<string, string> = {
@@ -62,8 +62,39 @@ function cdMap(): string[] {
   return rows;
 }
 
+const BACK_ARROW = [
+  '.....k......',
+  '....kk......',
+  '...kbk......',
+  '..kbbbkkkkkk',
+  '.kbbbbbbbbbk',
+  'kbbbbbbbbbbk',
+  '.kbbbbbbbbbk',
+  '..kbbbkkkkkk',
+  '...kbk......',
+  '....kk......',
+  '.....k......',
+];
+
 const MAPS: Record<IconName, string[]> = {
   cd: cdMap(),
+  back: centered(BACK_ARROW),
+  forward: centered(BACK_ARROW.map((r) => [...r].reverse().join(''))),
+  home: centered([
+    '......kk......',
+    '.....kRRk.....',
+    '....kRRRRk....',
+    '...kRRRRRRk...',
+    '..kRRRRRRRRk..',
+    '.kRRRRRRRRRRk.',
+    'kkkkkkkkkkkkkk',
+    '.kppppppppppk.',
+    '.kppkkkkkkppk.',
+    '.kppkWWWWkppk.',
+    '.kppkWWWWkppk.',
+    '.kppkWWWWkppk.',
+    'kkkkkkkkkkkkkk',
+  ]),
   book: centered([
     'kkkkkkkkkkkk',
     'kRrrrrrrrrrk',
