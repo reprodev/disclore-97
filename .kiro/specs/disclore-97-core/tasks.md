@@ -126,32 +126,32 @@ Property tests live under `tests/properties/` with one file per property, and ea
     - Create `tests/audio.test.ts`: lazy context creation, resume when suspended, silent no-op when `AudioContext` is missing, master gain 0 and nodes stopped when muting during playback, mute state flip and subscriber notification, and one exported function per effect
     - _Requirements: 13.3, 13.4, 13.5, 13.8, 13.9, 13.10_
 
-- [ ] 5. Implement the KeepMaze game logic
-  - [ ] 5.1 Implement the question queue in `src/model/questionQueue.ts`
+- [x] 5. Implement the KeepMaze game logic
+  - [x] 5.1 Implement the question queue in `src/model/questionQueue.ts`
     - Shuffled bag with an injected `rng`: draw without replacement and reshuffle only when empty
     - _Requirements: 12.7_
 
-  - [ ] 5.2 Implement the game reducer in `src/model/game.ts`
+  - [x] 5.2 Implement the game reducer in `src/model/game.ts`
     - Export `GameState`, `GameAction`, `initGame`, and `gameReducer` with `selectExit`, `answer`, and `restart` actions
     - `selectExit` draws a question and sets `pending` (ignoring destinations not in the dungeon). A correct answer moves the player, increments `moves`, and sets `won` at `throne_room`. An incorrect answer increments `incorrect`, keeps the room, and sets `lastWrong` to the cited `section_id`. `restart` returns `initGame`
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7_
 
-  - [ ]* 5.3 Write property test for question queue
+  - [x] 5.3 Write property test for question queue
     - Create `tests/properties/p15-no-repeat.test.ts`
     - **Property 15: Questions do not repeat until all are used**
     - **Validates: Requirements 12.7**
 
-  - [ ]* 5.4 Write property test for correct answers
+  - [x] 5.4 Write property test for correct answers
     - Create `tests/properties/p12-correct-answer.test.ts`
     - **Property 12: Correct answer moves the player**
     - **Validates: Requirements 12.3, 12.5**
 
-  - [ ]* 5.5 Write property test for incorrect answers
+  - [x] 5.5 Write property test for incorrect answers
     - Create `tests/properties/p13-incorrect-answer.test.ts`
     - **Property 13: Incorrect answer keeps the player in place**
     - **Validates: Requirements 12.4**
 
-  - [ ]* 5.6 Write property test for restart
+  - [x] 5.6 Write property test for restart
     - Create `tests/properties/p14-restart.test.ts`
     - **Property 14: Restart resets the game**
     - **Validates: Requirements 12.6**

@@ -35,6 +35,22 @@
     "4.2 Write property test for muted audio silence": {
       "status": "passed",
       "lastRunTimestamp": 1795280340160
+    },
+    "5.3 Write property test for question queue": {
+      "status": "passed",
+      "lastRunTimestamp": 1795280847010
+    },
+    "5.4 Write property test for correct answers": {
+      "status": "passed",
+      "lastRunTimestamp": 1795280877662
+    },
+    "5.5 Write property test for incorrect answers": {
+      "status": "passed",
+      "lastRunTimestamp": 1795280885591
+    },
+    "5.6 Write property test for restart": {
+      "status": "passed",
+      "lastRunTimestamp": 1795280886333
     }
   },
   "executionHistory": {
@@ -348,6 +364,85 @@
         "executionId": "5547b4e6-6471-4dd6-acf8-ac23119540bb",
         "chatSessionId": "sess_1c9e029f-091b-48da-b08b-44f73755b3b6",
         "timestamp": 1795280358903
+      }
+    ],
+    "5.1 Implement the question queue in `src/model/questionQueue.ts`": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280771116
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280795740
+      }
+    ],
+    "5.2 Implement the game reducer in `src/model/game.ts`": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280802198
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280851713
+      }
+    ],
+    "5.3 Write property test for question queue": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280802602
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280851810
+      }
+    ],
+    "5.4 Write property test for correct answers": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280853712
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280891390
+      }
+    ],
+    "5.5 Write property test for incorrect answers": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280854212
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280891872
+      }
+    ],
+    "5.6 Write property test for restart": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280854735
+      },
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280892517
+      }
+    ],
+    "5. Implement the KeepMaze game logic": [
+      {
+        "executionId": "09c8a3c5-a40d-41b6-bf98-4f2c068c014f",
+        "chatSessionId": "sess_f0f8eca9-1326-4fc0-a202-e27871fdf8a7",
+        "timestamp": 1795280892565
       }
     ]
   }
