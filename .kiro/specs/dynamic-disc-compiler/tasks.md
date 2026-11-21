@@ -270,7 +270,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/adapters/webpage.test.ts`: request URL and encoding, success, 404, SPA `index.html` with status 200, error JSON, wrong shape, and timeout with fake timers
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 17.14_
 
-- [ ] 10. Checkpoint - Ensure all tests pass
+- [x] 10. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 11. Implement burn orchestration with the loadDisc gate
