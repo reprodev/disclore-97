@@ -863,6 +863,73 @@
         "chatSessionId": "sess_8da95809-07ee-46eb-a9fb-83d569db324a",
         "timestamp": 1795301686236
       }
+    ],
+    "13. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "e260e722-d4a1-43e2-b230-90d0cd1c759c",
+        "chatSessionId": "sess_b34181ed-0e9a-42df-927a-f07c030a4dc0",
+        "timestamp": 1795301782124
+      },
+      {
+        "executionId": "e260e722-d4a1-43e2-b230-90d0cd1c759c",
+        "chatSessionId": "sess_b34181ed-0e9a-42df-927a-f07c030a4dc0",
+        "timestamp": 1795301809097
+      }
+    ],
+    "14.1 Create `src/styles/burn.css` and `src/components/useModalDialog.ts`": [
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795301907717
+      },
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795301973503
+      }
+    ],
+    "14.2 Create presets, `PresetList.tsx`, and `BurnProgress.tsx`": [
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795301911055
+      },
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795301974122
+      }
+    ],
+    "14.3 Implement `src/components/BurnDialog.tsx`": [
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795301976613
+      },
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795302110781
+      }
+    ],
+    "14.4 Write Burn dialog component tests": [
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795302111315
+      },
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795302233346
+      }
+    ],
+    "14. Build the Burn dialog UI": [
+      {
+        "executionId": "7b1fe940-516f-4364-8573-97ca5f824cd1",
+        "chatSessionId": "sess_d9bf115c-808f-4393-a679-e56566c4b6af",
+        "timestamp": 1795302233411
+      }
     ]
   }
 }

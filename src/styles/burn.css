@@ -1,0 +1,104 @@
+.window.burn-dialog {
+  width: min(600px, 100%);
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+}
+
+.burn-dialog .window-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.burn-dialog label {
+  font-family: var(--font-ui);
+}
+
+.burn-input {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  box-sizing: border-box;
+  padding: 4px;
+  resize: vertical;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  outline: 1px solid var(--color-bevel-edge);
+  outline-offset: calc(-1 * var(--bevel-w) - 1px);
+}
+
+.burn-input:focus {
+  outline: 1px dotted var(--color-bevel-edge);
+}
+
+.burn-input:disabled {
+  color: var(--color-bevel-shadow);
+  background: var(--color-surface);
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-ui);
+}
+
+.burn-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-ui);
+}
+
+.burn-progress__bar {
+  display: flex;
+  gap: 2px;
+  height: 18px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.burn-progress__block {
+  flex: 0 0 10px;
+  box-sizing: border-box;
+  height: 100%;
+  background: var(--color-title-bg);
+  border: 1px solid var(--color-title-bg);
+}
+
+.burn-progress__block[data-filled="false"] {
+  background: var(--color-paper);
+  border-color: var(--color-paper);
+}
+
+.burn-error {
+  margin: 0;
+  padding: 4px 6px;
+  font-family: var(--font-ui);
+  color: var(--color-crimson-dark);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-crimson) var(--color-crimson-dark) var(--color-crimson-dark) var(--color-crimson);
+}
+
+.burn-error[hidden] {
+  display: none;
+}
+
+.burn-dialog button:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}

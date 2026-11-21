@@ -313,22 +313,22 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Create `tests/library/discLibrary.test.ts`: key prefix and envelope shape, a `Storage` fake that throws on every method, a fake that throws a quota error only on `setItem`, remove, and no tokens or credentials in stored values
     - _Requirements: 15.1, 15.2, 15.4, 15.5, 15.6, 15.7, 17.17_
 
-- [ ] 13. Checkpoint - Ensure all tests pass
+- [x] 13. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 14. Build the Burn dialog UI
-  - [ ] 14.1 Create `src/styles/burn.css` and `src/components/useModalDialog.ts`
+- [x] 14. Build the Burn dialog UI
+  - [x] 14.1 Create `src/styles/burn.css` and `src/components/useModalDialog.ts`
     - `burn.css`: use only existing tokens and `var(--font-ui)`, no hex value, no `border-radius`, gradient, `backdrop-filter`, blurred `box-shadow`, or `url(`. Style `.window.burn-dialog` (`width: min(600px, 100%)`), the textarea with an inset bevel border, flat progress blocks built from CSS borders and token colors, and the error region
     - `useModalDialog`: Escape triggers cancel, Tab and Shift+Tab stay inside the dialog, and focus returns to the previously focused element on close
     - _Requirements: 13.12, 13.13, 13.16, 16.1, 16.2, 16.3, 16.4, 16.6_
 
-  - [ ] 14.2 Create presets, `PresetList.tsx`, and `BurnProgress.tsx`
+  - [x] 14.2 Create presets, `PresetList.tsx`, and `BurnProgress.tsx`
     - Add a presets module with at least 2 GitHub repository URL presets and at least 2 topic presets, all original text, each parsing to its declared kind
     - `PresetList`: an accessible list that places the preset text in the input on selection and can be disabled
     - `BurnProgress`: shows `Burning CD-R at 4x...` with a `progressbar` role made from flat blocks, announced through a live region
     - _Requirements: 13.5, 13.6, 13.9, 13.14, 16.4, 16.8_
 
-  - [ ] 14.3 Implement `src/components/BurnDialog.tsx`
+  - [x] 14.3 Implement `src/components/BurnDialog.tsx`
     - Build a modal `Window` titled `Burn New CD-R Disc...` with a labeled multi-line input, `PresetList`, `Burn` and `Cancel` `BevelButton`s, `BurnProgress`, and a `role="alert"` error region. Disable `Burn` for empty or whitespace input
     - On Burn enter the progress state, disable the input, presets, and `Burn`, keep `Cancel` enabled, call `burn` with an `AbortController`, and apply a `minBurnMs` floor (default 800) to successes only. Cancel and Escape abort pending requests and close without mounting. On success call `onBurned(manifest)`
     - Map each error code through `ERROR_MESSAGES`, list `path: message` for `validation-failed`, show the offline burn control when `fallbackTopic` is present, show `URL sources need a connection.` and route `markdown` and `topic` inputs through the fallback while the browser reports offline, keep the input text on failure, and clear the error when the user edits the input
@@ -336,7 +336,7 @@ Property tests live under `tests/properties/` with one file per property (`dcNN-
     - Request button clicks through the Audio_Module only, render all text as React text, and use no `dangerouslySetInnerHTML` or `innerHTML`
     - _Requirements: 6.3, 7.4, 11.3, 11.4, 13.1, 13.6, 13.7, 13.8, 13.9, 13.10, 13.11, 13.12, 13.13, 13.14, 13.15, 13.16, 14.1, 14.2, 14.3, 14.4, 14.6, 14.7, 16.3, 16.9_
 
-  - [ ] 14.4 Write Burn dialog component tests
+  - [x] 14.4 Write Burn dialog component tests
     - Create `tests/components/burn.test.tsx` (jsdom) with `minBurnMs={0}` and a stub `fetch`: Preset selection, `Burn` disabled for empty and whitespace input, the `Burning CD-R at 4x...` text with a `progressbar` and disabled input, Presets, and `Burn`, a successful topic burn, an error display with the offline control, `validation-failed` error lines, Cancel during a pending `fetch` aborts the signal and mounts nothing, Escape cancels, Tab stays inside, focus returns to the opener, roles and names, typing clears the error, and the offline message
     - Also assert: the presets list has at least 2 GitHub and at least 2 topic presets and each parses to its declared kind with `parseInput`, and with the mute toggle on, burning and clicking buttons creates no audio nodes (mock context counters, as in `app.test.tsx`)
     - _Requirements: 13.5, 13.6, 13.7, 13.8, 13.9, 13.10, 13.12, 13.13, 13.14, 13.16, 14.1, 14.3, 14.4, 14.7, 16.9, 17.16_
