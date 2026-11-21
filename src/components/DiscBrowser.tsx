@@ -1,14 +1,15 @@
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
 import type { View } from '../model/nav';
-import { BevelButton } from './BevelButton';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
 import { DiscCover } from './DiscCover';
+import { ExpansionPackList } from './ExpansionPackList';
+import { LoadDiscDialog } from './LoadDiscDialog';
 import { MenuBar } from './MenuBar';
 import { NavToolbar } from './NavToolbar';
-import { PixelIcon } from './PixelIcon';
 import { SpinUpBar } from './SpinUpBar';
 import { SplashBanner } from './SplashBanner';
 import { StatusBar } from './StatusBar';
@@ -77,6 +78,13 @@ export function DiscBrowser({
   onMinimize,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
+  /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
+  const [loadOverId, setLoadOverId] = useState<string | null>(null);
+
+  // Any change of the open disc (including closing it) dismisses the dialog.
+  useEffect(() => {
+    setLoadOverId(null);
+  }, [openDiscId]);
 
   const handleOpen = (discId: string) => {
     playSpinUp();
@@ -107,7 +115,13 @@ export function DiscBrowser({
         menuBar={
           <MenuBar
             menus={[
-              { label: 'File', items: [{ label: 'Close Disc', onSelect: onCloseDisc }] },
+              {
+                label: 'File',
+                items: [
+                  { label: 'Load Disc...', onSelect: () => setLoadOverId(disc.disc_id) },
+                  { label: 'Close Disc', onSelect: onCloseDisc },
+                ],
+              },
               {
                 label: 'Go',
                 items: [
@@ -133,7 +147,7 @@ export function DiscBrowser({
           onBack={goBack}
           onForward={goForward}
           onHome={goHome}
-          onDiscs={onCloseDisc}
+          onDiscs={() => setLoadOverId(disc.disc_id)}
           onDiagram={goDiagram}
           onKeepMaze={goKeepMaze}
         />
@@ -165,7 +179,26 @@ export function DiscBrowser({
   };
 
   if (open) {
-    return <div className="disc-browser disc-browser--open">{renderOpen(open)}</div>;
+    const loading = loadOverId === open.disc_id;
+    return (
+      <>
+        {/* inert keeps focus and clicks out of the disc window while the modal is up; its state stays mounted. */}
+        <div className="disc-browser disc-browser--open" inert={loading}>
+          {renderOpen(open)}
+        </div>
+        {loading ? (
+          <LoadDiscDialog
+            discs={discs}
+            currentDiscId={open.disc_id}
+            onLoad={(id) => {
+              setLoadOverId(null);
+              handleOpen(id);
+            }}
+            onCancel={() => setLoadOverId(null)}
+          />
+        ) : null}
+      </>
+    );
   }
 
   return (
@@ -173,25 +206,12 @@ export function DiscBrowser({
       <Window title="DiscLore '97 - Select a CD-ROM" className="disc-select-window">
         <div className="disc-select">
           <SplashBanner />
-          <p className="disc-select__prompt">Insert a disc to begin.</p>
-          {discs.length === 0 ? <p className="disc-select__empty">No discs are available.</p> : null}
-          <ul className="disc-list" aria-label="Discs">
-            {discs.map((disc) => (
-              <li key={disc.disc_id} className="disc-list-item">
-                <BevelButton
-                  className="disc-open"
-                  aria-pressed={disc.disc_id === openDiscId}
-                  onClick={() => handleOpen(disc.disc_id)}
-                >
-                  <PixelIcon name="cd" size={32} />
-                  <span className="disc-text">
-                    <span className="disc-title">{disc.title}</span>
-                    <span className="disc-tagline">{disc.tagline}</span>
-                  </span>
-                </BevelButton>
-              </li>
-            ))}
-          </ul>
+          <fieldset className="groupbox">
+            <legend className="groupbox__legend">Expansion Packs (CD-ROM Drive D:)</legend>
+            <p className="disc-select__prompt">Insert a disc to begin.</p>
+            {discs.length === 0 ? <p className="disc-select__empty">No discs are available.</p> : null}
+            <ExpansionPackList discs={discs} onPick={handleOpen} />
+          </fieldset>
         </div>
       </Window>
     </div>

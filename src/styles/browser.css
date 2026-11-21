@@ -94,3 +94,73 @@
 .disc-trivia-item {
   padding: 2px 4px;
 }
+
+/* Win95 groupbox: an etched frame with the caption sitting on its top edge. */
+.groupbox {
+  margin: 0;
+  padding: 8px 10px 10px;
+  min-width: 0;
+  border: 1px solid var(--color-bevel-shadow);
+  box-shadow: 1px 1px 0 var(--color-bevel-hi), inset 1px 1px 0 var(--color-bevel-hi);
+}
+
+.groupbox__legend {
+  padding: 0 4px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-ink);
+}
+
+.disc-open--current {
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+}
+
+.disc-current {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--color-crimson);
+}
+
+/* Modal layer: covers the workspace, draws no dimming, and blocks clicks to the window behind. */
+.modal-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.window.load-dialog {
+  width: min(560px, 100%);
+  max-height: 100%;
+}
+
+.load-dialog .window-content {
+  overflow: auto;
+}
+
+.load-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.load-dialog__prompt {
+  margin: 0;
+}
+
+.load-dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+}

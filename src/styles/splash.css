@@ -67,3 +67,11 @@
     visibility: visible;
   }
 }
+
+.splash__status {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-phosphor);
+}

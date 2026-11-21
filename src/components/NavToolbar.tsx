@@ -9,7 +9,7 @@ export interface NavToolbarProps {
   onBack: () => void;
   onForward: () => void;
   onHome: () => void;
-  /** Closes the open disc and returns to the disc list. */
+  /** Opens the Load Disc dialog over the current disc. */
   onDiscs: () => void;
   /** Omit when the disc has no diagrams: the button is disabled. */
   onDiagram?: () => void;

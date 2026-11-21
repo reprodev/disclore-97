@@ -63,7 +63,8 @@ export function SplashBanner() {
     <header className="splash">
       <SplashArt />
       <div className="splash__text">
-        <h1 className="splash__title">DiscLore '97 Multimedia Encyclopedia &mdash; AutoPlay Ready</h1>
+        <h1 className="splash__title">DiscLore '97 Multimedia Encyclopedia</h1>
+        <p className="splash__status">AutoPlay Ready</p>
         <div
           className="splash__bar"
           role="progressbar"

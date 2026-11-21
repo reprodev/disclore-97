@@ -15,6 +15,8 @@ export interface WindowProps {
   maximizable?: boolean;
   /** Lets the user drag the window by its title bar (not while maximized). */
   draggable?: boolean;
+  /** Marks the dialog as modal for assistive technology. The parent blocks the content behind it. */
+  modal?: boolean;
   menuBar?: ReactNode;
   children?: ReactNode;
   className?: string;
@@ -40,6 +42,7 @@ export function Window({
   minimized = false,
   maximizable = false,
   draggable = false,
+  modal = false,
   menuBar,
   children,
   className,
@@ -107,6 +110,7 @@ export function Window({
       ref={rootRef}
       role="dialog"
       aria-labelledby={titleId}
+      aria-modal={modal || undefined}
       className={classes.join(' ')}
       hidden={minimized}
       style={moved ? { transform: `translate(${offset.x}px, ${offset.y}px)` } : undefined}
