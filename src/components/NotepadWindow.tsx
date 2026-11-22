@@ -23,11 +23,11 @@ READING
 - Chronology strip: dated entries for the article, laid out along a timeline.
 - Show in Diagram: jumps to the diagram and highlights the pin for the article you were reading.
 - Cite / Print Preview: shows a page-style preview and a Copy Citation button.
-- Read Aloud: your browser's own voice reads the article, one paragraph at a time. The button shows how far it has got, for example Stop (2/5). Use Stop or the Sound button to silence it.
+- Read Aloud: your browser's own voice reads the article, one paragraph at a time. The paragraph being read is highlighted, and the button shows how far it has got, for example Stop (2/5). The 1x / 1.2x button next to it sets the speed. Use Stop or the Sound button to silence it.
 
 PICTURES
-- When a disc has pictures, the Multimedia Reel shows them in a picture frame. Prev, Play and Next step through them every four seconds.
-- Click a picture, or press Enlarge, to open the Picture Viewer. Arrow Left and Arrow Right change picture, Space starts and pauses the show, the thumbnail strip jumps to a picture, and Escape closes the window.
+- When a disc has pictures, the Multimedia Reel shows them in a picture frame with Prev, Next, Enlarge, and a Frame X / Y counter.
+- Click a picture, or press Enlarge, to open the Picture Viewer. This is the only place the slideshow plays: Play and Pause step through the pictures every four seconds, and closing the window pauses it. Space starts and pauses the show, Arrow Left and Arrow Right change picture, the thumbnail strip jumps to a picture, and Escape closes the window.
 - A picture that cannot be loaded is replaced by an illustration plate.
 
 DIAGRAMS
@@ -37,7 +37,11 @@ KEEPMAZE
 KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached. Reach it to earn a Victory Certificate.
 
 SOUND
-All sound effects are generated live, and no audio files are used. Use the Sound button in the taskbar to mute everything, including Read Aloud.
+All sound effects are generated live, and no audio files are used: soft chords for clicks and door locks, a projector click when you change pictures, a ding when a disc finishes burning, and a fanfare when you reach the throne room.
+
+The Ambience button in the taskbar is Off until you press it. When it is On, it plays a quiet background atmosphere that suits the open disc: wind and a hearth for castles, a CRT hum for code and web discs, and a soft study tone for the rest. Use the Sound button to mute everything, including Ambience and Read Aloud.
+
+A few pictures move a little: a blinking cursor on the computer screens, flickering torch windows, and a glint on the CD. They stand still if your system asks for reduced motion.
 
 ATTRIBUTION AND LICENSING
 - Built-in discs: original text, artwork and sound, made for this project.

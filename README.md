@@ -8,13 +8,16 @@ A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Br
 - **Burn New CD-R Disc.** Compile a new disc in the browser from GitHub, a web page, a topic, or Markdown. Burned discs are validated like the built-in ones and saved in `localStorage`.
 - **Interactive diagrams.** Each diagram is an SVG on a 0..100 coordinate grid with clickable hotspots. Burned discs get a diagram that matches their source: an architecture blueprint (GitHub), a site map (web page), an outline (Markdown), or a concept chart (topic).
 - **1997 Multimedia Experience.**
-  - **MediaReel.** A beveled picture frame with Prev, Play / Pause (every 4 seconds), Next, and a "Frame X / Y" counter. Pictures load without a referrer, show a loading note, and fall back to an SVG plate if they fail.
-  - **Pop-Out Picture Viewer.** A Win95 modal window with the full-size picture, the caption, a thumbnail filmstrip, and the same controls. Arrow keys change picture, Space toggles Play, and Escape closes it.
-  - **Read Aloud.** The browser's Web Speech API narrates the article one paragraph at a time, with live progress such as "Stop (2/5)". It stops on Mute, on a section change, and when the article closes.
+  - **MediaReel.** A beveled picture frame in the article sidebar with Prev, Next, Enlarge, and a "Frame X / Y" counter. Pictures load without a referrer, show a loading note, and fall back to an SVG plate if they fail.
+  - **Pop-Out Picture Viewer.** A Win95 modal window with the full-size picture, the caption, and a thumbnail filmstrip. It is the only place the slideshow plays: Play / Pause advances every 4 seconds, and closing the window pauses it. Space toggles Play, the left and right arrow keys step, and Escape closes it. The footer shows these shortcuts.
+  - **Read Aloud.** The browser's Web Speech API narrates the article one paragraph at a time. The paragraph being read is highlighted, and the button shows live progress such as "Stop (2/5)". A **1x / 1.2x** button sets the speed, and changing it mid-narration carries on from the current paragraph. It stops on Mute, on a section change, and when the article closes.
 - **Authenticity and study tools.** A Chronology strip, Show in Diagram (highlights the matching pin), Cite / Print Preview with Copy Citation, and a Victory Certificate in KeepMaze.
 - **KeepMaze.** A trivia dungeon with a Quest card, a mini-map with a legend, Peek Hint, and a torchlight pulse on each room. Maze layouts are verified with breadth-first search (BFS), so the exit is always reachable.
 - **1997 palette.** Royal Sapphire, Warm Ivory, Burgundy, and Antique Gold, on top of the seven required Win95 chrome colors. All colors live in `src/styles/tokens.css`.
-- **Procedural WebAudio.** All sound is generated at runtime, with no audio files, including the boot chime. A global **Mute** control silences everything, including Read Aloud.
+- **Procedural WebAudio.** All sound is generated at runtime, with no audio files. Effects are soft triangle and sine chords: clicks, page flips, door unlocks, a slide-projector click in the picture viewer, a CD-R burn completion ding, a KeepMaze victory fanfare, and the boot chime.
+- **Ambience.** An optional atmosphere, Off by default, switched by the **Ambience: Off/On** button in the taskbar. It follows the open disc: wind and hearth for castles, a CRT hum for code and web discs, and a quiet study tone for the rest. It is silent while Sound is muted and stops when the taskbar leaves the screen.
+- **Micro-animations.** Subtle SVG touches: a blinking CRT cursor, flickering torch windows, and a CD glint. They are plain CSS opacity steps (`blink`, `flicker`, `glint`), and all of them stop under `prefers-reduced-motion: reduce`.
+- **Global Mute.** One **Sound** control silences everything: effects, Ambience, and Read Aloud.
 
 ## How it was built
 
@@ -43,7 +46,7 @@ src/
   extract/     Server-side logic shared by the Pages Functions: SSRF guard, HTML extractor,
                /api/extract handler, /api/topic handler.
   library/     localStorage persistence for burned discs.
-  audio/       The only code that touches AudioContext, plus Web Speech narration.
+  audio/       The only code that touches AudioContext (effects and ambience), plus Web Speech narration.
   components/  Win95 components: windows, viewers, MediaReel, Picture Viewer, KeepMaze UI.
   discs/       The two built-in discs and the loader.
   styles/      CSS, with all colors defined once in tokens.css.

@@ -121,8 +121,8 @@ Real pictures and narration made the burned discs feel like multimedia, not just
 
 - **A safe `media` field.** `DiscManifest` and `ExtractedSource` gained an optional list of `{ url, caption }`, at most 8. One module, `src/model/media.ts`, decides what is allowed: public `https` addresses only, no private hosts, credentials, or odd ports, and no SVG. The validator, the compiler, and every adapter use that same module, and each re-checks what the one before it passed along.
 - **Extraction.** `extractImages` reads `og:image`, `twitter:image`, and `<img>` tags, skips icons and tracking pixels, and is bounded so a hostile page cannot make it slow. The GitHub adapter adds the owner's avatar and README images, turning relative paths into raw file addresses.
-- **MediaReel.** A beveled picture frame with Prev, Play / Pause, Next, and a frame counter. Pictures load without a referrer and lazily, show a loading note, and fall back to the SVG plate when they fail.
-- **Picture Viewer.** Clicking a picture, or Enlarge, opens a Win95 modal window. It reuses the existing modal hook for Escape, the focus trap, and focus return. It shares the reel's frame and Play state, so the two never disagree. Arrow keys step, Space toggles Play, and a thumbnail strip with a gold active border jumps to a frame. A small detail: focus starts on the picture, so pressing Space cannot press the Close button.
+- **MediaReel.** A beveled picture frame with Prev, Next, Enlarge, and a frame counter. Pictures load without a referrer and lazily, show a loading note, and fall back to the SVG plate when they fail.
+- **Picture Viewer.** Clicking a picture, or Enlarge, opens a Win95 modal window. It reuses the existing modal hook for Escape, the focus trap, and focus return. It shares the reel's current frame, so the two never disagree. Arrow keys step, Space toggles Play, and a thumbnail strip with a gold active border jumps to a frame. Play started out in the sidebar reel too, and was later moved into the viewer alone (see section 12). A small detail: focus starts on the picture, so pressing Space cannot press the Close button.
 - **Read Aloud.** Narration uses the browser's Web Speech API, so there are still no audio files. Each paragraph is its own utterance, because long utterances get cut off in some browsers. The button shows live progress, for example "Stop (2/5)", and the narration stops on Mute, on a section change, and on unmount. The speech code sits in `src/audio/`, next to the rest of the sound code.
 
 One rule from the static tests shaped the code in a small way. `src/` may not contain `https://` addresses other than GitHub's, so the raw GitHub file host is assembled from parts in `github.ts`.
@@ -138,7 +138,24 @@ At first, burning a topic produced a disc of "write down what you already know" 
 
 A live check against the real service showed the shape of the result: a search for "Lighthouses" returned 12 headings, 40 paragraphs, and 8 pictures, while "Mercury" returned a disambiguation page and was correctly sent to the fallback.
 
-## 12. Verification today
+## 12. Refining Multimedia, Sound, and Motion
+
+The next pass tidied the multimedia controls and gave the app a fuller 1997 soundscape.
+
+- **Play lives in the viewer only.** The sidebar reel was crowded at 210px. It now shows Prev, Next, Enlarge, and the frame counter. The Picture Viewer owns Play / Pause and its 4-second timer. Because the timer is part of the window, closing the window pauses the show with no extra bookkeeping. The footer lists the shortcuts: Space, the arrow keys, and Esc.
+- **Read Aloud you can follow.** The speech module reports which paragraph is being read, so the article highlights it with a gold rule. A 1x / 1.2x button sets the speed, and changing it mid-narration restarts from the current paragraph at the new speed.
+- **A fuller soundscape.** The existing effects became soft triangle and sine chords with gentler envelopes, with every export name kept so existing tests and mocks still worked. New effects cover slide clicks, a burn completion ding, and a victory fanfare. Buttons that play their own sound got a `quiet` option so they do not double up with the standard click.
+- **Disc-aware ambience.** An Ambience button in the taskbar, Off by default, plays a looping bed of filtered noise and soft drones chosen by the open disc: castles, code and web discs, or everything else. It is silent while Sound is muted, comes back when Sound does, and stops when the control unmounts. All of it stays inside `src/audio/`, so the `AudioContext` rule still holds.
+- **Quiet motion.** A blinking cursor on the CRT screens, flickering torch windows, and a CD glint, all as opacity steps in CSS and all off under `prefers-reduced-motion`. The two built-in diagrams are data, so shapes gained an optional `anim` field limited to `blink`, `flicker`, and `glint`. The validator rejects any other value, and the viewer turns only those three names into classes.
+
+## 13. Built with Kiro
+
+Kiro shaped the project at three levels.
+
+- **Steering.** `.kiro/steering/disclore-97-design-system.md` is one always-included file. It sets the Win95 look, the procedural-audio rules, the manifest and dungeon invariants, and the deployment rules. Every later change was held to it, and two static tests turned its rules into checks that fail the build.
+- **Specs.** Two specs in `.kiro/specs/` drove the large features, each with requirements, design, and a dependency-ordered task list. `disclore-97-core` produced the app, the validator, the BFS solver, and the two built-in discs. `dynamic-disc-compiler` produced Burn New CD-R Disc: source adapters, the seeded compiler, the library, and 25 correctness properties.
+- **Default-mode passes.** Everything after the specs was done as iterative conversations in Kiro's default mode: the Win95 desktop and boot splash, the 1997 palette, blueprint diagrams, the dev middleware, the multimedia experience, Wikipedia topics, and the soundscape. Each pass was small, ended with the same three commands (`npm test`, `npm run build`, `npm run lint`), and was held to the steering file and the static tests. When a pass hit a rule, such as the ban on stray absolute URLs in `src/`, the fix was made to fit the rule rather than to bend it.
+## 14. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance
