@@ -166,7 +166,18 @@ The Home shelf is a two-column grid, and a first visit showed only two cards. Tw
 
 An empty Burned CD-Rs tab used to be a dead end. It now offers three sample burns (Halloween, Gothic fiction, CD-ROM) that open the Burn dialog and start a Wikipedia topic burn at once, falling back to the offline outline if the lookup fails.
 
-## 16. Verification today
+## 16. An Encarta-style Home screen
+
+The Home window had the right parts but a generic look. A screenshot of a 1997 encyclopedia's title screen set the target: warm paper, a big serif name with a large numeral, engraved line art in the background, and a plain list of actions down the right side.
+
+- **Masthead.** The navy banner became a parchment header with a tracked uppercase eyebrow, a serif DISCLORE next to a large burgundy 97 with a gold offset, and a wide-tracked lowercase subtitle. All of the tracking and capitals is CSS, so the page text stays plain words and the heading's accessible name is still "DiscLore '97".
+- **Engraved watermarks.** A new component draws four flat SVG marks behind the content: a ringed planet, an open book, an arch beside a keep, and orbiting CD rings. They use two new tokens, a sepia stroke and a faint tint, at about half opacity. A test scans the markup for hex colors, gradients, filters, and images, because the design system forbids them.
+- **Action rail.** The cards became rows: a 24px icon, a bold title, and a one-line italic subtitle. They rest flat, raise with a Win95 bevel on hover or focus, and sink when pressed. Titles and accessible names were left alone, so no existing test had to change.
+- **Search anything.** The Pinpointer's dropdown now ends with `Burn CD-R for "<query>" (Wikipedia)...`. With no local matches it replaces "No matching articles.", and it reuses the same auto-start Burn dialog as the sample-burn buttons. The keyboard moves across the local results and that last row as one list.
+
+A small repository clean-up came with it: `*.tsbuildinfo` is ignored and the committed `tsconfig.tsbuildinfo` was untracked, and four empty `.gitkeep` files under `src/` were removed.
+
+## 17. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance

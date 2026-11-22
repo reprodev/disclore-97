@@ -8,7 +8,9 @@ DiscLore '97 is a make-believe 1997 CD-ROM encyclopedia. The four built-in discs
 
 DISCS
 - Four pre-baked Expansion Packs ship with the app: Ancient Castles and Keeps; Retro Computing and the Dial-Up Era; Folklore, Samhain and Halloween; and Lost Formats and Digital Resurrection.
-- The Home window has a Pinpointer search across all discs, a Did You Know? box, and Surprise Me!. If you have not burned any discs yet, the Burned CD-Rs tab offers three sample burns: Halloween, Gothic fiction, and CD-ROM.
+- The Home window is styled like a 1997 multimedia encyclopedia: a DISCLORE 97 masthead on warm parchment, with faint engraved line art (a ringed planet, an open book, an arch and keep, and orbiting CD rings) behind it. The right-hand column lists Quick Jump Modes and Utilities as plain rows, each with an icon, a title, and a short italic note. A row pops up with a raised button edge when you point at it.
+- The Pinpointer searches every disc. Type two or more letters to see matching articles, with the disc and where it came from. The last row of the list always reads Burn CD-R for your words (Wikipedia)..., so a search with no matches can become a new disc: press Enter on it, or click it, and the burn starts at once.
+- Home also has a Did You Know? box and Surprise Me!. If you have not burned any discs yet, the Burned CD-Rs tab offers three sample burns: Halloween, Gothic fiction, and CD-ROM.
 - Open a disc from the desktop, the Start menu, or the Select a CD-ROM window. Pick a topic in the Contents list, or type in Find in Disc.
 - Use Back, Forward and Home on the toolbar to move around.
 
