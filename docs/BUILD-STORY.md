@@ -160,7 +160,13 @@ Kiro shaped the project at three levels.
 
 A disc is only a manifest, so it can live in a file. File > Save Disc Image (.json) downloads the open disc, and Mount Disc Image (.json)... (in the File menu and under Utilities on the Home window) loads one back. The mount path trusts nothing: `JSON.parse`, then `loadDisc(parsed, false)`, the gate every burned disc already passes. Rejections (bad JSON, the wrong shape, an unsafe picture address, an unsolvable dungeon, an ID that collides with a built-in disc, or a file over 5 MB) show a Win95 message box and mount nothing. The test suite round-trips every built-in disc and a burned disc with pictures, then tries malformed and hostile files.
 
-## 15. Verification today
+## 15. Four built-in discs
+
+The Home shelf is a two-column grid, and a first visit showed only two cards. Two more built-in discs fill it: Folklore, Samhain and Halloween, and Lost Formats and Digital Resurrection, written as ordinary `DiscManifest` objects with their own diagrams and dungeons. Like the first two, each validates itself when its module loads, so a mistake in the data fails the build rather than the visitor. A test checks that every pin links to a section, that no two pins crowd each other, that every color is a defined token, and that each dungeon has a real shortest path. The diagrams reuse the `anim` shapes: a bonfire, castle windows, and a moon glint on one, a blinking CRT cursor and a CD glint on the other. The ambience follows too: Halloween gets the castle wind and hearth, Resurrection the CRT hum.
+
+An empty Burned CD-Rs tab used to be a dead end. It now offers three sample burns (Halloween, Gothic fiction, CD-ROM) that open the Burn dialog and start a Wikipedia topic burn at once, falling back to the offline outline if the lookup fails.
+
+## 16. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance

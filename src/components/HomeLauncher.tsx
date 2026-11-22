@@ -35,6 +35,8 @@ export interface HomeLauncherProps {
   onSaveDiscImage?: (disc: DiscManifest) => void;
   /** Removes a burned disc from the library. */
   onRemoveDisc?: (discId: string) => void;
+  /** Burns a sample disc about a topic (the quick-start buttons on the empty Burned CD-Rs tab). */
+  onBurnSample?: (topic: string) => void;
   /** Hides the Home window without closing it. The parent owns this state. */
   minimized?: boolean;
   onMinimize?: () => void;
@@ -105,6 +107,7 @@ export function HomeLauncher({
   removableIds,
   onSaveDiscImage,
   onRemoveDisc,
+  onBurnSample,
   minimized = false,
   onMinimize,
 }: HomeLauncherProps) {
@@ -152,6 +155,7 @@ export function HomeLauncher({
               onPick={onPickDisc}
               onSaveDiscImage={onSaveDiscImage}
               onRemoveDisc={onRemoveDisc}
+              onBurnSample={onBurnSample}
             />
             {onOpenSection ? <DidYouKnow discs={discs} onOpenSection={onOpenSection} random={random} /> : null}
           </Group>

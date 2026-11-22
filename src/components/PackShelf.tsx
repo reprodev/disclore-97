@@ -20,7 +20,16 @@ export interface PackShelfProps {
   onSaveDiscImage?: (disc: DiscManifest) => void;
   /** Removes a burned disc from the library. Omit to hide the Eject button. */
   onRemoveDisc?: (discId: string) => void;
+  /** Burns a sample disc about a topic. When given, the empty Burned CD-Rs tab offers three quick-start buttons. */
+  onBurnSample?: (topic: string) => void;
 }
+
+/** Quick-start burns offered while the library has no burned discs: a button label and the topic to look up. */
+export const SAMPLE_BURNS: readonly { label: string; topic: string }[] = [
+  { label: 'Burn Sample: Halloween', topic: 'Halloween' },
+  { label: 'Burn Sample: Gothic fiction', topic: 'Gothic fiction' },
+  { label: 'Burn Sample: CD-ROM', topic: 'CD-ROM' },
+];
 
 const EMBLEMS: Record<string, IconName> = {
   castles: 'castle',
@@ -34,7 +43,7 @@ const TABS: readonly PackFilter[] = ['all', 'builtin', 'burned'];
  * scrolling shelf with a compact two-column grid of disc cards. Each card has an origin tag,
  * and burned discs add Save .json and Eject buttons.
  */
-export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemoveDisc }: PackShelfProps) {
+export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemoveDisc, onBurnSample }: PackShelfProps) {
   const [filter, setFilter] = useState<PackFilter>('all');
   const uid = useId();
   const isBurned = (d: DiscManifest) => removableIds?.has(d.disc_id) ?? false;
@@ -91,11 +100,22 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
       </div>
       <div id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${filter}`} className="pack-shelf">
         {shown.length === 0 ? (
-          <p className="home__empty pack-shelf__empty">
-            {filter === 'burned'
-              ? 'No burned CD-Rs yet. Burn a new disc, or mount a saved disc image.'
-              : 'No discs are available.'}
-          </p>
+          <div className="pack-shelf__empty">
+            <p className="home__empty pack-shelf__message">
+              {filter === 'burned'
+                ? 'No burned CD-Rs yet. Burn a new disc, or mount a saved disc image.'
+                : 'No discs are available.'}
+            </p>
+            {filter === 'burned' && onBurnSample ? (
+              <div className="pack-samples" role="group" aria-label="Sample burns">
+                {SAMPLE_BURNS.map((s) => (
+                  <BevelButton key={s.topic} className="pack-sample" onClick={() => onBurnSample(s.topic)}>
+                    {s.label}
+                  </BevelButton>
+                ))}
+              </div>
+            ) : null}
+          </div>
         ) : (
           <ul className="pack-grid" aria-label="Discs">
             {shown.map((disc) => {

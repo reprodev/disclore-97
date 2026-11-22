@@ -276,6 +276,8 @@ describe('ambient soundscape', () => {
   it('picks a soundscape for a disc id', () => {
     expect(ambienceKindFor('castles')).toBe('castle');
     expect(ambienceKindFor('topic-medieval-castles-ab12')).toBe('castle');
+    expect(ambienceKindFor('halloween')).toBe('castle');
+    expect(ambienceKindFor('resurrection')).toBe('retro');
     expect(ambienceKindFor('retro-dialup')).toBe('retro');
     expect(ambienceKindFor('github-octo-hello-1a2b')).toBe('retro');
     expect(ambienceKindFor('webpage-example-com-9z8y')).toBe('retro');

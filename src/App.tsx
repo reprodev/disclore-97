@@ -95,6 +95,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   );
   const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
   const [burnOpen, setBurnOpen] = useState(false);
+  /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
+  const [burnSample, setBurnSample] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState(false);
   /** A notice about a disc image that could not be mounted or saved, shown as a Win95 message box. */
   const [imageNotice, setImageNotice] = useState<{ title: string; message: string; details: string[]; footnote?: string } | null>(null);
@@ -336,7 +338,14 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onQuickJump={quickJump}
           onOpenReadMe={openReadMe}
           onReplaySplash={() => setStage('splash')}
-          onBurnNew={() => setBurnOpen(true)}
+          onBurnNew={() => {
+            setBurnSample(null);
+            setBurnOpen(true);
+          }}
+          onBurnSample={(topic) => {
+            setBurnSample(topic);
+            setBurnOpen(true);
+          }}
           onSaveImage={() => disc && saveDiscImage(disc)}
           onSaveDiscImage={saveDiscImage}
           onOpenSection={openSectionIn}
@@ -390,6 +399,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           <BurnDialog
             onBurned={onBurned}
             onClose={() => setBurnOpen(false)}
+            {...(burnSample ? { initialText: burnSample, autoStart: true } : {})}
             {...(fetchImpl ? { fetch: fetchImpl } : {})}
           />
         ) : null}

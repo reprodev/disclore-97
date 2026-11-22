@@ -4,7 +4,7 @@ A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Br
 
 ## Features
 
-- **Win95-style CD-ROM encyclopedia.** Windows 95 chrome, article browsing, and original disc content on the two built-in discs.
+- **Win95-style CD-ROM encyclopedia.** Windows 95 chrome, article browsing, and original disc content on the four built-in discs.
 - **Burn New CD-R Disc.** Compile a new disc in the browser from GitHub, a web page, a topic, or Markdown. Burned discs are validated like the built-in ones and saved in `localStorage`.
 - **Interactive diagrams.** Each diagram is an SVG on a 0..100 coordinate grid with clickable hotspots. Burned discs get a diagram that matches their source: an architecture blueprint (GitHub), a site map (web page), an outline (Markdown), or a concept chart (topic).
 - **1997 Multimedia Experience.**
@@ -48,7 +48,7 @@ src/
   library/     localStorage persistence for burned discs, and disc image (.json) save and mount.
   audio/       The only code that touches AudioContext (effects and ambience), plus Web Speech narration.
   components/  Win95 components: windows, viewers, MediaReel, Picture Viewer, KeepMaze UI.
-  discs/       The two built-in discs and the loader.
+  discs/       The four built-in discs and the loader.
   styles/      CSS, with all colors defined once in tokens.css.
 functions/api/ Cloudflare Pages Functions: extract.ts and topic.ts.
 ```
@@ -57,15 +57,19 @@ The model layer has no React and no DOM. The compiler is pure and seeded, so the
 
 ## Pre-Baked Discs
 
-Two original discs ship with the app. Both are typed `DiscManifest` objects in `src/discs/`.
+Four original discs ship with the app, so a first visit fills a 2 by 2 grid on the Home shelf. Each is a typed `DiscManifest` object in `src/discs/`, works offline, and passes the same validator and BFS solver as a burned disc.
 
 | Disc | Sections | Diagrams / hotspots | Trivia questions | Dungeons |
 | --- | --- | --- | --- | --- |
 | DiscLore '97: Ancient Castles & Keeps | 5 | 1 diagram, 4 hotspots | 6 | 1 (10 rooms) |
 | DiscLore '97: Retro Computing & Dial-Up Era | 7 | 1 diagram, 4 hotspots | 6 | 1 (10 rooms) |
+| DiscLore '97: Folklore, Samhain & Halloween | 5 | 1 diagram, 5 hotspots | 8 | 1 (10 rooms) |
+| DiscLore '97: Lost Formats & Digital Resurrection | 5 | 1 diagram, 5 hotspots | 8 | 1 (10 rooms) |
 
 - **Castles:** the dungeon is "The Keep of Many Stairs". The diagram is a castle cross-section.
 - **Retro:** the dungeon is "The Cursor Catacombs". The diagram is a dial-up home setup.
+- **Halloween:** the dungeon is "The Hollow Halls of Hallowtide". The diagram is a haunted hill with a flickering bonfire, castle windows, and a glinting moon. Sections cover Samhain, jack-o'-lanterns, gargoyles and Gothic fiction, Victorian ghost stories, and modern Halloween.
+- **Resurrection:** the dungeon is "The Archive of Lost Formats". The diagram is an archive workbench with a blinking CRT cursor and a glinting CD-ROM. Sections cover the CD-ROM, HyperCard, floppy disks, CRT screens, and software preservation.
 
 ## Burn New CD-R Disc
 
@@ -79,6 +83,8 @@ Four source kinds are supported:
 | **webpage** | A public web page, fetched through `/api/extract`. The text and safe `og:image`, `twitter:image`, and `<img>` pictures are extracted. |
 | **topic** | A free-text topic, looked up on English Wikipedia through `/api/topic`. The article text, section headings, and pictures become a disc. |
 | **markdown** | Markdown text you paste in. |
+
+**Sample burns.** While the library has no burned discs, the empty **Burned CD-Rs** tab on the Home shelf offers three quick-start buttons: **Burn Sample: Halloween**, **Burn Sample: Gothic fiction**, and **Burn Sample: CD-ROM**. Each opens the Burn dialog and starts a Wikipedia topic burn for that topic (or the offline outline, if the lookup fails).
 
 ### Save and mount disc images
 

@@ -21,6 +21,10 @@ export interface BurnDialogProps {
   minBurnMs?: number;
   /** Reports whether the browser is online. Default `navigator.onLine !== false`. */
   online?: () => boolean;
+  /** Text to start with in the box, for example a sample topic. */
+  initialText?: string;
+  /** Starts burning the initial text as soon as the dialog opens. */
+  autoStart?: boolean;
 }
 
 const OFFLINE_NOTICE = 'URL sources need a connection.';
@@ -41,11 +45,19 @@ function wait(ms: number, signal: AbortSignal): Promise<void> {
 }
 
 /** Modal "Burn New CD-R Disc..." dialog: turns pasted input into a disc via `burn`. */
-export function BurnDialog({ onBurned, onClose, fetch: fetchImpl, minBurnMs = 800, online = defaultOnline }: BurnDialogProps) {
+export function BurnDialog({
+  onBurned,
+  onClose,
+  fetch: fetchImpl,
+  minBurnMs = 800,
+  online = defaultOnline,
+  initialText = '',
+  autoStart = false,
+}: BurnDialogProps) {
   const layerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<BurnError | null>(null);
 
@@ -93,18 +105,27 @@ export function BurnDialog({ onBurned, onClose, fetch: fetchImpl, minBurnMs = 80
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
-  const onBurn = () => {
-    if (busy || text.trim() === '') return;
+  const burnText = (input: string) => {
+    if (busy || input.trim() === '') return;
     if (offline) {
-      const parsed = parseInput(text);
+      const parsed = parseInput(input);
       if (parsed.ok && (parsed.kind === 'github' || parsed.kind === 'webpage')) {
         setError({ code: 'network', message: OFFLINE_NOTICE });
         return;
       }
     }
-    const input = text;
     void run((signal) => burn(input, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal }));
   };
+
+  const onBurn = () => burnText(text);
+
+  // A sample burn starts by itself once, when the dialog opens.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStarted.current) return;
+    autoStarted.current = true;
+    burnText(initialText);
+  }, []);
 
   const onBurnOffline = (topic: string) => {
     if (busy) return;

@@ -57,6 +57,8 @@ export interface DiscBrowserProps {
   random?: () => number;
   /** Exports any disc as a .json disc image (the Home cards for burned discs use it). */
   onSaveDiscImage?: (disc: DiscManifest) => void;
+  /** Opens the Burn dialog and burns a sample disc about this topic. */
+  onBurnSample?: (topic: string) => void;
   /** Removes a burned disc from the library. */
   onRemoveDisc?: (discId: string) => void;
   /** Ids of burned discs that may be removed. */
@@ -106,6 +108,7 @@ export function DiscBrowser({
   onOpenSection,
   random,
   onSaveDiscImage,
+  onBurnSample,
   onRemoveDisc,
   removableIds,
 }: DiscBrowserProps) {
@@ -260,6 +263,7 @@ export function DiscBrowser({
         random={random}
         onSaveDiscImage={onSaveDiscImage}
         onRemoveDisc={onRemoveDisc}
+        onBurnSample={onBurnSample}
         minimized={minimized}
         onMinimize={onMinimize}
       />

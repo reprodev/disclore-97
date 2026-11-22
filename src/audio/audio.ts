@@ -287,11 +287,13 @@ let ambienceBus: GainNode | null = null;
 let ambienceNodes: AudioScheduledSourceNode[] = [];
 const ambienceListeners = new Set<(on: boolean) => void>();
 
-/** Picks the soundscape for a disc: castles get wind and hearth, code and web discs a CRT hum, the rest a study tone. */
+/** Picks the soundscape for a disc: castles and Halloween get wind and hearth, code, web, and lost-format discs a CRT hum, the rest a study tone. */
 export function ambienceKindFor(discId: string | undefined): AmbienceKind {
   const id = (discId ?? '').toLowerCase();
-  if (id.includes('castle') || id.includes('keep') || id.includes('fort')) return 'castle';
-  if (id.startsWith('retro') || id.startsWith('github-') || id.startsWith('webpage-')) return 'retro';
+  if (id.includes('castle') || id.includes('keep') || id.includes('fort') || id.includes('halloween')) return 'castle';
+  if (id.startsWith('retro') || id.startsWith('resurrection') || id.startsWith('github-') || id.startsWith('webpage-')) {
+    return 'retro';
+  }
   return 'study';
 }
 

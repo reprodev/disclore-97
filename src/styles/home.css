@@ -765,3 +765,23 @@
 .spotlight .bevel-button.spotlight__button[data-pressed="true"] {
   padding: 2px 9px 0 11px;
 }
+/* Empty Burned CD-Rs tab: the message, then three quick-start sample burns. */
+.pack-shelf__message {
+  margin: 0;
+}
+
+.pack-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pack-samples .bevel-button.pack-sample {
+  min-width: 0;
+  padding: 3px 10px;
+}
+
+.pack-samples .bevel-button.pack-sample[data-pressed="true"] {
+  padding: 4px 9px 2px 11px;
+}

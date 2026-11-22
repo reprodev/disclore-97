@@ -4,10 +4,11 @@ import '../styles/shortcuts.css';
 
 export const README_TEXT = `DiscLore '97 - ReadMe
 
-DiscLore '97 is a make-believe 1997 CD-ROM encyclopedia. The two built-in discs are completely original, and the app is an unaffiliated tribute to the multimedia reference discs of the 1990s.
+DiscLore '97 is a make-believe 1997 CD-ROM encyclopedia. The four built-in discs are completely original, and the app is an unaffiliated tribute to the multimedia reference discs of the 1990s.
 
 DISCS
-- Two pre-baked Expansion Packs ship with the app: Ancient Castles and Keeps, and Retro Computing and the Dial-Up Era.
+- Four pre-baked Expansion Packs ship with the app: Ancient Castles and Keeps; Retro Computing and the Dial-Up Era; Folklore, Samhain and Halloween; and Lost Formats and Digital Resurrection.
+- The Home window has a Pinpointer search across all discs, a Did You Know? box, and Surprise Me!. If you have not burned any discs yet, the Burned CD-Rs tab offers three sample burns: Halloween, Gothic fiction, and CD-ROM.
 - Open a disc from the desktop, the Start menu, or the Select a CD-ROM window. Pick a topic in the Contents list, or type in Find in Disc.
 - Use Back, Forward and Home on the toolbar to move around.
 
