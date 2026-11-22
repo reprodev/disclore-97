@@ -59,12 +59,23 @@ A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Br
 
 The project was built with [Kiro](https://kiro.dev) using Spec-Driven Development. Each step feeds the next:
 
-1. `.kiro/steering`: project-wide guidance and conventions. Two hooks in `.kiro/hooks/` and a custom agent in `.kiro/agents/` enforce them (see below).
+1. `.kiro/steering`: project-wide guidance and conventions. Four hooks in `.kiro/hooks/` and a custom agent in `.kiro/agents/` enforce them (see below).
 2. `requirements.md`: user stories and acceptance criteria.
 3. `design.md`: architecture and the correctness properties to test.
 4. `tasks.md`: an ordered, dependency-aware implementation plan, executed task by task.
 
 The specs live in `.kiro/specs/`: `disclore-97-core` (the app and the built-in discs) and `dynamic-disc-compiler` (Burn New CD-R Disc). The later multimedia, palette, and Wikipedia work was done as follow-up changes. See [docs/BUILD-STORY.md](docs/BUILD-STORY.md) for the whole story.
+
+### Kiro hooks
+
+Four agent hooks in `.kiro/hooks/` run checks automatically. The file-save matchers accept both `/` and `\` path separators, so they work on Windows too.
+
+| Hook file | Runs when | Command |
+| --- | --- | --- |
+| `static-rules-on-src-save.json` | a file under `src/` is saved | `npx vitest run tests/static.test.ts tests/dynamic-static.test.ts` |
+| `properties-on-model-or-discs-save.json` | a file under `src/model/` or `src/discs/` is saved | `npx vitest run tests/properties/` |
+| `api-extract-adapter-guard.json` | a file under `src/extract/`, `functions/api/`, or `src/adapters/` is saved, or `vite.config.ts` | `npx vitest --run tests/extract/ tests/adapters/ tests/dynamic-static.test.ts` |
+| `typecheck-lint-gate-on-stop.json` | the agent finishes a turn (`Stop`) | `npx tsc --noEmit && npm run lint` |
 
 ### Kiro custom agent
 

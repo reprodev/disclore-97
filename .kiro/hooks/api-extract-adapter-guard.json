@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "API, extract and adapter guard on save",
+      "trigger": "PostFileSave",
+      "description": "When a file under src/extract/, functions/api/, or src/adapters/ is saved, or vite.config.ts itself, run the extract and adapter tests plus the dynamic static scan (SSRF guard, fixed API hosts, safe media, no secrets in functions/ or src/extract/, no Authorization in adapters, compiler purity). The matcher accepts both / and \\ path separators.",
+      "matcher": "(^|[\\\\/])(src[\\\\/](extract|adapters)[\\\\/]|functions[\\\\/]api[\\\\/]|vite\\.config\\.ts$)",
+      "action": {
+        "type": "command",
+        "command": "npx vitest --run tests/extract/ tests/adapters/ tests/dynamic-static.test.ts",
+        "timeout": 180
+      }
+    }
+  ]
+}

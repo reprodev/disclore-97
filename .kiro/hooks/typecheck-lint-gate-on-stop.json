@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Typecheck and lint gate on agent stop",
+      "trigger": "Stop",
+      "description": "When the agent finishes a turn (the Stop trigger, Kiro's agent-stop event), type-check the whole project and run ESLint, so a turn never ends with a type error or a lint failure left behind.",
+      "action": {
+        "type": "command",
+        "command": "npx tsc --noEmit && npm run lint",
+        "timeout": 240
+      }
+    }
+  ]
+}
