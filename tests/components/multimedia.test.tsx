@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { ArticleViewer } from '../../src/components/ArticleViewer';
 import { MediaReel, REEL_INTERVAL_MS } from '../../src/components/MediaReel';
 import { setMuted } from '../../src/audio/audio';
@@ -118,6 +118,7 @@ describe('ArticleViewer Multimedia Reel', () => {
 describe('Read Aloud', () => {
   class FakeUtterance {
     lang = '';
+    onstart: (() => void) | null = null;
     onend: (() => void) | null = null;
     onerror: (() => void) | null = null;
     constructor(readonly text: string) {}
@@ -156,9 +157,22 @@ describe('Read Aloud', () => {
     render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
     click('Read Aloud');
     expect(spoken.map((u) => u.text)).toEqual(['Alpha', 'Alpha text.', 'More alpha.']);
-    expect(screen.getByRole('button', { name: 'Stop' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Stop (1/3)' }).getAttribute('aria-pressed')).toBe('true');
     act(() => spoken[spoken.length - 1].onend?.());
     expect(screen.getByRole('button', { name: 'Read Aloud' })).toBeTruthy();
+  });
+
+  it('shows paragraph progress while narrating and follows each paragraph', () => {
+    installSpeech();
+    render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    click('Read Aloud');
+    expect(screen.getByRole('button', { name: 'Stop (1/3)' })).toBeTruthy();
+    act(() => spoken[1].onstart?.());
+    expect(screen.getByRole('button', { name: 'Stop (2/3)' })).toBeTruthy();
+    act(() => spoken[2].onstart?.());
+    expect(screen.getByRole('button', { name: 'Stop (3/3)' })).toBeTruthy();
+    act(() => spoken[2].onend?.());
+    expect(screen.getByRole('button', { name: 'Read Aloud' }).getAttribute('aria-pressed')).toBe('false');
   });
 
   it('Stop cancels the narration', () => {
@@ -166,7 +180,7 @@ describe('Read Aloud', () => {
     render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
     click('Read Aloud');
     cancel.mockClear();
-    click('Stop');
+    click('Stop (1/3)');
     expect(cancel).toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Read Aloud' })).toBeTruthy();
   });
@@ -209,5 +223,167 @@ describe('Read Aloud', () => {
     cancel.mockClear();
     unmount();
     expect(cancel).toHaveBeenCalled();
+  });
+});
+
+describe('MediaReel loading state', () => {
+  it('shows "Loading picture..." until the picture loads', () => {
+    render(<MediaReel media={MEDIA} fallback={noPlate} />);
+    expect(screen.getByText('Loading picture...')).toBeTruthy();
+    fireEvent.load(screen.getByRole('img', { name: 'First picture' }));
+    expect(screen.queryByText('Loading picture...')).toBeNull();
+  });
+
+  it('remembers loaded pictures and shows the note again for a new one', () => {
+    render(<MediaReel media={MEDIA} fallback={noPlate} />);
+    fireEvent.load(screen.getByRole('img', { name: 'First picture' }));
+    click('Next');
+    expect(screen.getByText('Loading picture...')).toBeTruthy();
+    click('Prev');
+    expect(screen.queryByText('Loading picture...')).toBeNull();
+  });
+
+  it('swaps the note for the fallback plate when the picture fails', () => {
+    render(<MediaReel media={MEDIA} fallback={noPlate} />);
+    fireEvent.error(screen.getByRole('img', { name: 'First picture' }));
+    expect(screen.queryByText('Loading picture...')).toBeNull();
+    expect(screen.getByTestId('plate')).toBeTruthy();
+  });
+});
+
+describe('Picture Viewer', () => {
+  const viewer = () => screen.getByRole('dialog', { name: 'Picture Viewer \u2014 Test Disc' });
+  const setup = (media = MEDIA) => render(<MediaReel media={media} fallback={noPlate} title="Test Disc" />);
+
+  it('opens from the picture and from Enlarge, with a Win95 caption bar', () => {
+    setup();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const zoom = screen.getByRole('button', { name: 'View larger: First picture' });
+    fireEvent.click(zoom);
+    expect(viewer()).toBeTruthy();
+    cleanup();
+
+    setup();
+    click('Enlarge');
+    expect(viewer()).toBeTruthy();
+  });
+
+  it('shows the full-size picture without a referrer, plus the full caption', () => {
+    setup();
+    click('Enlarge');
+    const img = within(viewer()).getByRole('img', { name: 'First picture' });
+    expect(img.getAttribute('src')).toBe(MEDIA[0].url);
+    expect(img.getAttribute('referrerpolicy')).toBe('no-referrer');
+    expect(within(viewer()).getByText('First picture', { selector: 'p' })).toBeTruthy();
+    expect(within(viewer()).getByText('Frame 1 / 3')).toBeTruthy();
+  });
+
+  it('puts focus on the picture, so Space cannot press Close', () => {
+    setup();
+    click('Enlarge');
+    expect(document.activeElement).toBe(within(viewer()).getByRole('group', { name: 'Picture' }));
+  });
+
+  it('Prev and Next step the frame and stay in sync with the reel', () => {
+    setup();
+    click('Enlarge');
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Next' }));
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+    expect(within(viewer()).getByRole('img', { name: 'Second picture' })).toBeTruthy();
+    expect(screen.getAllByText('Frame 2 / 3')).toHaveLength(2);
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Prev' }));
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Prev' }));
+    expect(within(viewer()).getByText('Frame 3 / 3')).toBeTruthy();
+  });
+
+  it('ArrowRight and ArrowLeft step the frame', () => {
+    setup();
+    click('Enlarge');
+    const stage = within(viewer()).getByRole('group', { name: 'Picture' });
+    fireEvent.keyDown(stage, { key: 'ArrowRight' });
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+    fireEvent.keyDown(stage, { key: 'ArrowLeft' });
+    fireEvent.keyDown(stage, { key: 'ArrowLeft' });
+    expect(within(viewer()).getByText('Frame 3 / 3')).toBeTruthy();
+  });
+
+  it('Space toggles Play and Pause, and Play advances the shared reel', () => {
+    vi.useFakeTimers();
+    setup();
+    click('Enlarge');
+    const stage = within(viewer()).getByRole('group', { name: 'Picture' });
+    fireEvent.keyDown(stage, { key: ' ' });
+    expect(within(viewer()).getByRole('button', { name: 'Pause' }).getAttribute('aria-pressed')).toBe('true');
+    act(() => void vi.advanceTimersByTime(4000));
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+    fireEvent.keyDown(stage, { key: ' ' });
+    expect(within(viewer()).getByRole('button', { name: 'Play' })).toBeTruthy();
+    act(() => void vi.advanceTimersByTime(8000));
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+  });
+
+  it('the thumbnail strip jumps to a frame and marks the active one', () => {
+    setup();
+    click('Enlarge');
+    const strip = within(viewer()).getByRole('list', { name: 'Thumbnails' });
+    const thumbs = within(strip).getAllByRole('button');
+    expect(thumbs).toHaveLength(3);
+    expect(thumbs[0].getAttribute('data-active')).toBe('true');
+    fireEvent.click(within(strip).getByRole('button', { name: 'Frame 3: Third picture' }));
+    expect(within(viewer()).getByText('Frame 3 / 3')).toBeTruthy();
+    expect(thumbs[2].getAttribute('data-active')).toBe('true');
+    expect(thumbs[2].getAttribute('aria-current')).toBe('true');
+    expect(thumbs[0].getAttribute('data-active')).toBe('false');
+    expect(screen.getAllByText('Frame 3 / 3')).toHaveLength(2);
+  });
+
+  it('shows no filmstrip or stepping for a single picture', () => {
+    setup([MEDIA[0]]);
+    click('Enlarge');
+    expect(within(viewer()).queryByRole('list', { name: 'Thumbnails' })).toBeNull();
+    expect((within(viewer()).getByRole('button', { name: 'Next' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('Escape closes it and focus returns to the picture button', () => {
+    setup();
+    const zoom = screen.getByRole('button', { name: 'View larger: First picture' });
+    zoom.focus();
+    fireEvent.click(zoom);
+    expect(viewer()).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(zoom);
+  });
+
+  it('the close button closes it', () => {
+    setup();
+    click('Enlarge');
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('keeps Tab inside the window', () => {
+    setup();
+    click('Enlarge');
+    const buttons = within(viewer()).getAllByRole('button');
+    const last = buttons[buttons.length - 1];
+    last.focus();
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(viewer().contains(document.activeElement)).toBe(true);
+  });
+
+  it('shows the fallback plate when the large picture fails to load', () => {
+    setup();
+    click('Enlarge');
+    fireEvent.error(within(viewer()).getByRole('img', { name: 'First picture' }));
+    expect(within(viewer()).getByTestId('plate')).toBeTruthy();
+  });
+
+  it('shows Loading picture... in the viewer until the picture arrives', () => {
+    setup();
+    click('Enlarge');
+    expect(within(viewer()).getByText('Loading picture...')).toBeTruthy();
+    fireEvent.load(within(viewer()).getByRole('img', { name: 'First picture' }));
+    expect(within(viewer()).queryByText('Loading picture...')).toBeNull();
   });
 });

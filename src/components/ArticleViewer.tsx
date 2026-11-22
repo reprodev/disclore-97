@@ -36,7 +36,9 @@ export function ArticleViewer({
 }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [citeOpen, setCiteOpen] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
+  /** Narration progress, 1-based paragraph number out of the total. Null when not speaking. */
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
+  const speaking = progress !== null;
   const [muted, setMuted] = useState(isMuted);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
@@ -48,7 +50,7 @@ export function ArticleViewer({
 
   // Narration belongs to one article: it stops on a section change and on unmount.
   useEffect(() => {
-    setSpeaking(false);
+    setProgress(null);
     return () => stopSpeaking();
   }, [sectionId]);
 
@@ -83,7 +85,11 @@ export function ArticleViewer({
       stopSpeaking();
       return;
     }
-    if (speak([section.title, ...section.paragraphs], () => setSpeaking(false))) setSpeaking(true);
+    speak(
+      [section.title, ...section.paragraphs],
+      () => setProgress(null),
+      (current, total) => setProgress({ current, total }),
+    );
   };
 
   return (
@@ -97,6 +103,7 @@ export function ArticleViewer({
         ) : null}
         {canCite ? <BevelButton onClick={() => setCiteOpen(true)}>Cite / Print Preview</BevelButton> : null}
         <BevelButton
+          className="article-tools__toggle"
           aria-pressed={speaking}
           disabled={!speechReady || (muted && !speaking)}
           title={
@@ -108,13 +115,14 @@ export function ArticleViewer({
           }
           onClick={toggleSpeech}
         >
-          {speaking ? 'Stop' : 'Read Aloud'}
+          {progress ? `Stop (${progress.current}/${progress.total})` : 'Read Aloud'}
         </BevelButton>
       </div>
       <aside className="article-aside">
         {reel.length > 0 ? (
           <MediaReel
             media={reel}
+            title={discTitle ?? section.title}
             fallback={(caption) => <Plate kind={section.plate} caption={caption} />}
           />
         ) : (

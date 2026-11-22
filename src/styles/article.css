@@ -378,3 +378,160 @@
   text-align: right;
   white-space: nowrap;
 }
+
+/* Pressed (on) state for toggle buttons: Read Aloud while speaking, Play while playing. */
+.bevel-button.article-tools__toggle[aria-pressed="true"] {
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+  background: var(--color-paper);
+  padding: 5px 11px 3px 13px;
+}
+
+.media-reel {
+  flex-wrap: wrap;
+}
+
+/* Clickable picture: a plain button around the img. */
+.media-frame__mat {
+  position: relative;
+}
+
+.media-frame__zoom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: zoom-in;
+}
+
+.media-frame__zoom:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -2px;
+}
+
+/* Compact loading note over the lower edge of a mat. */
+.media-loading {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 1px 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-bevel-edge);
+  background: var(--color-tooltip-bg);
+  border: 1px solid var(--color-bevel-edge);
+  pointer-events: none;
+}
+
+/* Picture Viewer window. */
+.window.picture-viewer {
+  width: min(860px, 94vw);
+  max-width: 100%;
+  max-height: 100%;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+}
+
+.picture-viewer .window-content {
+  overflow: auto;
+}
+
+.picture-viewer__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.picture-viewer__mat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 6px;
+  min-height: 120px;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  outline: 1px solid var(--color-bevel-edge);
+  outline-offset: -3px;
+}
+
+.picture-viewer__mat:focus {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -3px;
+}
+
+.picture-viewer__img {
+  display: block;
+  max-width: min(820px, 90vw);
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.picture-viewer__fallback {
+  width: min(360px, 80%);
+}
+
+.picture-viewer__caption {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.picture-viewer__strip {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.picture-viewer__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 48px;
+  box-sizing: border-box;
+  padding: 1px;
+  overflow: hidden;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  cursor: default;
+}
+
+.picture-viewer__thumb[data-active="true"] {
+  border: 3px solid var(--color-gold);
+  padding: 0;
+}
+
+.picture-viewer__thumb:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: 1px;
+}
+
+.picture-viewer__thumb img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.picture-viewer__thumb-miss {
+  font-family: var(--font-ui);
+  color: var(--color-bevel-shadow);
+}

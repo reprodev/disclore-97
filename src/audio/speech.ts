@@ -37,10 +37,15 @@ export function stopSpeaking(): void {
 
 /**
  * Speaks the given paragraphs one after another. `onEnd` runs exactly once, when the last
- * paragraph finishes, when speech fails, or when it is stopped. Returns false (and speaks
- * nothing) when speech is unavailable, muted, or there is no text.
+ * paragraph finishes, when speech fails, or when it is stopped. onProgress(current, total),
+ * with a 1-based paragraph number, runs when narration begins and as each paragraph starts.
+ * Returns false (and speaks nothing) when speech is unavailable, muted, or there is no text.
  */
-export function speak(paragraphs: readonly string[], onEnd: () => void): boolean {
+export function speak(
+  paragraphs: readonly string[],
+  onEnd: () => void,
+  onProgress?: (current: number, total: number) => void,
+): boolean {
   const s = synth();
   const texts = paragraphs.map((p) => p.trim()).filter((p) => p !== '');
   if (!s || isMuted() || texts.length === 0) return false;
@@ -61,10 +66,14 @@ export function speak(paragraphs: readonly string[], onEnd: () => void): boolean
       onEnd();
     }
   };
+  onProgress?.(1, texts.length);
   try {
     texts.forEach((text, i) => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
+      u.onstart = () => {
+        if (current === run) onProgress?.(i + 1, texts.length);
+      };
       u.onend = i === texts.length - 1 ? finish : null;
       u.onerror = finish;
       s.speak(u);
