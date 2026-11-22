@@ -293,3 +293,69 @@
   color: var(--color-title-text);
   background: var(--color-title-bg);
 }
+
+/* Keyboard Shortcuts dialog. */
+.window.shortcuts-dialog {
+  width: min(480px, 100%);
+  max-height: 100%;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+}
+
+.shortcuts-dialog .window-content {
+  overflow: auto;
+}
+
+.shortcuts-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.shortcuts-dialog__heading {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-crimson);
+  border-bottom: 1px solid var(--color-bevel-shadow);
+}
+
+.shortcuts-dialog__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+}
+
+.shortcuts-dialog__row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.shortcuts-dialog__row dt {
+  flex: 0 0 150px;
+}
+
+.shortcuts-dialog__row dd {
+  margin: 0;
+}
+
+.shortcuts-dialog__keys {
+  display: inline-block;
+  padding: 0 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.shortcuts-dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+}

@@ -125,3 +125,23 @@ export function gameReducer(
       return initGame(d, qs, rng);
   }
 }
+
+/** Scholar Ranks from lowest to highest. `scholarRank` returns one of these. */
+export const SCHOLAR_RANKS = ['Torchbearer', 'Keep Explorer', 'Court Scholar', 'Royal Archivist'] as const;
+
+/** A disc's best KeepMaze run. */
+export interface PersonalBest {
+  bestScore: number;
+  bestRank: string;
+}
+
+/**
+ * Whether a finished run beats the stored best: a higher score, or the same score with a higher
+ * rank. With no stored best, any finished run is a new best.
+ */
+export function beatsBest(prev: PersonalBest | null, score: number, rank: string): boolean {
+  if (prev === null) return true;
+  if (score !== prev.bestScore) return score > prev.bestScore;
+  const at = (r: string): number => (SCHOLAR_RANKS as readonly string[]).indexOf(r);
+  return at(rank) > at(prev.bestRank);
+}

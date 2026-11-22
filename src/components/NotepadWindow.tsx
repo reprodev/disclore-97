@@ -32,13 +32,14 @@ READING
 - Cross-links: when an article mentions the title of another article on the same disc, the words are a link. Each article is linked once per paragraph, and Back and Forward work as usual.
 - Bookmark: the Bookmark button in the article tools marks the article. Bookmarks are kept on this computer for each disc, and a Bookmarks list appears in the contents sidebar for one-click jumping. Press Bookmarked to remove one.
 - Show in Diagram: jumps to the diagram and highlights the pin for the article you were reading.
-- Cite / Print Preview: shows a page-style preview and a Copy Citation button.
+- Cite / Print Preview: shows a page-style preview, a Copy Citation button, and a Print... button. Print... opens your browser's print window. Only the citation sheet is printed, in dark ink on ivory paper, and the desktop, taskbar, toolbars, and sidebar are left out.
 - Read Aloud: your browser's own voice reads the article, one paragraph at a time. The paragraph being read is highlighted, and the button shows how far it has got, for example Stop (2/5). The 1x / 1.2x button next to it sets the speed. Use Stop or the Sound button to silence it.
 
 LOOKING THINGS UP
 - Dictionary: the Dictionary button on the toolbar, View > Dictionary..., and the Dictionary card on the Home window open a word finder. Double-click a single word in an article to open it with that word filled in. As you type, it lists where the word appears on every open disc: article titles, Quick Facts, and sentences. Click a result to open that article. Press Look Up to fetch a short definition, which needs a connection. If the word is not found or you are offline, the matches from your discs are still shown.
 - Media Gallery: the Gallery button shows a contact sheet for the open disc. If the disc has pictures, click one to open it in the Picture Viewer. If it has none, each article is shown as an illustration plate, and a click opens that article.
 - Read articles: the contents list puts a check mark beside every article you have opened and shows how many you have read, for example 3 / 10 read. This is kept on this computer for each disc.
+- Keyboard shortcuts: while an article is open, Ctrl+F (Cmd+F on a Mac) opens the Find in Article bar instead of your browser's own find. While any disc is open, Ctrl+D (Cmd+D) opens the Dictionary instead of bookmarking the page. Help > Shortcuts... lists every shortcut, including the Picture Viewer keys, the Pinpointer keys, and Tab and Esc in dialogs.
 - Find in Article: the Find in Article button opens a search bar for the open article. Matches are highlighted, and Previous match, Next match, or Enter and Shift+Enter step through them. Escape closes the bar.
 PICTURES
 - When a disc has pictures, the Multimedia Reel shows them in a picture frame with Prev, Next, Enlarge, and a Frame X / Y counter.
@@ -52,6 +53,8 @@ KEEPMAZE
 KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached.
 
 Your Knowledge Score, Streak, and Torches are in the Quest card. A right answer is worth 100 points, plus 10 more for each right answer you already have in a row (the bonus stops growing after five). If you used Peek Hint on the question, the answer is worth 50 points with no bonus. A wrong answer ends your streak and dims one of your three torches. Torches are only a tally of mistakes: they never lock a door, and you can always keep going. Reach the throne room to earn a Victory Certificate stamped with your Score, Best Streak, and Scholar Rank: Royal Archivist, Court Scholar, Keep Explorer, or Torchbearer.
+
+Your Personal Best for each disc is kept on this computer. It is replaced when you finish a maze with a higher score, or with the same score and a better rank. Once there is one, the Quest card shows it, for example Personal Best: 210 pts (Royal Archivist), and a run that sets a new record is marked New Personal Best! on the certificate.
 
 SOUND
 All sound effects are generated live, and no audio files are used: soft chords for clicks and door locks, a projector click when you change pictures, a ding when a disc finishes burning, and a fanfare when you reach the throne room.

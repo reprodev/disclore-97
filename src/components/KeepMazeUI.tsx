@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { playDoorUnlock, playTorch, playVictoryFanfare } from '../audio/audio';
-import { gameReducer, initGame, scholarRank, STARTING_TORCHES } from '../model/game';
+import { loadBest, saveBest } from '../library/best';
+import type { StorageLike } from '../library/discLibrary';
+import { beatsBest, gameReducer, initGame, scholarRank, STARTING_TORCHES } from '../model/game';
+import type { PersonalBest } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
 import { ENTRANCE_ROOM_ID } from '../model/manifest';
 import type { DiscManifest, Dungeon } from '../model/manifest';
@@ -15,6 +18,8 @@ export interface KeepMazeUIProps {
   dungeon: Dungeon;
   /** Opens a section in the Article_Viewer. */
   onOpenSection: (sectionId: string) => void;
+  /** Where the disc's Personal Best is kept. Without it, no best is recorded or shown. */
+  storage?: StorageLike;
   /** Injected for tests; defaults to Math.random. */
   rng?: () => number;
 }
@@ -29,7 +34,7 @@ function firstSentence(text: string): string {
   return s.length > PEEK_MAX ? `${s.slice(0, PEEK_MAX - 3).trimEnd()}...` : s;
 }
 
-export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: KeepMazeUIProps) {
+export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.random }: KeepMazeUIProps) {
   const questions = disc.trivia;
   const rngRef = useRef(rng);
   rngRef.current = rng;
@@ -60,6 +65,33 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
   useEffect(() => {
     if (state.won) playVictoryFanfare();
   }, [state.won]);
+
+  /** The disc's best run so far, and whether the run just finished set it. */
+  const [best, setBest] = useState<PersonalBest | null>(() => loadBest(storage, disc.disc_id));
+  const [newBest, setNewBest] = useState(false);
+  const scoreRef = useRef(state);
+  scoreRef.current = state;
+
+  // Record the run when the throne room is reached: a higher score, or the same score with a better rank.
+  useEffect(() => {
+    if (!state.won) {
+      setNewBest(false);
+      return;
+    }
+    if (!storage) return;
+    const run = scoreRef.current;
+    const rank = scholarRank(run.score, run.moves);
+    const prev = loadBest(storage, disc.disc_id);
+    if (beatsBest(prev, run.score, rank)) {
+      const next = { bestScore: run.score, bestRank: rank };
+      saveBest(storage, disc.disc_id, next);
+      setBest(next);
+      setNewBest(true);
+    } else {
+      setBest(prev);
+      setNewBest(false);
+    }
+  }, [state.won, storage, disc.disc_id]);
 
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);
@@ -140,6 +172,12 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
             <p className="certificate__rank">
               Scholar Rank: <strong>{scholarRank(state.score, state.moves)}</strong>
             </p>
+            {newBest ? <p className="certificate__best-badge">New Personal Best!</p> : null}
+            {best ? (
+              <p className="certificate__best">
+                Personal Best: {best.bestScore} pts ({best.bestRank})
+              </p>
+            ) : null}
             <p className="keepmaze__message certificate__result" role="status">
               Victory! You reached the throne room in {state.moves} moves with {state.incorrect}{' '}
               incorrect answers.
@@ -213,6 +251,11 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
           <p className="quest-card__progress">
             Rooms explored: {visited.length} of {dungeon.rooms.length}
           </p>
+          {best ? (
+            <p className="quest-card__best">
+              Personal Best: {best.bestScore} pts ({best.bestRank})
+            </p>
+          ) : null}
           <dl className="quest-card__stats" aria-label="Knowledge stats">
             <div className="quest-card__stat">
               <dt>Score</dt>

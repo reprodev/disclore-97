@@ -1,10 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Section } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import { useModalDialog } from './useModalDialog';
 import { Window } from './Window';
 import '../styles/article.css';
+import '../styles/print.css';
 
 /** Encyclopedia-style citation: `"Section Title." DiscLore '97: Disc Title.` */
 export function formatCitation(sectionTitle: string, discTitle: string): string {
@@ -31,6 +32,15 @@ export function CiteDialog({ section, discTitle, onClose }: CiteDialogProps) {
 
   const cancel = useCallback(() => onClose(), [onClose]);
   useModalDialog(layerRef, cancel, true);
+
+  // Marks the page while the sheet is open, so the print rules show only the citation sheet.
+  useEffect(() => {
+    document.body.classList.add('cite-printing');
+    return () => document.body.classList.remove('cite-printing');
+  }, []);
+
+  /** Opens the browser's print dialog. The button plays its usual click. */
+  const print = () => window.print();
 
   const copyCitation = async () => {
     try {
@@ -76,6 +86,7 @@ export function CiteDialog({ section, discTitle, onClose }: CiteDialogProps) {
               {copy === 'copied' ? 'Citation copied.' : copy === 'manual' ? 'Press Ctrl+C to copy.' : ''}
             </span>
             <BevelButton onClick={() => void copyCitation()}>Copy Citation</BevelButton>
+            <BevelButton onClick={print}>Print...</BevelButton>
             <BevelButton onClick={cancel}>Close</BevelButton>
           </div>
         </div>

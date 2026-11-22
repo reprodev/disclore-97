@@ -34,6 +34,8 @@ export interface DiscBrowserProps {
   onSelectGallery?: () => void;
   /** Opens the Dictionary dialog. Omit to hide the Dictionary button, View menu item, and Home card. */
   onOpenDictionary?: (word?: string) => void;
+  /** Opens the Keyboard Shortcuts dialog. Omit to hide the Help menu. */
+  onOpenShortcuts?: () => void;
   /** Section ids of the open disc that were already read. */
   visited?: readonly string[];
   /** Current view in the open disc. Drives the sidebar highlight, breadcrumb, and status bar. */
@@ -111,6 +113,7 @@ export function DiscBrowser({
   bookmarks,
   onSelectGallery,
   onOpenDictionary,
+  onOpenShortcuts,
   visited,
   view = null,
   main,
@@ -209,6 +212,7 @@ export function DiscBrowser({
                   ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
                 ],
               },
+              ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
             ]}
           />
         }

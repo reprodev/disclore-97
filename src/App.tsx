@@ -10,6 +10,7 @@ import { MediaGallery } from './components/MediaGallery';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
 import { MessageDialog } from './components/MessageDialog';
+import { ShortcutsDialog } from './components/ShortcutsDialog';
 import { HotspotViewer } from './components/HotspotViewer';
 import { KeepMazeUI } from './components/KeepMazeUI';
 import { TimelineView } from './components/TimelineView';
@@ -107,6 +108,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   const visitedRef = useRef<readonly string[]>([]);
   /** The Dictionary dialog: null when closed, otherwise the word it opened with ('' for none). */
   const [dictionary, setDictionary] = useState<{ word: string } | null>(null);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [burnOpen, setBurnOpen] = useState(false);
   /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
   const [burnSample, setBurnSample] = useState<string | null>(null);
@@ -167,6 +169,20 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     setVisited(next);
     saveVisited(bookmarkStorage, disc.disc_id, next);
   }, [marksDiscId, openSectionId]);
+
+  // Ctrl+D / Cmd+D opens the Dictionary while a disc is open, instead of the browser's bookmark dialog.
+  const discIsOpen = disc !== undefined;
+  useEffect(() => {
+    if (!discIsOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'd') return;
+      e.preventDefault();
+      if (document.querySelector('.modal-layer')) return;
+      setDictionary({ word: '' });
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [discIsOpen]);
 
   const toggleMark = (sectionId: string) => {
     if (!disc) return;
@@ -357,6 +373,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
             key={`${disc.disc_id}/${dungeon.dungeon_id}`}
             disc={disc}
             dungeon={dungeon}
+            storage={bookmarkStorage}
             onOpenSection={goSection}
           />
         );
@@ -387,6 +404,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onSelectTimeline={() => visit({ kind: 'timeline' })}
           onSelectGallery={() => visit({ kind: 'gallery' })}
           onOpenDictionary={(word) => setDictionary({ word: word ?? '' })}
+          onOpenShortcuts={() => setShortcutsOpen(true)}
           bookmarks={marks}
           visited={visited}
           view={nav.view}
@@ -458,6 +476,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
             minimized={readMeMinimized}
           />
         ) : null}
+        {shortcutsOpen ? <ShortcutsDialog onClose={() => setShortcutsOpen(false)} /> : null}
         {dictionary ? (
           <DictionaryDialog
             discs={discs}

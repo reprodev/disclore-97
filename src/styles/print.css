@@ -1,0 +1,96 @@
+/*
+ * Printing the Cite / Print Preview sheet. While the dialog is open it puts `cite-printing` on
+ * <body>. In print, everything of the Win95 desktop is hidden (desktop icons, disc windows,
+ * toolbars, sidebar, taskbar, dialog title bar, buttons, and the modal layer's backdrop) and only
+ * the page itself prints, in dark ink on ivory paper. Colors come from tokens only.
+ */
+@media print {
+  body.cite-printing,
+  body.cite-printing .desktop,
+  body.cite-printing .desktop__work {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  /* The desktop furniture: taskbar and everything in the work area except the dialog layer. */
+  body.cite-printing .desktop > :not(.desktop__work),
+  body.cite-printing .desktop__work > :not(.modal-layer) {
+    display: none;
+  }
+
+  /* Other dialogs that may be stacked under the sheet. */
+  body.cite-printing .modal-layer:not(:has(.cite-dialog)) {
+    display: none;
+  }
+
+  body.cite-printing .modal-layer {
+    position: static;
+    display: block;
+    padding: 0;
+    background: transparent;
+  }
+
+  /* The dialog window loses its frame, title bar, menu, and controls. */
+  body.cite-printing .window.cite-dialog {
+    position: static;
+    display: block;
+    width: auto;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.cite-printing .cite-dialog .window-title-bar,
+  body.cite-printing .cite-dialog .window-menubar,
+  body.cite-printing .cite-dialog__label,
+  body.cite-printing .cite-dialog__text,
+  body.cite-printing .cite-dialog__buttons {
+    display: none;
+  }
+
+  body.cite-printing .cite-dialog .window-content,
+  body.cite-printing .cite-dialog__body {
+    display: block;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+  }
+
+  /* The printed page: no scroll box, no offset shadow, dark ink on ivory. */
+  body.cite-printing .cite-dialog__page {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    color: var(--color-ink);
+    background: var(--color-paper);
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.cite-printing .cite-dialog__running,
+  body.cite-printing .cite-dialog__heading,
+  body.cite-printing .cite-dialog__para,
+  body.cite-printing .cite-dialog__foot {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  body.cite-printing .cite-dialog__para {
+    font-size: 12pt;
+    orphans: 3;
+    widows: 3;
+  }
+
+  body.cite-printing .cite-dialog__heading {
+    page-break-after: avoid;
+  }
+}

@@ -85,6 +85,21 @@ export function ArticleViewer({
     setFindIndex(0);
   }, [sectionId]);
 
+  // Ctrl+F / Cmd+F opens and focuses the find bar instead of the browser's own find. A dialog on top keeps the default.
+  useEffect(() => {
+    if (!found) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'f') return;
+      if (document.querySelector('.modal-layer')) return;
+      e.preventDefault();
+      setFindOpen(true);
+      findInputRef.current?.focus();
+      findInputRef.current?.select();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [found]);
+
   // Focus the search box when the bar opens.
   useEffect(() => {
     if (findOpen) findInputRef.current?.focus();
