@@ -126,6 +126,120 @@ export function HeroArt() {
   );
 }
 
+// ---- Engraved watermarks for the Home screen -------------------------------------------------
+// Flat line art in the sepia watermark ink: strokes and faint tints only, no gradients, no images.
+
+const W = {
+  ink: 'var(--color-watermark-ink)',
+  tint: 'var(--color-parchment-tint)',
+};
+
+const MARK_PROPS = {
+  fill: 'none',
+  stroke: W.ink,
+  strokeWidth: 0.9,
+  strokeLinejoin: 'miter' as const,
+} as const;
+
+/** A ringed planet with latitude bands, hatching, a small moon, and a few stars. */
+function PlanetMark() {
+  const bands: [number, number][] = [
+    [34, 20.8],
+    [42, 23.7],
+    [50, 23.7],
+    [58, 20.8],
+  ];
+  return (
+    <svg className="home-mark home-mark--planet" viewBox="0 0 120 90" focusable="false" {...MARK_PROPS}>
+      {[
+        [8, 10], [22, 26], [100, 40], [14, 70], [92, 74], [70, 8],
+      ].map(([x, y]) => (
+        <path key={`${x}-${y}`} d={`M${x! - 2} ${y}H${x! + 2}M${x} ${y! - 2}V${y! + 2}`} />
+      ))}
+      <circle cx={56} cy={46} r={24} fill={W.tint} />
+      {bands.map(([y, hw]) => (
+        <line key={y} x1={56 - hw} y1={y} x2={56 + hw} y2={y} />
+      ))}
+      {[0, 1, 2, 3].map((i) => (
+        <line key={i} x1={64 + i * 3} y1={62 - i * 2} x2={70 + i * 3} y2={55 - i * 2} />
+      ))}
+      <ellipse cx={56} cy={46} rx={46} ry={11} transform="rotate(-16 56 46)" />
+      <ellipse cx={56} cy={46} rx={40} ry={8.5} transform="rotate(-16 56 46)" />
+      <circle cx={104} cy={18} r={5} fill={W.tint} />
+      <circle cx={102.5} cy={16.5} r={1.2} />
+    </svg>
+  );
+}
+
+/** An open encyclopedia volume with ruled lines of text on both pages. */
+function BookMark() {
+  return (
+    <svg className="home-mark home-mark--book" viewBox="0 0 120 80" focusable="false" {...MARK_PROPS}>
+      <path d="M6 26V66L58 72L60 70L62 72L114 66V26" />
+      <polygon points="10,22 58,28 58,68 10,62" fill={W.tint} />
+      <polygon points="62,28 110,22 110,62 62,68" fill={W.tint} />
+      <line x1={60} y1={26} x2={60} y2={70} />
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <g key={i}>
+          <line x1={15} y1={30.6 + i * 5} x2={53} y2={35.4 + i * 5} />
+          <line x1={67} y1={35.4 + i * 5} x2={105} y2={30.6 + i * 5} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** A classical arch beside a keep silhouette with battlements. */
+function ArchMark() {
+  return (
+    <svg className="home-mark home-mark--arch" viewBox="0 0 120 90" focusable="false" {...MARK_PROPS}>
+      <line x1={8} y1={82} x2={112} y2={82} />
+      <line x1={14} y1={86} x2={106} y2={86} />
+      <path d="M24 82V44A21 21 0 0 1 66 44V82" />
+      <path d="M30 82V46A15 15 0 0 1 60 46V82" />
+      <rect x={20} y={42} width={10} height={3} fill={W.tint} />
+      <rect x={60} y={42} width={10} height={3} fill={W.tint} />
+      <polygon points="41,22 49,22 47,29 43,29" fill={W.tint} />
+      <rect x={78} y={36} width={26} height={46} fill={W.tint} />
+      {[78, 85, 92, 99].map((x) => (
+        <rect key={x} x={x} y={31} width={5} height={5} fill={W.tint} />
+      ))}
+      <path d="M87 82V70A4 4 0 0 1 95 70V82" />
+      <rect x={88} y={48} width={6} height={10} />
+    </svg>
+  );
+}
+
+/** A CD in orbit: dotted rings, an orbit track, and little satellites. */
+function RingsMark() {
+  return (
+    <svg className="home-mark home-mark--rings" viewBox="0 0 120 120" focusable="false" {...MARK_PROPS}>
+      <circle cx={60} cy={60} r={52} strokeDasharray="2 3" />
+      <circle cx={60} cy={60} r={42} />
+      <ellipse cx={60} cy={60} rx={56} ry={18} transform="rotate(25 60 60)" />
+      <circle cx={60} cy={60} r={20} fill={W.tint} />
+      <circle cx={60} cy={60} r={14} />
+      <circle cx={60} cy={60} r={5} />
+      {[
+        [112, 60], [26, 92], [86, 14],
+      ].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r={2.6} fill={W.tint} />
+      ))}
+    </svg>
+  );
+}
+
+/** Low-opacity engraved backdrop for the Home window. Decorative only. */
+export function EngravedWatermarks() {
+  return (
+    <div className="home-marks" aria-hidden="true">
+      <PlanetMark />
+      <RingsMark />
+      <BookMark />
+      <ArchMark />
+    </div>
+  );
+}
 const BLOCKS = 20;
 
 export interface InitBarProps {

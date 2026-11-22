@@ -26,28 +26,27 @@
   padding: 8px;
   font-family: var(--font-ui);
   font-size: 12px;
+  background: var(--color-parchment);
 }
 
-/* Hero header */
+/* Hero masthead: an Encarta-style lockup on warm parchment, over the engraved watermarks. */
 .home-hero {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   flex: 0 0 auto;
   gap: 6px 16px;
-  padding: 6px 12px;
-  color: var(--color-title-text);
-  background: var(--color-night);
-  border: 2px solid var(--color-gold);
-  outline: 1px solid var(--color-gold-dark);
-  outline-offset: -6px;
+  padding: 4px 8px 8px;
+  color: var(--color-ink);
+  background: transparent;
+  border-bottom: 3px double var(--color-gold-dark);
 }
 
 .home-hero__emblem {
-  flex: 0 0 140px;
+  flex: 0 0 132px;
   max-width: 100%;
   background: var(--color-night);
-  border: 1px solid var(--color-gold-dark);
+  border: 2px solid var(--color-gold-dark);
 }
 
 .home-hero__emblem .boot-hero__art {
@@ -59,28 +58,54 @@
 .home-hero__text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 1px;
   min-width: 0;
 }
 
-.home-hero__title {
+/* Micro-tracked uppercase eyebrow. */
+.home-hero__eyebrow {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: 32px;
+  font-family: var(--font-ui);
+  font-size: 10px;
   font-weight: bold;
-  line-height: 1;
-  letter-spacing: 1px;
-  color: var(--color-gold-light);
-  text-shadow: 2px 2px 0 var(--color-crimson);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-wood-dark);
 }
 
-.home-hero__subtitle {
+/* DISCLORE in serif capitals next to a large burgundy 97 with a gold offset. */
+.home-hero__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 12px;
-  letter-spacing: 0.26em;
+  line-height: 1;
+}
+
+.home-hero__word {
+  font-size: 34px;
+  font-weight: normal;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.home-hero__num {
+  font-size: 54px;
+  font-weight: normal;
+  line-height: 0.9;
+  color: var(--color-crimson);
+  text-shadow: 2px 2px 0 var(--color-gold);
+}
+
+/* Wide-tracked lowercase subtitle. */
+.home-hero__tag {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  letter-spacing: 0.55em;
+  color: var(--color-crimson-dark);
 }
 
 .home-hero__badge {
@@ -784,4 +809,135 @@
 
 .pack-samples .bevel-button.pack-sample[data-pressed="true"] {
   padding: 4px 9px 2px 11px;
+}
+
+/* ---- Engraved watermark backdrop (decorative, behind everything) ---- */
+.home {
+  position: relative;
+}
+
+.home > .home-marks {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home > :not(.home-marks) {
+  position: relative;
+  z-index: 1;
+}
+
+.home-mark {
+  position: absolute;
+  display: block;
+  opacity: 0.55;
+}
+
+.home-mark--planet {
+  top: 0;
+  right: 4px;
+  width: 190px;
+  height: 142px;
+}
+
+.home-mark--rings {
+  top: 118px;
+  right: 14px;
+  width: 128px;
+  height: 128px;
+}
+
+.home-mark--book {
+  top: 238px;
+  right: 150px;
+  width: 124px;
+  height: 83px;
+}
+
+.home-mark--arch {
+  top: 330px;
+  right: 12px;
+  width: 116px;
+  height: 87px;
+}
+
+/* ---- Editorial action rail: icon, bold title, quiet italic subtitle ---- */
+.home .bevel-button.home-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 8px;
+  text-align: left;
+  color: var(--color-ink);
+  background: transparent;
+  border: var(--bevel-w) solid transparent;
+  border-bottom-color: var(--color-parchment-dark);
+}
+
+.home .bevel-button.home-card:hover:not(:disabled),
+.home .bevel-button.home-card:focus-visible:not(:disabled) {
+  background: var(--color-surface);
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.home .bevel-button.home-card:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+/* Pressed: a sunken bevel, without the usual text shift so the row does not jump. */
+.home .bevel-button.home-card[data-pressed="true"]:not(:disabled),
+.home .bevel-button.home-card:active:not(:disabled) {
+  padding: 4px 8px;
+  background: var(--color-surface);
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+}
+
+.home .bevel-button.home-card:disabled {
+  background: transparent;
+}
+
+.home .home-card .pixel-icon {
+  flex: 0 0 auto;
+}
+
+.home .home-card__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 1px;
+}
+
+.home .home-card__title {
+  overflow: hidden;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home .home-card__desc {
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-wood-dark);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home .bevel-button.home-card:disabled .home-card__desc {
+  color: var(--color-bevel-shadow);
+}
+
+.home .home__note {
+  font-family: var(--font-serif);
+  font-style: italic;
 }

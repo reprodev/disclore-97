@@ -9,7 +9,7 @@ import { PackShelf } from './PackShelf';
 import { Pinpointer } from './Pinpointer';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
-import { HeroArt } from './SplashArt';
+import { EngravedWatermarks, HeroArt } from './SplashArt';
 import { Window } from './Window';
 import '../styles/home.css';
 import '../styles/workspace.css';
@@ -57,7 +57,7 @@ function Card({
 }) {
   return (
     <BevelButton className="home-card" disabled={disabled || !onClick} onClick={() => onClick?.()}>
-      <PixelIcon name={icon} size={32} />
+      <PixelIcon name={icon} size={24} />
       <span className="home-card__text">
         <span className="home-card__title">{title}</span>
         <span className="home-card__desc">{text}</span>
@@ -133,13 +133,22 @@ export function HomeLauncher({
       onMinimize={onMinimize}
     >
       <div className="home">
+        <EngravedWatermarks />
         <header className="home-hero">
           <div className="home-hero__emblem">
             <HeroArt />
           </div>
           <div className="home-hero__text">
-            <h1 className="home-hero__title">DiscLore '97</h1>
-            <p className="home-hero__subtitle">Multimedia Encyclopedia &bull; 1997 Edition</p>
+            <p className="home-hero__eyebrow">Multimedia Encyclopedia &bull; 1997 Edition</p>
+            <h1 className="home-hero__title" aria-label="DiscLore '97">
+              <span className="home-hero__word" aria-hidden="true">
+                DiscLore
+              </span>
+              <span className="home-hero__num" aria-hidden="true">
+                97
+              </span>
+            </h1>
+            <p className="home-hero__tag">encyclopedia</p>
           </div>
           <p className="home-hero__badge">D: CD-ROM Mounted &bull; Procedural Audio</p>
         </header>
@@ -166,14 +175,14 @@ export function HomeLauncher({
                 <Card
                   icon="diagram"
                   title="Interactive Diagrams"
-                  text="Go straight to a diagram and click its numbered pins."
+                  text="find and jump straight to pin diagrams"
                   disabled={!hasDiagrams}
                   onClick={onQuickJump ? () => onQuickJump('diagram') : undefined}
                 />
                 <Card
                   icon="torch"
                   title="KeepMaze Quest"
-                  text="Go straight into the trivia dungeon."
+                  text="explore the trivia dungeon"
                   disabled={!hasDungeons}
                   onClick={onQuickJump ? () => onQuickJump('keepmaze') : undefined}
                 />
@@ -181,7 +190,7 @@ export function HomeLauncher({
                   <Card
                     icon="book"
                     title="Surprise Me!"
-                    text="Open a random article from any disc."
+                    text="open a random article from any disc"
                     disabled={!hasSections}
                     onClick={surprise}
                   />
@@ -195,27 +204,27 @@ export function HomeLauncher({
                 <Card
                   icon="cd"
                   title="Burn New CD-R Disc..."
-                  text="Turn a GitHub repo, web page, or topic into a disc."
+                  text="burn a Wikipedia topic, GitHub repo, or web page"
                   onClick={onBurnNew}
                 />
                 {onMountImage ? (
                   <Card
                     icon="cd"
                     title="Mount Disc Image (.json)..."
-                    text="Open a disc you saved earlier, from a file on this computer."
+                    text="open a disc image saved on this computer"
                     onClick={onMountImage}
                   />
                 ) : null}
                 <Card
                   icon="notepad"
                   title="About / ReadMe.txt"
-                  text="What DiscLore '97 and KeepMaze are."
+                  text="what DiscLore '97 and KeepMaze are"
                   onClick={onOpenReadMe}
                 />
                 <Card
                   icon="key"
                   title="Replay Intro Splash"
-                  text="Watch the boot screen again."
+                  text="watch the boot screen again"
                   onClick={onReplaySplash}
                 />
               </div>

@@ -252,8 +252,8 @@ function runs(rows: string[], yOffset = 0): Run[] {
 
 export interface PixelIconProps {
   name: IconName;
-  /** Rendered size in CSS pixels. Use 16 or 32 for crisp scaling. */
-  size?: 16 | 32;
+  /** Rendered size in CSS pixels. 16 and 32 scale the 16-pixel grid by whole numbers; 24 is for compact rows. */
+  size?: 16 | 24 | 32;
   /** Speaker only: draw the muted cross. */
   muted?: boolean;
   className?: string;

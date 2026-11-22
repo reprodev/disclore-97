@@ -15,6 +15,10 @@
   --color-parchment: #F0E6C8;
   --color-parchment-dark: #D8C898;
 
+  /* Encarta-style engraved watermark line art: a sepia stroke and a faint paper tint for its fills */
+  --color-watermark-ink: #B8A878;
+  --color-parchment-tint: #E6DABA;
+
   /* Flat VGA-style accents. Stone */
   --color-stone-light: #C8C8B8;
   --color-stone: #9C9C8C;
