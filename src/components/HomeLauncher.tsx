@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { DiscManifest } from '../model/manifest';
 import type { QuickJumpMode } from '../model/nav';
 import { BevelButton } from './BevelButton';
-import { ExpansionPackList } from './ExpansionPackList';
+import { PackShelf } from './PackShelf';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
 import { HeroArt } from './SplashArt';
@@ -21,6 +21,12 @@ export interface HomeLauncherProps {
   onBurnNew?: () => void;
   /** Opens the file picker to mount a .json disc image. Omit to hide the card. */
   onMountImage?: () => void;
+  /** Ids of burned or mounted discs: they get the Burned CD-Rs tab, Save .json, and Eject. */
+  removableIds?: ReadonlySet<string>;
+  /** Exports a burned disc as a .json disc image. */
+  onSaveDiscImage?: (disc: DiscManifest) => void;
+  /** Removes a burned disc from the library. */
+  onRemoveDisc?: (discId: string) => void;
   /** Hides the Home window without closing it. The parent owns this state. */
   minimized?: boolean;
   onMinimize?: () => void;
@@ -63,17 +69,17 @@ const HOW_IT_WORKS: { icon: IconName; term: string; text: string }[] = [
   {
     icon: 'diagram',
     term: 'Interactive SVG Hotspots',
-    text: 'Numbered pins on each diagram link straight to the matching article.',
+    text: 'Click a numbered pin to open its article.',
   },
   {
     icon: 'torch',
     term: 'KeepMaze BFS Dungeons',
-    text: 'Every dungeon is checked with a breadth-first search, so the throne room can always be reached.',
+    text: 'Every dungeon is checked, so the exit is reachable.',
   },
   {
     icon: 'speaker',
     term: 'Procedural WebAudio',
-    text: 'Every sound is synthesized live in your browser. No audio files are used.',
+    text: 'All sound is made live. No audio files.',
   },
 ];
 
@@ -86,6 +92,9 @@ export function HomeLauncher({
   onReplaySplash,
   onBurnNew,
   onMountImage,
+  removableIds,
+  onSaveDiscImage,
+  onRemoveDisc,
   minimized = false,
   onMinimize,
 }: HomeLauncherProps) {
@@ -117,8 +126,13 @@ export function HomeLauncher({
 
         <div className="home__grid">
           <Group legend="Expansion Packs (CD-ROM Drive D:)" className="home-group--packs">
-            {discs.length === 0 ? <p className="home__empty">No discs are available.</p> : null}
-            <ExpansionPackList discs={discs} onPick={onPickDisc} variant="card" />
+            <PackShelf
+              discs={discs}
+              removableIds={removableIds}
+              onPick={onPickDisc}
+              onSaveDiscImage={onSaveDiscImage}
+              onRemoveDisc={onRemoveDisc}
+            />
           </Group>
 
           <div className="home__side">
@@ -180,7 +194,7 @@ export function HomeLauncher({
               <dl className="home-info__list">
                 {HOW_IT_WORKS.map((item) => (
                   <div key={item.term} className="home-info__row">
-                    <PixelIcon name={item.icon} size={32} />
+                    <PixelIcon name={item.icon} size={16} />
                     <div>
                       <dt>{item.term}</dt>
                       <dd>{item.text}</dd>

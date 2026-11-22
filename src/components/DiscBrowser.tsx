@@ -51,6 +51,8 @@ export interface DiscBrowserProps {
   onSaveImage?: () => void;
   /** Opens the file picker to mount a .json disc image. Omit to hide the menu item and launcher card. */
   onMountImage?: () => void;
+  /** Exports any disc as a .json disc image (the Home cards for burned discs use it). */
+  onSaveDiscImage?: (disc: DiscManifest) => void;
   /** Removes a burned disc from the library. */
   onRemoveDisc?: (discId: string) => void;
   /** Ids of burned discs that may be removed. */
@@ -97,6 +99,7 @@ export function DiscBrowser({
   onBurnNew,
   onSaveImage,
   onMountImage,
+  onSaveDiscImage,
   onRemoveDisc,
   removableIds,
 }: DiscBrowserProps) {
@@ -241,6 +244,9 @@ export function DiscBrowser({
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}
+        removableIds={removableIds}
+        onSaveDiscImage={onSaveDiscImage}
+        onRemoveDisc={onRemoveDisc}
         minimized={minimized}
         onMinimize={onMinimize}
       />

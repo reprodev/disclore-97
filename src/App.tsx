@@ -145,10 +145,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     playBurnComplete();
     setBurnOpen(false);
   };
-  /** Saves the open disc as a .json disc image download. */
-  const saveImage = () => {
-    if (!disc) return;
-    if (!saveTextFile(discImageFileName(disc), serializeDiscImage(disc))) {
+  /** Saves a disc as a .json disc image download. */
+  const saveDiscImage = (m: DiscManifest) => {
+    if (!saveTextFile(discImageFileName(m), serializeDiscImage(m))) {
       setImageNotice({
         title: 'Save Disc Image',
         message: 'This browser could not save the disc image file.',
@@ -326,7 +325,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onOpenReadMe={openReadMe}
           onReplaySplash={() => setStage('splash')}
           onBurnNew={() => setBurnOpen(true)}
-          onSaveImage={saveImage}
+          onSaveImage={() => disc && saveDiscImage(disc)}
+          onSaveDiscImage={saveDiscImage}
           onMountImage={openImagePicker}
           onRemoveDisc={removeDisc}
           removableIds={removable}

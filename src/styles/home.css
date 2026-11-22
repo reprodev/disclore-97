@@ -12,17 +12,18 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
-/* Fills the window when maximized, grows past it (and scrolls) when content is taller. */
+/* Locked to the window height: only the disc shelf and, if the window is very short, the right column scroll. */
 .home {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
+  gap: 8px;
+  padding: 8px;
   font-family: var(--font-ui);
   font-size: 12px;
 }
@@ -32,8 +33,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 18px;
-  padding: 10px 14px;
+  flex: 0 0 auto;
+  gap: 6px 16px;
+  padding: 6px 12px;
   color: var(--color-title-text);
   background: var(--color-night);
   border: 2px solid var(--color-gold);
@@ -42,7 +44,7 @@
 }
 
 .home-hero__emblem {
-  flex: 0 0 200px;
+  flex: 0 0 140px;
   max-width: 100%;
   background: var(--color-night);
   border: 1px solid var(--color-gold-dark);
@@ -64,7 +66,7 @@
 .home-hero__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 42px;
+  font-size: 32px;
   font-weight: bold;
   line-height: 1;
   letter-spacing: 1px;
@@ -98,7 +100,8 @@
   flex: 1 1 auto;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 10px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 8px;
   align-items: stretch;
   min-height: 0;
 }
@@ -111,13 +114,16 @@
 
 .home-group--packs {
   min-height: 0;
+  overflow: hidden;
 }
 
 .home__side {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Expansion Pack cards: paper fill, emblem on a night tile, gold-trimmed edge. */
@@ -295,4 +301,288 @@
   .home-hero__badge {
     margin-left: 0;
   }
+}
+
+/* ---- Expansion Packs: Win95 folder tabs over a sunken ivory shelf ---- */
+.pack-tabs-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The tab row dips 2px into the shelf, so the active tab covers the shelf's top border. */
+.pack-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 1px;
+  margin-bottom: -2px;
+  padding: 0 4px;
+}
+
+.pack-tab {
+  margin: 2px 0 2px;
+  padding: 3px 10px 2px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-bottom: none;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) transparent var(--color-bevel-hi);
+  cursor: default;
+}
+
+.pack-tab[data-active="true"] {
+  margin: 0;
+  padding: 5px 12px 4px;
+  font-weight: bold;
+  background: var(--color-paper);
+}
+
+.pack-tab:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+.pack-shelf {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.pack-shelf__empty {
+  margin: 0;
+  padding: 10px;
+}
+
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  align-content: start;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+
+@media (max-width: 720px) {
+  .pack-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A compact disc card: raised, tooltip-yellow, with the open button above a slim footer. */
+.pack-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--color-tooltip-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.pack-tile .bevel-button.pack-tile__open {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  text-align: left;
+  color: var(--color-ink);
+  background: transparent;
+  border: none;
+}
+
+.pack-tile .bevel-button.pack-tile__open:hover,
+.pack-tile .bevel-button.pack-tile__open:focus-visible {
+  background: var(--color-parchment);
+}
+
+.pack-tile .bevel-button.pack-tile__open[data-pressed="true"] {
+  padding: 6px 8px;
+  background: var(--color-parchment-dark);
+  border: none;
+}
+
+.pack-tile .pack-card__emblem {
+  padding: 4px;
+  border-width: 1px;
+  outline: none;
+}
+
+.pack-tile .disc-text {
+  gap: 2px;
+  min-width: 0;
+}
+
+.pack-tile .disc-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.2;
+  color: var(--color-title-bg);
+}
+
+.pack-tile .disc-tagline {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.pack-tile .pack-card__meta {
+  max-width: 100%;
+  margin-top: 2px;
+  padding-top: 2px;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pack-tile__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 22px;
+  padding: 2px 6px 4px;
+}
+
+.pack-tile__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pack-tile .bevel-button.pack-mini {
+  min-width: 0;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.pack-tile .bevel-button.pack-mini[data-pressed="true"] {
+  padding: 1px 5px 0 7px;
+}
+
+/* Origin tag: a tiny flat label, colored by where the disc came from. */
+.pack-badge {
+  display: inline-block;
+  padding: 0 5px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.pack-badge[data-origin="Built-In"] {
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+}
+
+.pack-badge[data-origin="GitHub"] {
+  color: var(--color-paper);
+  background: var(--color-forest);
+}
+
+.pack-badge[data-origin="Web"] {
+  color: var(--color-title-text);
+  background: var(--color-sky-deep);
+}
+
+.pack-badge[data-origin="Markdown"] {
+  color: var(--color-paper);
+  background: var(--color-wood);
+}
+
+.pack-badge[data-origin="Outline"] {
+  background: var(--color-stone-light);
+  border-style: dashed;
+}
+
+.pack-badge[data-origin="Disc Image"] {
+  color: var(--color-paper);
+  background: var(--color-gold-dark);
+}
+
+/* ---- Compact right column ---- */
+.home .home-card {
+  padding: 4px 8px;
+}
+
+.home .home__cards {
+  gap: 4px;
+}
+
+.home .home__note {
+  margin: 4px 0 0;
+}
+
+.home-info {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+}
+
+.home-info__title {
+  margin: 0 0 4px;
+  padding-bottom: 2px;
+  font-size: 13px;
+  border-bottom-width: 2px;
+}
+
+.home-info__list {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+.home-info__row {
+  align-items: center;
+  gap: 6px;
+}
+
+.home-info__row > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.home-info__row dt {
+  flex: 0 0 auto;
+  font-size: 12px;
+}
+
+.home-info__row dd {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
