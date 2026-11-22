@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { playClick } from '../audio/audio';
-import { discOrigin } from '../library/discOrigin';
+import { discOrigin, originClassName } from '../library/discOrigin';
 import type { DiscManifest } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import { discMeta } from './ExpansionPackList';
@@ -117,7 +117,7 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
                     </span>
                   </BevelButton>
                   <div className="pack-tile__foot">
-                    <span className="pack-badge" data-origin={origin}>
+                    <span className={`pack-badge ${originClassName(origin)}`} data-origin={origin}>
                       {origin}
                     </span>
                     {burned ? (

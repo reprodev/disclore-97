@@ -51,6 +51,10 @@ export interface DiscBrowserProps {
   onSaveImage?: () => void;
   /** Opens the file picker to mount a .json disc image. Omit to hide the menu item and launcher card. */
   onMountImage?: () => void;
+  /** Opens a disc straight to a section (Home: Pinpointer, Did You Know?, Surprise Me!). */
+  onOpenSection?: (discId: string, sectionId: string) => void;
+  /** [0, 1) generator for the Home discovery features. Tests pass a fixed one. */
+  random?: () => number;
   /** Exports any disc as a .json disc image (the Home cards for burned discs use it). */
   onSaveDiscImage?: (disc: DiscManifest) => void;
   /** Removes a burned disc from the library. */
@@ -99,6 +103,8 @@ export function DiscBrowser({
   onBurnNew,
   onSaveImage,
   onMountImage,
+  onOpenSection,
+  random,
   onSaveDiscImage,
   onRemoveDisc,
   removableIds,
@@ -115,6 +121,11 @@ export function DiscBrowser({
   const handleOpen = (discId: string) => {
     playSpinUp();
     onOpenDisc(discId);
+  };
+
+  const handleOpenSection = (discId: string, sectionId: string) => {
+    playSpinUp();
+    onOpenSection?.(discId, sectionId);
   };
 
   const renderOpen = (disc: DiscManifest) => {
@@ -245,6 +256,8 @@ export function DiscBrowser({
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}
         removableIds={removableIds}
+        onOpenSection={onOpenSection ? handleOpenSection : undefined}
+        random={random}
         onSaveDiscImage={onSaveDiscImage}
         onRemoveDisc={onRemoveDisc}
         minimized={minimized}

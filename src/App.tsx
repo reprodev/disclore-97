@@ -247,6 +247,18 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     setDiagramFocus(sectionId); // after visit, which clears it
   };
 
+  /** Home discovery (Pinpointer, Did You Know?, Surprise Me!): opens a disc straight to one article. */
+  const openSectionIn = (discId: string, sectionId: string) => {
+    const target = discs.find((d) => d.disc_id === discId);
+    if (!target || !target.sections.some((s) => s.section_id === sectionId)) return;
+    const view: View = { kind: 'section', section_id: sectionId };
+    setDiagramFocus(null);
+    setNotFound(null);
+    setMinimized(false);
+    setLastDiscId(discId);
+    setShell({ nav: { discId, view }, history: pushView(initialHistory, view) });
+  };
+
   const goSection = (sectionId: string) => {
     const r = selectSection(nav, disc, sectionId);
     setNotFound(r.notFound);
@@ -327,6 +339,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onBurnNew={() => setBurnOpen(true)}
           onSaveImage={() => disc && saveDiscImage(disc)}
           onSaveDiscImage={saveDiscImage}
+          onOpenSection={openSectionIn}
           onMountImage={openImagePicker}
           onRemoveDisc={removeDisc}
           removableIds={removable}

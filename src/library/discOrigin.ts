@@ -22,3 +22,23 @@ export function discOrigin(disc: DiscManifest, builtIn: boolean): DiscOrigin {
   }
   return 'Disc Image';
 }
+
+/** The badge class for an origin, for example `pack-badge--wikipedia`. */
+export function originClassName(origin: DiscOrigin): string {
+  switch (origin) {
+    case 'Built-In':
+      return 'pack-badge--builtin';
+    case 'Wikipedia':
+      return 'pack-badge--wikipedia';
+    case 'GitHub':
+      return 'pack-badge--github';
+    case 'Web':
+      return 'pack-badge--web';
+    case 'Markdown':
+      return 'pack-badge--markdown';
+    case 'Outline':
+      return 'pack-badge--outline';
+    case 'Disc Image':
+      return 'pack-badge--image';
+  }
+}

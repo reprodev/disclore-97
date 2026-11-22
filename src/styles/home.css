@@ -366,6 +366,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   align-content: start;
+  align-items: stretch;
   margin: 0;
   padding: 6px;
   list-style: none;
@@ -388,6 +389,7 @@
 }
 
 .pack-tile .bevel-button.pack-tile__open {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -460,6 +462,8 @@
 }
 
 .pack-tile__foot {
+  flex: 0 0 auto;
+  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -499,36 +503,38 @@
   border: 1px solid var(--color-bevel-edge);
 }
 
-.pack-badge[data-origin="Built-In"] {
+/* Colors by origin: navy Built-In, burgundy Wikipedia, antique gold GitHub and Web, slate for the rest. */
+.pack-badge.pack-badge--builtin {
   color: var(--color-title-text);
   background: var(--color-title-bg);
+  border-color: var(--color-title-bg);
 }
 
-.pack-badge[data-origin="GitHub"] {
+.pack-badge.pack-badge--wikipedia {
   color: var(--color-paper);
-  background: var(--color-forest);
+  background: var(--color-crimson);
+  border-color: var(--color-crimson-dark);
 }
 
-.pack-badge[data-origin="Web"] {
-  color: var(--color-title-text);
-  background: var(--color-sky-deep);
-}
-
-.pack-badge[data-origin="Markdown"] {
-  color: var(--color-paper);
-  background: var(--color-wood);
-}
-
-.pack-badge[data-origin="Outline"] {
-  background: var(--color-stone-light);
-  border-style: dashed;
-}
-
-.pack-badge[data-origin="Disc Image"] {
+.pack-badge.pack-badge--github,
+.pack-badge.pack-badge--web {
   color: var(--color-paper);
   background: var(--color-gold-dark);
+  border-color: var(--color-wood-dark);
 }
 
+.pack-badge.pack-badge--markdown,
+.pack-badge.pack-badge--outline,
+.pack-badge.pack-badge--image {
+  color: var(--color-paper);
+  background: var(--color-dungeon-stone);
+  border-color: var(--color-dungeon-bg);
+}
+
+.pack-badge.pack-badge--outline {
+  border-style: dashed;
+  border-color: var(--color-paper);
+}
 /* ---- Compact right column ---- */
 .home .home-card {
   padding: 4px 8px;
@@ -585,4 +591,177 @@
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ---- Encarta-style editorial touches ---- */
+.home .home-group--editorial {
+  border-color: var(--color-gold-dark);
+}
+
+.home .home-group--editorial .groupbox__legend {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--color-crimson);
+}
+
+.home .home-group--editorial .home__cards {
+  padding-top: 2px;
+  border-top: 3px double var(--color-gold-dark);
+}
+
+/* Pinpointer: a search bar with a sunken results list. */
+.pinpointer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.pinpointer__label {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-crimson);
+}
+
+.pinpointer__field {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pinpointer__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.pinpointer__input:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+.pinpointer__results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 210px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  outline: 1px solid var(--color-bevel-edge);
+}
+
+.pinpointer__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pinpointer__hit {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 6px;
+  font-size: 12px;
+  color: var(--color-ink);
+  cursor: default;
+}
+
+.pinpointer__hit + .pinpointer__hit {
+  border-top: 1px solid var(--color-parchment-dark);
+}
+
+.pinpointer__hit[data-active="true"] {
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+}
+
+.pinpointer__title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pinpointer__disc {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pinpointer__empty {
+  margin: 0;
+  padding: 6px;
+  font-size: 12px;
+  color: var(--color-bevel-shadow);
+}
+
+/* Did You Know?: an ivory box with a gold double rule and a burgundy serif heading. */
+.spotlight {
+  flex: 0 0 auto;
+  margin-top: 6px;
+  padding: 4px 8px 6px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 3px double var(--color-gold-dark);
+}
+
+.spotlight__title {
+  margin: 0 0 2px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-crimson);
+}
+
+.spotlight__fact {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.spotlight__source {
+  margin: 2px 0 4px;
+  overflow: hidden;
+  font-size: 11px;
+  color: var(--color-bevel-shadow);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spotlight__buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.spotlight .bevel-button.spotlight__button {
+  min-width: 0;
+  padding: 1px 10px;
+}
+
+.spotlight .bevel-button.spotlight__button[data-pressed="true"] {
+  padding: 2px 9px 0 11px;
 }

@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react';
+import { playSlideClick } from '../audio/audio';
+import { pickRandomSection } from '../model/discSearch';
 import type { DiscManifest } from '../model/manifest';
 import type { QuickJumpMode } from '../model/nav';
 import { BevelButton } from './BevelButton';
+import { DidYouKnow } from './DidYouKnow';
 import { PackShelf } from './PackShelf';
+import { Pinpointer } from './Pinpointer';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
 import { HeroArt } from './SplashArt';
@@ -21,6 +25,10 @@ export interface HomeLauncherProps {
   onBurnNew?: () => void;
   /** Opens the file picker to mount a .json disc image. Omit to hide the card. */
   onMountImage?: () => void;
+  /** Opens a disc straight to a section. Powers the Pinpointer, Did You Know?, and Surprise Me!. Omit to hide them. */
+  onOpenSection?: (discId: string, sectionId: string) => void;
+  /** [0, 1) generator for Surprise Me! and the first spotlight fact. Defaults to Math.random. */
+  random?: () => number;
   /** Ids of burned or mounted discs: they get the Burned CD-Rs tab, Save .json, and Eject. */
   removableIds?: ReadonlySet<string>;
   /** Exports a burned disc as a .json disc image. */
@@ -92,6 +100,8 @@ export function HomeLauncher({
   onReplaySplash,
   onBurnNew,
   onMountImage,
+  onOpenSection,
+  random,
   removableIds,
   onSaveDiscImage,
   onRemoveDisc,
@@ -100,6 +110,13 @@ export function HomeLauncher({
 }: HomeLauncherProps) {
   const hasDiagrams = discs.some((d) => d.diagrams.length > 0);
   const hasDungeons = discs.some((d) => d.dungeons.length > 0);
+  const hasSections = discs.some((d) => d.sections.length > 0);
+  const surprise = () => {
+    const pick = pickRandomSection(discs, random ?? Math.random);
+    if (!pick || !onOpenSection) return;
+    playSlideClick();
+    onOpenSection(pick.discId, pick.sectionId);
+  };
   const packs = `${discs.length} Expansion ${discs.length === 1 ? 'Pack' : 'Packs'} Ready`;
 
   return (
@@ -126,6 +143,9 @@ export function HomeLauncher({
 
         <div className="home__grid">
           <Group legend="Expansion Packs (CD-ROM Drive D:)" className="home-group--packs">
+            {onOpenSection ? (
+              <Pinpointer discs={discs} removableIds={removableIds} onOpenSection={onOpenSection} />
+            ) : null}
             <PackShelf
               discs={discs}
               removableIds={removableIds}
@@ -133,10 +153,11 @@ export function HomeLauncher({
               onSaveDiscImage={onSaveDiscImage}
               onRemoveDisc={onRemoveDisc}
             />
+            {onOpenSection ? <DidYouKnow discs={discs} onOpenSection={onOpenSection} random={random} /> : null}
           </Group>
 
           <div className="home__side">
-            <Group legend="Quick Jump Modes">
+            <Group legend="Quick Jump Modes" className="home-group--editorial">
               <div className="home__cards">
                 <Card
                   icon="diagram"
@@ -152,11 +173,20 @@ export function HomeLauncher({
                   disabled={!hasDungeons}
                   onClick={onQuickJump ? () => onQuickJump('keepmaze') : undefined}
                 />
+                {onOpenSection ? (
+                  <Card
+                    icon="book"
+                    title="Surprise Me!"
+                    text="Open a random article from any disc."
+                    disabled={!hasSections}
+                    onClick={surprise}
+                  />
+                ) : null}
               </div>
               <p className="home__note">Uses the last disc you opened, or the first one.</p>
             </Group>
 
-            <Group legend="Utilities">
+            <Group legend="Utilities" className="home-group--editorial">
               <div className="home__cards">
                 <Card
                   icon="cd"
