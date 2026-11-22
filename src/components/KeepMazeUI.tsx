@@ -71,6 +71,11 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
       </div>
       <div className="keepmaze__map">
         <MiniMap dungeon={dungeon} visited={visited} currentRoomId={state.roomId} />
+        <ul className="minimap-legend" aria-label="Mini-map legend">
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--current" aria-hidden="true" />Current</li>
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--visited" aria-hidden="true" />Visited</li>
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--unknown" aria-hidden="true" />Unexplored</li>
+        </ul>
       </div>
     </div>
   );
@@ -182,7 +187,15 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
         </div>
       </div>
 
-      <div className="keepmaze__side">
+      <section className="keepmaze__side quest-card" aria-label="KeepMaze Quest">
+        <p className="quest-card__title">KeepMaze Quest</p>
+        <div className="quest-card__body">
+          <p className="quest-card__objective">
+            Reach the Throne Room by unlocking doors with encyclopedia trivia.
+          </p>
+          <p className="quest-card__progress">
+            Rooms explored: {visited.length} of {dungeon.rooms.length}
+          </p>
       {!pending && !state.lastWrong && (
         <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
       )}
@@ -229,7 +242,8 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
           </button>
         </div>
       )}
-      </div>
+        </div>
+      </section>
       </div>
     </div>
   );

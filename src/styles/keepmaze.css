@@ -359,3 +359,100 @@
   font-size: 12px;
   font-weight: bold;
 }
+
+/* KeepMaze Quest card: ivory sheet with a navy caption bar and an antique-gold rule. */
+.keepmaze__side.quest-card {
+  gap: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 2px solid var(--color-bevel-edge);
+  outline: 1px solid var(--color-gold);
+  outline-offset: -4px;
+}
+
+.quest-card__title {
+  margin: 0;
+  padding: 2px 8px;
+  font-weight: bold;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+}
+
+.quest-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+
+.quest-card__objective {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--color-crimson);
+}
+
+.quest-card__progress {
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-gold);
+}
+
+.quest-card .keepmaze__hint {
+  padding: 0;
+  color: var(--color-ink);
+}
+
+/* Mini-map panel: map above, legend strip below. */
+.keepmaze__map {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.keepmaze__map .minimap {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 138px;
+}
+
+.minimap-legend {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 2px 4px;
+  list-style: none;
+  font-size: 11px;
+  color: var(--color-console-text);
+}
+
+.minimap-legend li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.minimap-legend__swatch {
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+}
+
+.minimap-legend__swatch--current {
+  background: var(--color-flame);
+  border: 1px solid var(--color-gold-light);
+}
+
+.minimap-legend__swatch--visited {
+  background: var(--color-parchment);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.minimap-legend__swatch--unknown {
+  background: var(--color-dungeon-stone);
+  border: 1px dashed var(--color-stone-dark);
+}

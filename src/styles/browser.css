@@ -106,6 +106,29 @@
   padding: 2px 4px;
 }
 
+/* Trivia bank: a sunken ivory box that scrolls, with a rule between prompts. */
+.disc-trivia-bank {
+  max-height: 120px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  outline: 1px solid var(--color-bevel-edge);
+  outline-offset: -3px;
+}
+
+.disc-trivia-bank .disc-trivia-item {
+  padding: 3px 6px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.disc-trivia-bank .disc-trivia-item + .disc-trivia-item {
+  border-top: 1px solid var(--color-parchment-dark);
+}
+
 /* Win95 groupbox: an etched frame with the caption sitting on its top edge. */
 .groupbox {
   margin: 0;

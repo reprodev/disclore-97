@@ -103,7 +103,7 @@ export function ContentsSidebar({
           <PixelIcon name="key" />
           Trivia
         </h2>
-        <ul>
+        <ul className="disc-trivia-bank">
           {disc.trivia.map((q) => (
             <li key={q.question_id} className="disc-trivia-item">
               {q.prompt}
