@@ -313,3 +313,68 @@
   flex: 1 1 auto;
   color: var(--color-forest);
 }
+
+/* Media Frame: a beveled picture frame on an ivory mat, with the Multimedia Reel bar below. */
+.media-frame {
+  margin: 0;
+  padding: 4px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.media-frame__mat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 4px;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.media-frame__img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.media-frame__mat .plate {
+  width: 100%;
+  max-height: 100%;
+}
+
+.media-frame__caption {
+  margin: 4px 0;
+  min-height: 2.6em;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-ink);
+}
+
+.media-reel {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+.media-reel .media-reel__button {
+  min-width: 0;
+  padding: 1px 5px;
+  font-size: 11px;
+}
+
+.media-reel__counter {
+  flex: 1 1 auto;
+  text-align: right;
+  white-space: nowrap;
+}

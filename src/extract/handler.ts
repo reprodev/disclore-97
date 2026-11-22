@@ -1,10 +1,10 @@
 /**
  * handleExtract: testable core of the /api/extract Pages Function.
- * Fetches a public web page with SSRF checks, and returns its extracted text as JSON.
+ * Fetches a public web page with SSRF checks, and returns its extracted text, and any safe picture URLs, as JSON.
  */
 
 import { checkTarget } from './ssrf';
-import { extractHtml } from './htmlExtract';
+import { extractHtml, extractImages } from './htmlExtract';
 
 export interface ExtractDeps {
   fetch: (input: string, init?: RequestInit) => Promise<Response>;
@@ -139,7 +139,8 @@ async function run(
       throw fail(502, 'upstream-failed');
     }
     const { title, headings, paragraphs } = extractHtml(html);
-    return json(200, { title, headings, paragraphs, url: current.href });
+    const media = extractImages(html, current.href);
+    return json(200, { title, headings, paragraphs, url: current.href, ...(media.length > 0 ? { media } : {}) });
   }
 }
 

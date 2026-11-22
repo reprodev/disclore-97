@@ -10,6 +10,7 @@ import type { ExtractedSource, SourceKind, SourceMetadata } from './source';
 import { buildDiagram, ALLOWED_TOKENS as DIAGRAM_TOKENS } from './compile/diagram';
 import { buildDungeon } from './compile/dungeon';
 import { createIdAllocator, discId } from './compile/ids';
+import { MAX_CAPTION, MAX_MEDIA, pickMedia } from './media';
 import { fnv1a32, stream } from './compile/prng';
 import { planSections } from './compile/sections';
 import { sanitizeLine, sanitizeParagraph } from './compile/text';
@@ -91,11 +92,14 @@ export function normalizeSource(input: unknown): ExtractedSource {
     .map((p) => sanitizeParagraph(p))
     .filter((p) => p !== '');
 
+  const media = pickMedia(obj.media, (c) => sanitizeLine(c, MAX_CAPTION), MAX_MEDIA);
+
   return {
     title: typeof obj.title === 'string' ? sanitizeLine(obj.title, TITLE_MAX) : '',
     headings,
     paragraphs,
     metadata,
+    ...(media.length > 0 ? { media } : {}),
   };
 }
 
@@ -135,6 +139,12 @@ export function compileDisc(source: ExtractedSource): DiscManifest {
   const trivia = buildTrivia(planned.sections, seed, stream(seed, 'trivia'), ids);
   const dungeon = buildDungeon(planned.sections, planned.title, stream(seed, 'dungeon'), ids);
 
+  // Pictures never change the seed, so discs without media compile exactly as before.
+  const media = (src.media ?? []).map((m, i) => ({
+    url: m.url,
+    caption: m.caption !== '' ? m.caption : sanitizeLine(`${planned.title}, picture ${i + 1}`, MAX_CAPTION),
+  }));
+
   return {
     disc_id: discId(src.metadata.kind, identityOf(src)),
     title: planned.title,
@@ -143,5 +153,6 @@ export function compileDisc(source: ExtractedSource): DiscManifest {
     diagrams: [diagram],
     trivia,
     dungeons: [dungeon],
+    ...(media.length > 0 ? { media } : {}),
   };
 }

@@ -6,6 +6,7 @@ import type {
   ValidationError,
   ValidationResult,
 } from './manifest';
+import { isValidCaption, MAX_MEDIA, safeMediaUrl } from './media';
 import { solveDungeon } from './solver';
 
 type Obj = Record<string, unknown>;
@@ -166,6 +167,14 @@ export function validateManifest(input: unknown): ValidationResult {
       });
     });
 
+    // Optional Multimedia Reel pictures: checked only when present.
+    if ('media' in root && root.media !== undefined) {
+      items(arrayOf(root, 'media', '$'), '$.media', (it, p) => {
+        field(it, 'url', p, 'string');
+        field(it, 'caption', p, 'string');
+      });
+    }
+
     if (errors.length > 0) return { ok: false, errors };
 
     // ---------- Pass 2: semantic checks on well-typed data ----------
@@ -242,6 +251,21 @@ export function validateManifest(input: unknown): ValidationResult {
         }
       }
     });
+
+    if (m.media !== undefined) {
+      if (m.media.length > MAX_MEDIA) {
+        err('$.media', 'unsafe-media', `At most ${MAX_MEDIA} media items are allowed`);
+      }
+      m.media.forEach((it, i) => {
+        const p = `$.media[${i}]`;
+        if (safeMediaUrl(it.url) === null) {
+          err(`${p}.url`, 'unsafe-media', `Media url must be a public https image address at ${p}.url`);
+        }
+        if (!isValidCaption(it.caption)) {
+          err(`${p}.caption`, 'unsafe-media', `Media caption must be plain, non-empty text at ${p}.caption`);
+        }
+      });
+    }
 
     if (errors.length > 0) return { ok: false, errors };
     return { ok: true, manifest: m };

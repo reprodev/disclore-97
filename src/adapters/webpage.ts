@@ -4,6 +4,7 @@ import { makeError } from './errors';
 import { fetchWithDeadline } from './http';
 import type { AdapterOptions, FetchLike, Result } from './types';
 import { sanitizeLine } from '../model/compiler';
+import { MAX_CAPTION, MAX_MEDIA, pickMedia } from '../model/media';
 import type { ExtractedSource } from '../model/source';
 
 const DEFAULT_ENDPOINT = '/api/extract';
@@ -70,6 +71,8 @@ export async function fetchWebpageSource(
   const source = finalUrl ? body.url as string : url;
   const host = (finalUrl ?? parseHttpUrl(url))?.hostname ?? '';
 
+  const media = pickMedia(body.media, (c) => sanitizeLine(c, MAX_CAPTION), MAX_MEDIA);
+
   return {
     ok: true,
     value: {
@@ -77,6 +80,7 @@ export async function fetchWebpageSource(
       headings: body.headings.slice(0, MAX_HEADINGS),
       paragraphs: body.paragraphs.slice(0, MAX_PARAGRAPHS),
       metadata: { kind: 'webpage', source },
+      ...(media.length > 0 ? { media } : {}),
     },
   };
 }

@@ -51,4 +51,71 @@ describe('Property 9: Sanitization of hostile text', () => {
       { numRuns: 200 },
     );
   }, 15000);
+
+  // Feature: dynamic-disc-compiler, Property 9: Sanitization of hostile text (media)
+  it('keeps only validated https media urls and sanitizes every caption', () => {
+    const arbUrl = fc.oneof(
+      fc.constantFrom(
+        'https://cdn.example.org/a.png',
+        'https://cdn.example.org/b.jpg?w=300',
+        'http://cdn.example.org/c.png',
+        'javascript:alert(1)',
+        'data:image/png;base64,AAAA',
+        'https://localhost/d.png',
+        'https://10.0.0.1/e.png',
+        'https://cdn.example.org/f.svg',
+        'https://cdn.example.org/<script>.png',
+        'https://cdn.example.org/a b.png',
+      ),
+      fc.webUrl(),
+      fc.string(),
+    );
+    const arbCaption = fc.oneof(
+      fc.string(),
+      fc.constantFrom(
+        '<script>alert(1)</script>Caption',
+        '![x](https://img.example/y.png) caption',
+        'bidi \u202Etext\u202C here',
+        'ctrl\u0000char\u0007s',
+        '  spaced   out   ',
+        '',
+      ),
+    );
+    const arbMedia = fc.array(fc.record({ url: arbUrl, caption: arbCaption }), { maxLength: 14 });
+
+    fc.assert(
+      fc.property(arbHostileSource, arbMedia, (source, media) => {
+        const m = compileDisc({ ...source, media });
+        const { media: kept, ...rest } = m;
+
+        for (const s of collectStrings(rest)) {
+          expect(s).not.toMatch(/[<>]/);
+          expect(s).not.toMatch(CONTROL);
+          expect(s).not.toMatch(BIDI_ZERO_WIDTH);
+        }
+
+        const items = kept ?? [];
+        expect(items.length).toBeLessThanOrEqual(8);
+        expect(new Set(items.map((i) => i.url)).size).toBe(items.length);
+        for (const item of items) {
+          // URLs are checked on their own terms: https only, no markup, no whitespace.
+          expect(item.url.startsWith('https://')).toBe(true);
+          expect(item.url).not.toMatch(/[<>\s]/);
+          expect(item.url).not.toMatch(CONTROL);
+          expect(item.url).not.toMatch(/\.svgz?($|[?#])/i);
+          // Captions get the same treatment as every other text field.
+          expect(item.caption.trim()).not.toBe('');
+          expect(item.caption).not.toMatch(/[<>]/);
+          expect(item.caption).not.toMatch(CONTROL);
+          expect(item.caption).not.toMatch(BIDI_ZERO_WIDTH);
+          expect(item.caption).not.toMatch(LONE_SURROGATE);
+          expect(item.caption).not.toMatch(/\s{2,}/);
+          expect(item.caption).not.toMatch(/!\[[^\]]*\]\(/);
+          expect(item.caption).not.toContain('img.example');
+          expect(item.caption.length).toBeLessThanOrEqual(120);
+        }
+      }),
+      { numRuns: 200 },
+    );
+  }, 15000);
 });

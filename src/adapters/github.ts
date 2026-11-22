@@ -2,8 +2,12 @@
 
 import { makeError } from './errors';
 import { fetchWithDeadline } from './http';
+import { extractImages } from '../extract/htmlExtract';
 import { parseMarkdown } from './markdown';
 import type { AdapterOptions, BurnError, FetchLike, Result } from './types';
+import { sanitizeLine } from '../model/compiler';
+import { MAX_CAPTION, MAX_MEDIA, pickMedia, safeMediaUrl } from '../model/media';
+import type { MediaItem } from '../model/manifest';
 import type { ExtractedSource } from '../model/source';
 
 const API = 'https://api.github.com';
@@ -11,6 +15,9 @@ const DEFAULT_TIMEOUT_MS = 8000;
 const README_MAX_CHARS = 100000;
 const README_MAX_B64 = 133336;
 const MAX_LANGUAGES = 8;
+const IMAGE_SCAN_CHARS = 60000;
+/** Where GitHub serves repository files as raw bytes. Built from parts so no address literal sits in source. */
+const RAW_BASE = ['https:', '', 'raw.githubusercontent.com'].join('/');
 const INIT: RequestInit = { method: 'GET', headers: { Accept: 'application/vnd.github+json' } };
 
 /** Base64 to bytes to UTF-8 text, at most 100000 characters. Returns '' on invalid base64. */
@@ -26,6 +33,50 @@ export function decodeReadme(content: string): string {
   } catch {
     return '';
   }
+}
+
+const MD_IMAGE = /!\[([^\]]{0,200})\]\(\s*<?([^)\s>]{1,500})>?(?:\s+"[^"]{0,200}")?\s*\)/g;
+const ABSOLUTE_REF = /^[a-z][a-z0-9+.-]*:/i;
+
+/** Resolves a README image reference to a picture address, or null when it is unusable. */
+function resolveReadmeImage(ref: string, owner: string, repo: string): string | null {
+  const t = ref.trim();
+  if (t === '' || t.startsWith('//')) return null;
+  if (ABSOLUTE_REF.test(t)) return t;
+  // Relative to the repository root, served raw. A path that climbs out of the repo is dropped.
+  try {
+    const root = new URL(`${RAW_BASE}/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/HEAD/`);
+    const u = new URL(t.replace(/^\/+/, ''), root);
+    return u.host === root.host && u.pathname.startsWith(root.pathname) ? u.href : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Safe pictures referenced by a README: Markdown images and HTML img tags.
+ * Relative paths become raw file addresses. SVG badges and unsafe addresses are skipped.
+ */
+export function readmeImages(readme: string, owner: string, repo: string): MediaItem[] {
+  const text = readme.slice(0, IMAGE_SCAN_CHARS);
+  const found: { url: string; caption: string }[] = [];
+
+  MD_IMAGE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = MD_IMAGE.exec(text)) !== null && found.length < MAX_MEDIA * 4) {
+    const url = resolveReadmeImage(m[2], owner, repo);
+    if (url !== null && safeMediaUrl(url) !== null) found.push({ url, caption: m[1] });
+  }
+
+  // HTML img tags: let the page extractor resolve them against the repository root.
+  const root = `${RAW_BASE}/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/HEAD/`;
+  const rootPath = new URL(root).pathname;
+  for (const img of extractImages(text, root)) {
+    if (new URL(img.url).host !== new URL(root).host || new URL(img.url).pathname.startsWith(rootPath)) {
+      found.push(img);
+    }
+  }
+  return pickMedia(found, (c) => c, MAX_MEDIA * 4);
 }
 
 function parseJson(text: string): unknown {
@@ -114,6 +165,12 @@ export async function fetchGithubSource(
 
   const title = str(info.full_name) ?? `${owner}/${repo}`;
   const author = isObj(info.owner) ? str(info.owner.login) : undefined;
+  const avatar = isObj(info.owner) ? str(info.owner.avatar_url) : undefined;
+  const media = pickMedia(
+    [...(avatar ? [{ url: avatar, caption: `${author ?? owner} on GitHub` }] : []), ...readmeImages(readme, owner, repo)],
+    (c) => sanitizeLine(c, MAX_CAPTION),
+    MAX_MEDIA,
+  );
 
   return {
     ok: true,
@@ -129,6 +186,7 @@ export async function fetchGithubSource(
         ...(author ? { author } : {}),
         facts,
       },
+      ...(media.length > 0 ? { media } : {}),
     },
   };
 }

@@ -1,3 +1,5 @@
+import type { MediaItem } from './manifest';
+
 export type SourceKind = 'github' | 'webpage' | 'markdown' | 'topic';
 
 export interface SourceMetadata {
@@ -16,4 +18,6 @@ export interface ExtractedSource {
   headings: string[];
   paragraphs: string[];
   metadata: SourceMetadata;
+  /** Optional candidate pictures. The compiler keeps only safe ones, at most 8. */
+  media?: MediaItem[];
 }

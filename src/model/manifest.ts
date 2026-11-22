@@ -19,6 +19,12 @@ export const ENTRANCE_ROOM_ID = 'entrance' as const;
  */
 export const THRONE_ROOM_ID = 'throne_room' as const;
 
+/** One picture for the Multimedia Reel. `url` is a safe public image address (see media.ts). */
+export interface MediaItem {
+  url: string;
+  caption: string;
+}
+
 /** A disc: the top-level unit that is loaded, validated, and browsed. */
 export interface DiscManifest {
   disc_id: string;
@@ -29,6 +35,8 @@ export interface DiscManifest {
   diagrams: Diagram[];
   trivia: TriviaQuestion[];
   dungeons: Dungeon[];
+  /** Optional pictures for the Multimedia Reel: at most 8, omitted when there are none. */
+  media?: MediaItem[];
 }
 
 /** One dated entry in an article's timeline callout. */
@@ -126,7 +134,8 @@ export type ErrorCode =
   | 'index-range'
   | 'missing-room'
   | 'unsolvable-dungeon'
-  | 'orphan-room';
+  | 'orphan-room'
+  | 'unsafe-media';
 
 export type ValidationError = { path: string; code: ErrorCode; message: string };
 

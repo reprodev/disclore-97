@@ -1,7 +1,9 @@
 /**
  * HTML_Extractor: strips an HTML string to a title, headings, and paragraphs.
- * Pure, linear scanner with no DOM and no imports.
+ * Pure, linear scanner with no DOM. Also lists safe picture URLs (extractImages).
  */
+
+import { safeMediaUrl } from '../model/media';
 
 export interface Extracted {
   title: string;
@@ -242,4 +244,129 @@ export function extractHtml(html: string): Extracted {
     // never throw; return what was gathered
   }
   return { title, headings, paragraphs };
+}
+
+// ---------------------------------------------------------------------------
+// Picture extraction
+// ---------------------------------------------------------------------------
+
+export interface ImageCandidate {
+  url: string;
+  caption: string;
+}
+
+const MAX_IMAGES = 8;
+const MAX_TAGS_SCANNED = 500;
+const MAX_TAG_LENGTH = 4096;
+/** An explicit width or height at or below this is a pixel, spacer, or icon. */
+const MIN_IMAGE_SIDE = 48;
+const META_IMAGE_KEYS = new Set([
+  'og:image',
+  'og:image:url',
+  'og:image:secure_url',
+  'twitter:image',
+  'twitter:image:src',
+]);
+/** Names that mean an icon, sprite, spacer, or tracking pixel, as whole words in a path or class. */
+const ICON_HINT =
+  /(?:^|[\s/_.-])(?:favicon|icons?|sprites?|spacer|pixel|tracking|beacon|blank|1x1)(?:$|[\s/_.?-])|\.ico(?:$|\?)/i;
+const ATTR_RE = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
+
+function parseAttrs(tag: string): Map<string, string> {
+  const attrs = new Map<string, string>();
+  ATTR_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = ATTR_RE.exec(tag)) !== null) {
+    const key = m[1].toLowerCase();
+    if (!attrs.has(key)) attrs.set(key, decodeEntities(m[2] ?? m[3] ?? m[4] ?? ''));
+  }
+  return attrs;
+}
+
+function isTiny(attrs: Map<string, string>): boolean {
+  for (const key of ['width', 'height']) {
+    const v = attrs.get(key);
+    if (v === undefined) continue;
+    const n = parseInt(v, 10);
+    if (Number.isFinite(n) && n <= MIN_IMAGE_SIDE && !v.includes('%')) return true;
+  }
+  return false;
+}
+
+/**
+ * Lists safe https pictures from og:image, twitter:image, and img tags, in page order.
+ * Relative paths resolve against `base`. Skips duplicates, data URLs, svg, icons, tiny
+ * images, and anything safeMediaUrl rejects. Returns at most 8. Never throws.
+ */
+export function extractImages(html: string, base: string): ImageCandidate[] {
+  const out: ImageCandidate[] = [];
+  try {
+    const src = typeof html === 'string' ? html : '';
+    let baseUrl: URL;
+    try {
+      baseUrl = new URL(base);
+    } catch {
+      return out;
+    }
+    const seen = new Set<string>();
+    const n = src.length;
+    let scanned = 0;
+    let i = 0;
+
+    const take = (rawUrl: string, caption: string): void => {
+      const trimmed = rawUrl.trim();
+      if (trimmed === '' || /^data:/i.test(trimmed) || ICON_HINT.test(trimmed)) return;
+      let abs: string;
+      try {
+        abs = new URL(trimmed, baseUrl).href;
+      } catch {
+        return;
+      }
+      const safe = safeMediaUrl(abs);
+      if (safe === null || seen.has(safe)) return;
+      seen.add(safe);
+      out.push({ url: safe, caption: clean(caption).slice(0, 200) });
+    };
+
+    while (i < n && out.length < MAX_IMAGES && scanned < MAX_TAGS_SCANNED) {
+      const lt = src.indexOf('<', i);
+      if (lt === -1) break;
+      i = lt + 1;
+      const head = src.slice(lt + 1, lt + 6).toLowerCase();
+      const isMeta = head.startsWith('meta') && /[\s/]/.test(head.charAt(4));
+      const isImg = head.startsWith('img') && /[\s/]/.test(head.charAt(3));
+      if (!isMeta && !isImg) continue;
+      scanned++;
+
+      let end = -1;
+      const limit = Math.min(n, lt + MAX_TAG_LENGTH);
+      let quote = '';
+      for (let j = lt + 4; j < limit; j++) {
+        const ch = src.charAt(j);
+        if (quote) {
+          if (ch === quote) quote = '';
+        } else if (ch === '"' || ch === "'") {
+          quote = ch;
+        } else if (ch === '>') {
+          end = j;
+          break;
+        }
+      }
+      if (end === -1) continue;
+      i = end + 1;
+
+      const attrs = parseAttrs(src.slice(lt + (isMeta ? 5 : 4), end));
+      if (isMeta) {
+        const key = (attrs.get('property') ?? attrs.get('name') ?? '').toLowerCase();
+        const content = attrs.get('content');
+        if (META_IMAGE_KEYS.has(key) && content) take(content, '');
+      } else {
+        const url = attrs.get('src');
+        if (url && !isTiny(attrs) && !ICON_HINT.test(attrs.get('class') ?? '')) take(url, attrs.get('alt') ?? '');
+      }
+    }
+  } catch {
+    // never throw; return what was gathered
+  }
+  return out;
 }

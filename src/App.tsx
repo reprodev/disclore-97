@@ -200,6 +200,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           discTitle={disc.title}
           diagrams={disc.diagrams}
           onShowInDiagram={showInDiagram}
+          {...(disc.media ? { media: disc.media } : {})}
         />
       );
     } else if (v.kind === 'diagram') {
