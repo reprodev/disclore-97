@@ -28,6 +28,9 @@ DISC IMAGES
 
 READING
 - Chronology strip: dated entries for the article, laid out along a timeline.
+- Explore History: the Timeline button on the toolbar gathers every dated event from every article on the open disc into one strip, oldest first, in columns by century. Each event shows the article it came from. Click an event to open that article, and use Back to return to the timeline. The button is dimmed when no article on the disc has dated events.
+- Cross-links: when an article mentions the title of another article on the same disc, the words are a link. Each article is linked once per paragraph, and Back and Forward work as usual.
+- Bookmark: the Bookmark button in the article tools marks the article. Bookmarks are kept on this computer for each disc, and a Bookmarks list appears in the contents sidebar for one-click jumping. Press Bookmarked to remove one.
 - Show in Diagram: jumps to the diagram and highlights the pin for the article you were reading.
 - Cite / Print Preview: shows a page-style preview and a Copy Citation button.
 - Read Aloud: your browser's own voice reads the article, one paragraph at a time. The paragraph being read is highlighted, and the button shows how far it has got, for example Stop (2/5). The 1x / 1.2x button next to it sets the speed. Use Stop or the Sound button to silence it.
@@ -38,10 +41,12 @@ PICTURES
 - A picture that cannot be loaded is replaced by an illustration plate.
 
 DIAGRAMS
-Click the numbered pins on a diagram to jump to articles. Burned discs get a diagram that matches their source: a blueprint for a GitHub repository, a site map for a web page, an outline for Markdown, and a concept chart for a topic.
+Click the numbered pins on a diagram to jump to articles. Point at a pin, or tab to it, to see a small preview card with the article's title and its first Quick Fact before you click. Burned discs get a diagram that matches their source: a blueprint for a GitHub repository, a site map for a web page, an outline for Markdown, and a concept chart for a topic.
 
 KEEPMAZE
-KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached. Reach it to earn a Victory Certificate.
+KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached.
+
+Your Knowledge Score, Streak, and Torches are in the Quest card. A right answer is worth 100 points, plus 10 more for each right answer you already have in a row (the bonus stops growing after five). If you used Peek Hint on the question, the answer is worth 50 points with no bonus. A wrong answer ends your streak and dims one of your three torches. Torches are only a tally of mistakes: they never lock a door, and you can always keep going. Reach the throne room to earn a Victory Certificate stamped with your Score, Best Streak, and Scholar Rank: Royal Archivist, Court Scholar, Keep Explorer, or Torchbearer.
 
 SOUND
 All sound effects are generated live, and no audio files are used: soft chords for clicks and door locks, a projector click when you change pictures, a ding when a disc finishes burning, and a fanfare when you reach the throne room.

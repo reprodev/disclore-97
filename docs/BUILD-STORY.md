@@ -177,7 +177,17 @@ The Home window had the right parts but a generic look. A screenshot of a 1997 e
 
 A small repository clean-up came with it: `*.tsbuildinfo` is ignored and the committed `tsconfig.tsbuildinfo` was untracked, and four empty `.gitkeep` files under `src/` were removed.
 
-## 17. Verification today
+## 17. Encyclopedia and gameplay depth
+
+A reference disc is more than a list of articles, and a game needs a reason to try again. One pass added both.
+
+- **Explore History.** Every article already carried a few dated events, but they were visible only inside that article. A pure function now gathers them for the whole disc: it reads the first year in each date, sorts by it, and groups by century. Dates with no year, such as "Middle Ages" or the "Part 2 of 10" of burned discs, go last under "Other dates" instead of being guessed at. The timeline is a new place in the navigation history, so Back and Forward treat it like any other page, and the toolbar button is dimmed for a disc with nothing to show.
+- **Pin previews.** A diagram pin used to show only its label. It now previews the target article's title and first Quick Fact on hover or focus. The tooltip component took an optional card body, so the old plain tooltip, and the tests that cover it, did not change.
+- **Cross-links without HTML.** Linking article titles inside paragraphs is a classic way to end up with `dangerouslySetInnerHTML`, which the design system forbids. Instead, a small pure function splits a paragraph into plain pieces and link pieces, and React renders each one as text or a button. A test feeds it text with tags, ampersands, and regular-expression characters, and checks that the pieces always rebuild the original string.
+- **Bookmarks.** The reader owns the toggle and the sidebar owns the list, so the state lives one level up, in the app shell, next to the library. Bookmarks use their own storage key per disc and are checked against the disc's real sections when read, so a removed section cannot leave a dead entry.
+- **MindMaze.** KeepMaze gained a score, a streak, and three torches. The design question was how to add stakes without breaking the rule that every dungeon can always be finished. The answer is that nothing is ever taken away: the score only goes up, a wrong answer only ends the streak and dims a torch, and torches stop at zero. A test fails eight answers in a row and then finishes the maze. The Peek Hint button, added earlier as a convenience, now has a price: a hinted answer is worth 50 and gets no streak bonus. The scholar rank compares the score with the best possible one for the same number of moves, so a short maze and a long one are judged fairly.
+
+## 18. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance
