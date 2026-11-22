@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { App } from '../../src/App';
+import type { FetchLike } from '../../src/adapters/types';
 import { HomeLauncher } from '../../src/components/HomeLauncher';
 import { PackShelf } from '../../src/components/PackShelf';
 import { discOrigin, originClassName } from '../../src/library/discOrigin';
@@ -226,6 +227,123 @@ describe('Pinpointer', () => {
   });
 });
 
+describe('Pinpointer burn row', () => {
+  const burnName = (q: string) => `Burn CD-R for "${q}" (Wikipedia)...`;
+  const lastOption = () => options()[options().length - 1]!;
+
+  it('replaces the dead end with a burn row when nothing matches', async () => {
+    const user = userEvent.setup();
+    setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'zzzzqq');
+    expect(screen.queryByText('No matching articles.')).toBeNull();
+    expect(options()).toHaveLength(1);
+    expect(options()[0]!.textContent).toBe(burnName('zzzzqq'));
+    expect(options()[0]!.getAttribute('aria-selected')).toBe('true');
+    expect(box().getAttribute('aria-activedescendant')).toBe(options()[0]!.id);
+  });
+
+  it('Enter on the lone burn row starts the burn with the typed text', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample, onOpenSection } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'zzzzqq');
+    await user.keyboard('{Enter}');
+    expect(onBurnSample).toHaveBeenCalledTimes(1);
+    expect(onBurnSample).toHaveBeenCalledWith('zzzzqq');
+    expect(onOpenSection).not.toHaveBeenCalled();
+    expect(box().value).toBe('');
+    expect(options()).toEqual([]);
+  });
+
+  it('is the last row after the local matches, and a click burns the trimmed query', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample, onOpenSection } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), '  moat ');
+    expect(options()).toHaveLength(4); // three local sections, then the burn row
+    expect(options().slice(0, 3).map((o) => o.querySelector('.pinpointer__title')!.textContent)).toEqual([
+      'The Moat',
+      'Modems and the Moat of Noise',
+      'About the moat plugin',
+    ]);
+    expect(lastOption().textContent).toBe(burnName('moat'));
+    expect(lastOption().className).toContain('pinpointer__burn');
+    await user.click(lastOption());
+    expect(onBurnSample).toHaveBeenCalledWith('moat');
+    expect(onOpenSection).not.toHaveBeenCalled();
+    expect(box().value).toBe('');
+  });
+
+  it('is reached with the arrow keys, wraps in both directions, and Enter burns it', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample, onOpenSection } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'moat');
+    expect(options()[0]!.getAttribute('aria-selected')).toBe('true');
+    await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}');
+    expect(lastOption().getAttribute('aria-selected')).toBe('true');
+    expect(box().getAttribute('aria-activedescendant')).toBe(lastOption().id);
+    await user.keyboard('{ArrowDown}'); // wraps to the first result
+    expect(options()[0]!.getAttribute('aria-selected')).toBe('true');
+    await user.keyboard('{ArrowUp}'); // and back to the burn row
+    expect(lastOption().getAttribute('aria-selected')).toBe('true');
+    expect(options().filter((o) => o.getAttribute('aria-selected') === 'true')).toHaveLength(1);
+    await user.keyboard('{Enter}');
+    expect(onBurnSample).toHaveBeenCalledWith('moat');
+    expect(onOpenSection).not.toHaveBeenCalled();
+  });
+
+  it('Enter on a local result still opens the article, not the burn', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample, onOpenSection } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'moat');
+    await user.keyboard('{ArrowDown}{Enter}');
+    expect(onOpenSection).toHaveBeenCalledWith('retro-dialup', 'modem');
+    expect(onBurnSample).not.toHaveBeenCalled();
+  });
+
+  it('Escape closes the list without burning', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'zzzzqq');
+    await user.keyboard('{Escape}');
+    expect(box().value).toBe('');
+    expect(options()).toEqual([]);
+    expect(onBurnSample).not.toHaveBeenCalled();
+  });
+
+  it('needs two characters, and Enter on a one-character query does nothing', async () => {
+    const user = userEvent.setup();
+    const { onBurnSample } = setup({ onBurnSample: vi.fn() });
+    await user.type(box(), 'z');
+    expect(options()).toEqual([]);
+    await user.keyboard('{Enter}');
+    expect(onBurnSample).not.toHaveBeenCalled();
+    await user.type(box(), 'z');
+    expect(options()).toHaveLength(1);
+  });
+
+  it('keeps the old message and offers no burn row when the launcher cannot burn', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(box(), 'zzzzqq');
+    expect(screen.getByText('No matching articles.')).toBeTruthy();
+    expect(options()).toEqual([]);
+    await user.clear(box());
+    await user.type(box(), 'moat');
+    expect(options()).toHaveLength(3);
+  });
+
+  it('in the app, the burn row opens the Burn dialog and burns the typed topic at once', async () => {
+    const user = userEvent.setup();
+    const fetchSpy = vi.fn<FetchLike>(() => Promise.reject(new TypeError('offline')));
+    render(<App sources={[castles, retro]} fetch={fetchSpy} />);
+    await user.type(screen.getByRole('combobox', { name: /Pinpointer/ }), 'Lighthouse keepers');
+    await user.click(screen.getByRole('option', { name: burnName('Lighthouse keepers') }));
+    expect(screen.getByRole('dialog', { name: /Burn New CD-R Disc|Lighthouse keepers/ })).toBeTruthy();
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+    expect(fetchSpy.mock.calls[0]![0]).toBe('/api/topic?q=Lighthouse%20keepers');
+    // The lookup fails offline, so the disc is the study outline, opened when the burn finishes.
+    await waitFor(() => expect(screen.getByRole('dialog', { name: 'Lighthouse keepers' })).toBeTruthy(), { timeout: 4000 });
+  });
+});
 describe('Did You Know? spotlight', () => {
   const spot = () => screen.getByRole('region', { name: 'Did You Know?' });
 

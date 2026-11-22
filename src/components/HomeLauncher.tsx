@@ -156,7 +156,12 @@ export function HomeLauncher({
         <div className="home__grid">
           <Group legend="Expansion Packs (CD-ROM Drive D:)" className="home-group--packs">
             {onOpenSection ? (
-              <Pinpointer discs={discs} removableIds={removableIds} onOpenSection={onOpenSection} />
+              <Pinpointer
+                discs={discs}
+                removableIds={removableIds}
+                onOpenSection={onOpenSection}
+                onBurnTopic={onBurnSample}
+              />
             ) : null}
             <PackShelf
               discs={discs}

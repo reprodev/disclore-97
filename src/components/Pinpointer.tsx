@@ -12,24 +12,36 @@ export interface PinpointerProps {
   removableIds?: ReadonlySet<string>;
   /** Opens a disc straight to a section. */
   onOpenSection: (discId: string, sectionId: string) => void;
+  /**
+   * Burns a disc about the typed text. When given, the dropdown ends with a
+   * `Burn CD-R for "..." (Wikipedia)...` row, even when no article matches.
+   */
+  onBurnTopic?: (topic: string) => void;
 }
 
 /**
  * The Pinpointer: a search bar over every mounted disc. Typing lists matching sections in a
  * sunken dropdown, each with its disc and origin badge. Enter or a click opens that section.
- * Escape, or emptying the box, closes the list.
+ * The last row offers to burn a Wikipedia disc for what was typed. Escape, or emptying the
+ * box, closes the list.
  */
-export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerProps) {
+export function Pinpointer({ discs, removableIds, onOpenSection, onBurnTopic }: PinpointerProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const uid = useId();
   const listId = `${uid}-results`;
 
-  const searching = query.trim().length >= MIN_QUERY_CHARS;
+  const topic = query.trim();
+  const searching = topic.length >= MIN_QUERY_CHARS;
   const hits = useMemo(() => searchSections(discs, query), [discs, query]);
   const showList = open && searching;
   const byId = useMemo(() => new Map(discs.map((d) => [d.disc_id, d])), [discs]);
+
+  // Rows are the local results, then the burn row when it is offered.
+  const burnRow = onBurnTopic !== undefined;
+  const rowCount = hits.length + (burnRow ? 1 : 0);
+  const current = Math.min(active, Math.max(rowCount - 1, 0));
 
   const reset = () => {
     setQuery('');
@@ -42,6 +54,12 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
     reset();
   };
 
+  const burn = () => {
+    if (!onBurnTopic || !searching) return;
+    onBurnTopic(topic);
+    reset();
+  };
+
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       if (query !== '' || open) {
@@ -50,13 +68,14 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
       }
       return;
     }
-    if (!showList || hits.length === 0) return;
+    if (!showList || rowCount === 0) return;
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
-      setActive((a) => (a + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length);
+      setActive((a) => (Math.min(a, rowCount - 1) + (e.key === 'ArrowDown' ? 1 : -1) + rowCount) % rowCount);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      choose(hits[Math.min(active, hits.length - 1)]!);
+      if (current < hits.length) choose(hits[current]!);
+      else burn();
     }
   };
 
@@ -78,7 +97,7 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
           aria-expanded={showList}
           aria-controls={listId}
           aria-autocomplete="list"
-          aria-activedescendant={showList && hits.length > 0 ? `${uid}-hit-${active}` : undefined}
+          aria-activedescendant={showList && rowCount > 0 ? `${uid}-hit-${current}` : undefined}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -92,7 +111,7 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
         {showList ? (
           // Mouse presses must not take focus from the input, or the list would close before the click lands.
           <div className="pinpointer__results" onMouseDown={(e) => e.preventDefault()}>
-            {hits.length === 0 ? (
+            {rowCount === 0 ? (
               <p className="pinpointer__empty">No matching articles.</p>
             ) : (
               <ul id={listId} role="listbox" aria-label="Matching articles" className="pinpointer__list">
@@ -104,8 +123,8 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
                       key={`${hit.discId}/${hit.sectionId}`}
                       id={`${uid}-hit-${i}`}
                       role="option"
-                      aria-selected={i === active}
-                      data-active={i === active ? 'true' : 'false'}
+                      aria-selected={i === current}
+                      data-active={i === current ? 'true' : 'false'}
                       className="pinpointer__hit"
                       onMouseEnter={() => setActive(i)}
                       onClick={() => choose(hit)}
@@ -118,6 +137,20 @@ export function Pinpointer({ discs, removableIds, onOpenSection }: PinpointerPro
                     </li>
                   );
                 })}
+                {burnRow ? (
+                  <li
+                    id={`${uid}-hit-${hits.length}`}
+                    role="option"
+                    aria-selected={current === hits.length}
+                    data-active={current === hits.length ? 'true' : 'false'}
+                    className="pinpointer__hit pinpointer__burn"
+                    title={`Burn a CD-R about "${topic}" from Wikipedia`}
+                    onMouseEnter={() => setActive(hits.length)}
+                    onClick={burn}
+                  >
+                    <span className="pinpointer__title">{`Burn CD-R for "${topic}" (Wikipedia)...`}</span>
+                  </li>
+                ) : null}
               </ul>
             )}
           </div>

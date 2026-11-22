@@ -941,3 +941,18 @@
   font-family: var(--font-serif);
   font-style: italic;
 }
+
+/* Pinpointer: the last row offers to burn a Wikipedia disc for what was typed. */
+.pinpointer__hit.pinpointer__burn {
+  border-top: 2px double var(--color-gold-dark);
+}
+
+.pinpointer__burn .pinpointer__title {
+  flex: 1 1 auto;
+  font-style: italic;
+  color: var(--color-crimson);
+}
+
+.pinpointer__burn[data-active="true"] .pinpointer__title {
+  color: var(--color-title-text);
+}
