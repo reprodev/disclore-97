@@ -63,7 +63,7 @@ Some problems only showed up while building and verifying. These are the real on
 
 ## 5. Final verification
 
-The last checkpoint ran the whole suite and build:
+The first checkpoint, at the end of Spec #1, ran the whole suite and build:
 
 - **Tests:** 24 test files and 111 tests pass with Vitest and fast-check.
 - **Types and build:** `tsc --noEmit` is clean, and `vite build` writes the static site to `dist/`.
@@ -80,6 +80,67 @@ The second spec, `.kiro/specs/dynamic-disc-compiler/`, added the Burn New CD-R D
 - **Static first.** The only server code is one optional Pages Function, `functions/api/extract.ts`. Its logic lives in `src/extract/` so it can be unit tested, and the app works when the function is absent.
 - **Still dependency-light.** Runtime dependencies are still `react` and `react-dom`. A static test scans `src/` and `functions/` for secrets and unsafe HTML.
 
+## 7. Dynamic Disc Compiler
+
+Spec #2 (section 6) is where DiscLore '97 stopped being a fixed set of discs. The finished system is a small pipeline:
+
+1. **Adapter.** `src/adapters/` reads a source (GitHub, web page, topic, or Markdown) into one plain `ExtractedSource`: a title, headings, paragraphs, and metadata.
+2. **Compiler.** `compileDisc` in `src/model/compiler.ts` turns that into a `DiscManifest`. It is pure and seeded, so the same source always gives the same disc. Separate seeded streams build the sections, the diagram, the trivia, and the dungeon.
+3. **Gate.** The `burn` orchestrator passes the manifest through `loadDisc`, which runs the same validator and BFS solver as the built-in discs. Nothing reaches the screen without passing.
+4. **Library.** Burned discs are saved to `localStorage`, up to 10, oldest first out.
+
+Two design choices paid off later:
+
+- **Sanitizing at one door.** All untrusted text goes through `sanitizeLine` and `sanitizeParagraph` inside the compiler. Adapters can stay simple, and one property test (`dc09-sanitize`) covers markup, control characters, and Markdown images for every source kind.
+- **Static scans as tests.** `tests/dynamic-static.test.ts` checks that the compiler stays pure (no React, no `Math.random`, no `fetch`), that `src/` has no `innerHTML`, and that the only absolute URLs in `src/` are GitHub's. That last rule shaped the later server work: any other address has to live in a Pages Function or be built from parts.
+
+## 8. 1997 Encarta Palette and UI Polish
+
+After the compiler worked, the app was made to look the part. The original dark navy and neon-green terminal colors read as "AI tool", not "1997 multimedia encyclopedia". The re-theme changed values, not names:
+
+- **Tokens, not hunting.** Because every color lived in `src/styles/tokens.css`, the palette changed in one file: Royal Sapphire for the splash and hero, Warm Ivory for paper, Burgundy for accents, and Antique Gold for borders. The seven required Win95 chrome tokens were left alone.
+- **CRT green stayed where it belongs.** The phosphor tokens now appear only on computer-monitor screens. The boot console and the Home badge got new ivory-on-slate console tokens, and the KeepMaze mini-map got a warm dungeon slate.
+- **Per-source diagrams.** The compiler's diagram builder gained four scenes: a blueprint for GitHub, a browser site map for web pages, an outline for Markdown, and a concept chart for topics. All are built from rectangles, circles, and lines in 12 allowed colors, and they keep the geometry property tests passing.
+- **Study tools.** A Chronology strip, Show in Diagram, Cite / Print Preview, a KeepMaze Quest card with a mini-map legend, Peek Hint, a Victory Certificate, a taskbar clock and Drive D: light, and a boot chime.
+
+Through all of this, the static tests held the line: hex colors only in `tokens.css`, `border-radius: 0`, no gradients, no blurred shadows, and `AudioContext` only under `src/audio/`.
+
+## 9. Dev Middleware for /api/extract and /api/topic
+
+A screenshot of a failed web-page burn exposed a gap. In `npm run dev`, Vite had no `/api/extract` route, so the burn dialog said the page reader was not available. The route only existed as a Cloudflare Pages Function.
+
+The fix is a small Vite plugin in `vite.config.ts`. For `/api/extract` and later `/api/topic`, it turns the Node request into a web `Request`, calls the same handler the Pages Function uses, and writes the `Response` back. Three details matter:
+
+- **Dev only.** `apply: 'serve'` keeps it out of `vite build`. The deployed site is unchanged.
+- **One handler.** The logic lives in `src/extract/`, shared by the Pages Function, the dev middleware, and the unit tests, so dev and production cannot drift.
+- **Same guard.** The dev route runs the same SSRF checks. A request for a loopback address is refused in dev just as it is in production.
+
+## 10. 1997 Multimedia Experience and Pop-Out Picture Viewer
+
+Real pictures and narration made the burned discs feel like multimedia, not just text. The work started with the data rules:
+
+- **A safe `media` field.** `DiscManifest` and `ExtractedSource` gained an optional list of `{ url, caption }`, at most 8. One module, `src/model/media.ts`, decides what is allowed: public `https` addresses only, no private hosts, credentials, or odd ports, and no SVG. The validator, the compiler, and every adapter use that same module, and each re-checks what the one before it passed along.
+- **Extraction.** `extractImages` reads `og:image`, `twitter:image`, and `<img>` tags, skips icons and tracking pixels, and is bounded so a hostile page cannot make it slow. The GitHub adapter adds the owner's avatar and README images, turning relative paths into raw file addresses.
+- **MediaReel.** A beveled picture frame with Prev, Play / Pause, Next, and a frame counter. Pictures load without a referrer and lazily, show a loading note, and fall back to the SVG plate when they fail.
+- **Picture Viewer.** Clicking a picture, or Enlarge, opens a Win95 modal window. It reuses the existing modal hook for Escape, the focus trap, and focus return. It shares the reel's frame and Play state, so the two never disagree. Arrow keys step, Space toggles Play, and a thumbnail strip with a gold active border jumps to a frame. A small detail: focus starts on the picture, so pressing Space cannot press the Close button.
+- **Read Aloud.** Narration uses the browser's Web Speech API, so there are still no audio files. Each paragraph is its own utterance, because long utterances get cut off in some browsers. The button shows live progress, for example "Stop (2/5)", and the narration stops on Mute, on a section change, and on unmount. The speech code sits in `src/audio/`, next to the rest of the sound code.
+
+One rule from the static tests shaped the code in a small way. `src/` may not contain `https://` addresses other than GitHub's, so the raw GitHub file host is assembled from parts in `github.ts`.
+
+## 11. Wikipedia-Backed Topic Burns
+
+At first, burning a topic produced a disc of "write down what you already know" prompts. It worked, but it taught nothing. The upgrade makes a topic burn fetch a real article.
+
+- **A new function.** `functions/api/topic.ts` calls the shared handler in `src/extract/topicHandler.ts`. The handler searches English Wikipedia for the best match, then reads that article's plain text and its images. The Wikipedia host is fixed in the code and built from parts, and the search text only ever travels as a query parameter, so a caller cannot aim it anywhere else.
+- **Cleaning.** Section headings become disc sections. "See also", "References", and similar sections, short list fragments, and disambiguation pages are dropped. Images must be JPEG, PNG, or WebP of a reasonable size, with icons, flags, and logos filtered out by file name. Every address then goes through the shared media rules.
+- **Graceful fallback.** `burn` tries `/api/topic` first. If anything goes wrong (offline, no match, a disambiguation page, or no function at all), it falls back to `topicToSource`, so a topic burn never fails just because Wikipedia could not be reached. That fallback text was rewritten to say plainly that it is an offline study outline and not an article.
+- **Attribution.** Wikipedia text is CC BY-SA 4.0 and Commons pictures carry their own licenses. Each burned disc names its Wikipedia page in the Source line of its first section, and the README and in-app ReadMe describe the licensing.
+
+A live check against the real service showed the shape of the result: a search for "Lighthouses" returned 12 headings, 40 paragraphs, and 8 pictures, while "Mercury" returned a disambiguation page and was correctly sent to the fallback.
+
+## 12. Verification today
+
+The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance
 
 ```mermaid

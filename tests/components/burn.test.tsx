@@ -148,7 +148,9 @@ describe('BurnDialog', () => {
     await user.click(burnBtn());
     await waitFor(() => expect(onBurned).toHaveBeenCalledTimes(1));
     expect(onBurned.mock.calls[0]![0].sections.length).toBeGreaterThan(0);
-    expect(fetchSpy).not.toHaveBeenCalled();
+    // The only request is the encyclopedia lookup, which failed here, so the offline outline was used.
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(String(fetchSpy.mock.calls[0]![0])).toMatch(/^\/api\/topic\?q=/);
   });
 
   it('shows an error with an offline control that burns a disc (13.12, 14.3)', async () => {

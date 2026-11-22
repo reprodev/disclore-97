@@ -105,13 +105,88 @@ describe('burn orchestrator', () => {
     expect(loadDiscMock.mock.calls[0]![1]).toBe(false);
   });
 
-  it('makes no fetch call for markdown and topic inputs', async () => {
+  it('makes no fetch call for markdown, and only the topic lookup for a topic', async () => {
     const a = await burn(MD, { fetch: fetchSpy });
-    const b = await burn('medieval castles', { fetch: fetchSpy });
     expect(a.ok).toBe(true);
-    expect(b.ok).toBe(true);
     expect(fetchSpy).not.toHaveBeenCalled();
+
+    const b = await burn('medieval castles', { fetch: fetchSpy });
+    expect(b.ok).toBe(true);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy.mock.calls[0]![0]).toBe('/api/topic?q=medieval%20castles');
     expect(githubMock).not.toHaveBeenCalled();
     expect(webMock).not.toHaveBeenCalled();
+  });
+
+  describe('topic burns', () => {
+    const wikiReply = () =>
+      new Response(
+        JSON.stringify({
+          title: 'Lighthouse',
+          headings: ['History', 'Design', 'Lenses', 'Keepers', 'Modern use'],
+          paragraphs: [
+            'A lighthouse is a tower with a bright light that guides ships at sea.',
+            'Early lighthouses burned wood or coal in open fires on a hilltop or tower.',
+            'The Fresnel lens, invented in 1822, bent light into a narrow and powerful beam.',
+          ],
+          media: [
+            { url: 'https://cdn.example.org/lighthouse.jpg', caption: 'A lighthouse' },
+            { url: 'http://cdn.example.org/insecure.jpg', caption: 'Insecure' },
+          ],
+          metadata: { kind: 'topic', source: ['https:', '', 'en.example.org', 'wiki', 'Lighthouse'].join('/') },
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+
+    it('builds the disc from the fetched encyclopedia article and its safe pictures', async () => {
+      const f = vi.fn<FetchLike>(async () => wikiReply());
+      const r = await burn('Lighthouses', { fetch: f });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.manifest.title).toBe('Lighthouse');
+      expect(r.manifest.sections.some((s) => s.paragraphs.some((p) => p.includes('Fresnel lens')))).toBe(true);
+      expect(r.manifest.media).toEqual([{ url: 'https://cdn.example.org/lighthouse.jpg', caption: 'A lighthouse' }]);
+      expect(JSON.stringify(r.manifest)).not.toContain('offline study outline');
+    });
+
+    it('reports the fetching stage before compiling', async () => {
+      const stages: string[] = [];
+      await burn('Lighthouses', { fetch: vi.fn<FetchLike>(async () => wikiReply()), onStage: (s) => stages.push(s) });
+      expect(stages).toEqual(['fetching', 'compiling', 'validating']);
+    });
+
+    it.each([
+      ['a network failure', () => Promise.reject(new Error('offline'))],
+      ['a 404 (no match or no endpoint)', () => Promise.resolve(new Response('not found', { status: 404 }))],
+      ['a 502 from the endpoint', () => Promise.resolve(new Response('{"error":"upstream-failed"}', { status: 502 }))],
+      ['an HTML reply', () => Promise.resolve(new Response('<html></html>', { status: 200 }))],
+      ['a reply with no paragraphs', () => Promise.resolve(new Response('{"title":"X","headings":[],"paragraphs":[]}', { status: 200 }))],
+    ])('falls back to the offline study outline after %s', async (_name, reply) => {
+      const f = vi.fn<FetchLike>(reply);
+      const r = await burn('Lighthouses', { fetch: f });
+      expect(f).toHaveBeenCalledTimes(1);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.manifest.title).toBe('Lighthouses');
+      expect(r.manifest.sections[0]!.paragraphs.join(' ')).toMatch(/offline study outline/i);
+      expect('media' in r.manifest).toBe(false);
+      expect(validateManifest(r.manifest).ok).toBe(true);
+    });
+
+    it('still returns cancelled when the burn is aborted', async () => {
+      const ctl = new AbortController();
+      const f = vi.fn<FetchLike>(async () => {
+        ctl.abort();
+        return wikiReply();
+      });
+      const r = await burn('Lighthouses', { fetch: f, signal: ctl.signal });
+      expect(!r.ok && r.error.code).toBe('cancelled');
+    });
+
+    it('burnFallback never calls the network', async () => {
+      const r = await burnFallback('Lighthouses', {});
+      expect(r.ok).toBe(true);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
   });
 });

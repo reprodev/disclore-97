@@ -4,6 +4,7 @@ import { ERROR_MESSAGES, FALLBACK_CODES, makeError } from './errors';
 import { fetchGithubSource } from './github';
 import { markdownToSource, topicToSource } from './markdown';
 import type { BurnError, FetchLike, Result } from './types';
+import { fetchTopicSource } from './topic';
 import { fetchWebpageSource } from './webpage';
 import { loadDisc } from '../discs/loader';
 import { compileDisc } from '../model/compiler';
@@ -80,7 +81,19 @@ async function run(input: string, deps: BurnDeps): Promise<BurnResult> {
   if (parsed.kind === 'markdown') {
     source = markdownToSource(parsed.text);
   } else if (parsed.kind === 'topic') {
-    source = topicToSource(parsed.text);
+    // Real encyclopedia content when /api/topic can supply it; otherwise the offline study outline.
+    stage(deps, 'fetching');
+    let found: Result<ExtractedSource>;
+    try {
+      found = await fetchTopicSource(parsed.text, {
+        ...(deps.fetch ? { fetch: deps.fetch } : {}),
+        ...(signal ? { signal } : {}),
+      });
+    } catch {
+      found = { ok: false, error: makeError('fetch-failed') };
+    }
+    if (signal?.aborted) return fail('cancelled');
+    source = found.ok ? found.value : topicToSource(parsed.text);
   } else {
     let res: Result<ExtractedSource>;
     const opts = { ...(deps.fetch ? { fetch: deps.fetch } : {}), ...(signal ? { signal } : {}) };

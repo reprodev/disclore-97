@@ -145,26 +145,31 @@ export function markdownToSource(md: string, source: string = 'Markdown text'): 
   };
 }
 
+/**
+ * Offline study outline for a topic. Used only when no encyclopedia text could be fetched
+ * (offline, no match, or the lookup service is down). It says so plainly, so it does not
+ * read as a broken article.
+ */
 export function topicToSource(topic: string): ExtractedSource {
   const t = String(topic ?? '').replace(/\s+/g, ' ').trim() || 'this topic';
   return {
     title: t,
     headings: [
-      `What is ${t}?`,
+      `${t}: offline study outline`,
       `Key terms in ${t}`,
-      `How ${t} is used`,
+      `Where you have met ${t}`,
       `Questions to explore about ${t}`,
       `Where to learn more about ${t}`,
       `Putting ${t} into practice`,
     ],
     paragraphs: [
-      `Use this page to write down what you already know about ${t}.`,
-      `List the words and names you expect to meet while studying ${t}, then look each one up.`,
+      `This is an offline study outline for ${t}, not an encyclopedia article. No article text could be fetched, so use this page to write down what you already know about ${t}.`,
+      `List the words and names you expect to meet while studying ${t}, then look each one up once you are back online.`,
       `Think of one place where you have seen ${t} and note what you would like to understand better.`,
       `Write three questions about ${t} that you want answered before you finish studying.`,
       `Pick a library, a teacher, or a trusted website and plan when you will read about ${t}.`,
       `Choose a small exercise that lets you try ${t} yourself, and note what you learn from it.`,
     ],
-    metadata: { kind: 'topic', source: `Topic: ${t}` },
+    metadata: { kind: 'topic', source: `Topic: ${t} (offline study outline)` },
   };
 }
