@@ -10,7 +10,7 @@
 
   /* Desktop and paper */
   --color-desktop: #008080;
-  --color-paper: #FFFFFF;
+  --color-paper: #FAF6E8;
   --color-ink: #000000;
   --color-parchment: #F0E6C8;
   --color-parchment-dark: #D8C898;
@@ -21,14 +21,14 @@
   --color-stone-dark: #6C6C5C;
 
   /* Gold */
-  --color-gold-light: #FFE860;
-  --color-gold: #FFD700;
-  --color-gold-dark: #B8860B;
+  --color-gold-light: #E6C25A;
+  --color-gold: #C89B3C;
+  --color-gold-dark: #8F6A1E;
 
   /* Crimson */
   --color-crimson-light: #D84060;
-  --color-crimson: #A00020;
-  --color-crimson-dark: #600010;
+  --color-crimson: #7A1C24;
+  --color-crimson-dark: #4E1118;
 
   /* Forest */
   --color-forest-light: #40A040;
@@ -45,14 +45,24 @@
   --color-wood: #8B5A2B;
   --color-wood-dark: #583818;
 
-  /* CRT phosphor */
+  /* CRT phosphor: used only inside computer-monitor screens (Retro disc, plates, hero PC). */
   --color-phosphor: #33FF33;
   --color-phosphor-dim: #00A000;
   --color-crt-bg: #001800;
 
-  /* Night field for the boot splash hero */
-  --color-night: #05052A;
-  --color-night-light: #14145A;
+  /* Royal sapphire field for the boot splash and Home hero */
+  --color-night: #0B2E59;
+  --color-night-light: #16477E;
+
+  /* Boot console and Home badge: warm ivory and antique gold on slate blue */
+  --color-console-bg: #1F3B5C;
+  --color-console-text: #FAF6E8;
+  --color-console-accent: #E6C25A;
+  --color-console-dim: #C89B3C;
+
+  /* KeepMaze mini-map: warm dungeon slate */
+  --color-dungeon-bg: #242933;
+  --color-dungeon-stone: #4A4E58;
 
   /* Torch fire */
   --color-flame: #FF8000;

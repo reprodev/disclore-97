@@ -188,7 +188,7 @@
 }
 
 .taskbar__drive[data-active="true"] .taskbar__led {
-  background: var(--color-phosphor);
+  background: var(--color-gold-light);
 }
 
 .taskbar__clock {

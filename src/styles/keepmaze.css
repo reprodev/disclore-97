@@ -106,7 +106,7 @@
   justify-content: center;
   padding: 2px;
   overflow: hidden;
-  background: var(--color-crt-bg);
+  background: var(--color-dungeon-bg);
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
 }
@@ -173,11 +173,11 @@
 }
 
 .minimap__bg {
-  fill: var(--color-crt-bg);
+  fill: var(--color-dungeon-bg);
 }
 
 .minimap__edge {
-  stroke: var(--color-phosphor-dim);
+  stroke: var(--color-stone-dark);
   stroke-width: 2px;
 }
 
@@ -188,14 +188,14 @@
 }
 
 .minimap__room--current {
-  fill: var(--color-gold);
-  stroke: var(--color-crimson);
+  fill: var(--color-flame);
+  stroke: var(--color-gold-light);
   stroke-width: 2px;
 }
 
 .minimap__room--unknown {
-  fill: var(--color-stone-dark);
-  stroke: var(--color-phosphor-dim);
+  fill: var(--color-dungeon-stone);
+  stroke: var(--color-stone-dark);
   stroke-width: 1px;
   stroke-dasharray: 2 2;
 }
