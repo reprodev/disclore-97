@@ -74,7 +74,7 @@
   min-height: 0;
   resize: none;
   padding: 4px 6px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.35;
   color: var(--color-ink);

@@ -28,7 +28,7 @@
   box-sizing: border-box;
   padding: 6px;
   resize: vertical;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.4;
   color: var(--color-ink);
@@ -65,6 +65,97 @@
 .article-callout__added {
   margin: 4px 0 0;
   min-height: 1em;
+  font-size: 11px;
+  color: var(--color-forest);
+}
+
+/* Disc selector and Pin to Desktop, above the pad. */
+.notebook-dialog__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notebook-dialog__select {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 1px 2px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.notebook-dialog__buttons {
+  flex-wrap: wrap;
+}
+
+/* The share link the clipboard refused, for copying by hand. */
+.notebook-dialog__share {
+  margin: 0;
+  padding: 4px 8px 6px;
+}
+
+.notebook-dialog__share-text {
+  margin: 0 0 4px;
+}
+
+.notebook-dialog__share-link {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+/* The printed notes page: hidden on screen, shown alone by print.css. */
+.notebook-dialog__page {
+  display: none;
+  font-family: var(--font-serif);
+}
+
+.notebook-dialog__running {
+  margin: 0 0 6px;
+  padding-bottom: 2px;
+  font-size: 11px;
+  font-style: italic;
+  border-bottom: 1px solid var(--color-bevel-shadow);
+}
+
+.notebook-dialog__heading {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-size: 1.3em;
+}
+
+.notebook-dialog__print-text {
+  margin: 0;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+
+/* The Shared Notes dialog. */
+.window.shared-notes-dialog {
+  width: min(520px, 100%);
+  max-height: 100%;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+}
+
+.shared-notes-dialog .window-content {
+  overflow: auto;
+}
+
+/* "+ Quote" confirmation in the article tools. */
+.article-tools__added {
+  align-self: center;
+  font-family: var(--font-ui);
   font-size: 11px;
   color: var(--color-forest);
 }

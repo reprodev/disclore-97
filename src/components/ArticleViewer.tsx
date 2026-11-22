@@ -5,6 +5,7 @@ import { isSpeechAvailable, speak, stopSpeaking } from '../audio/speech';
 import type { Diagram, MediaItem, Section } from '../model/manifest';
 import { linkSegments } from '../model/crossLinks';
 import { normalizeQuery, splitByQuery } from '../model/findInText';
+import { quoteText } from '../library/notebook';
 import { relatedSections } from '../model/topics';
 import { BevelButton } from './BevelButton';
 import { CiteDialog } from './CiteDialog';
@@ -64,6 +65,10 @@ export function ArticleViewer({
   const findInputRef = useRef<HTMLInputElement | null>(null);
   /** The fact just added to the Notebook, shown briefly as confirmation. */
   const [noteAdded, setNoteAdded] = useState(false);
+  /** The quote just added with + Quote, shown briefly. */
+  const [quoteAdded, setQuoteAdded] = useState(false);
+  /** The selection when the + Quote button was pressed: pressing a button can clear it before the click. */
+  const pendingQuote = useRef('');
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
 
@@ -89,7 +94,13 @@ export function ArticleViewer({
   // The confirmation belongs to one article and fades after a moment.
   useEffect(() => {
     setNoteAdded(false);
+    setQuoteAdded(false);
   }, [sectionId]);
+  useEffect(() => {
+    if (!quoteAdded) return;
+    const id = window.setTimeout(() => setQuoteAdded(false), 2500);
+    return () => window.clearTimeout(id);
+  }, [quoteAdded]);
   useEffect(() => {
     if (!noteAdded) return;
     const id = window.setTimeout(() => setNoteAdded(false), 2500);
@@ -197,6 +208,29 @@ export function ArticleViewer({
     }
   };
 
+  /** The selected text, when the selection is inside this article. Empty otherwise. */
+  const readSelection = (): string => {
+    const sel = window.getSelection?.();
+    const text = sel?.toString() ?? '';
+    if (text.trim() === '') return '';
+    const node = sel?.anchorNode;
+    if (node instanceof Node && !(ref.current?.contains(node) ?? false)) return '';
+    return text;
+  };
+
+  /** + Quote: the selected text (or the article's first sentence) as a quoted line in the Notebook. */
+  const addQuote = () => {
+    if (!onAddNote) return;
+    const picked = pendingQuote.current || readSelection();
+    pendingQuote.current = '';
+    const lead = (section.paragraphs[0] ?? '').trim();
+    const firstSentence = /^[\s\S]*?[.!?](?=\s|$)/.exec(lead)?.[0] ?? lead;
+    const quote = quoteText(picked || firstSentence || section.title);
+    if (quote === '') return;
+    onAddNote(section.title, quote);
+    setQuoteAdded(true);
+  };
+
   /** A double-click on one word of the text opens the Dictionary for it. */
   const onParagraphDoubleClick = (e: MouseEvent<HTMLElement>) => {
     if (!onLookUpWord) return;
@@ -266,6 +300,23 @@ export function ArticleViewer({
         <BevelButton className="article-tools__toggle" aria-pressed={findOpen} onClick={() => setFindOpen((o) => !o)}>
           Find in Article
         </BevelButton>
+        {onAddNote ? (
+          <BevelButton
+            className="article-tools__quote"
+            title="Add the selected text to the Notebook, or the first sentence when nothing is selected"
+            onPointerDown={() => {
+              pendingQuote.current = readSelection();
+            }}
+            onClick={addQuote}
+          >
+            + Quote
+          </BevelButton>
+        ) : null}
+        {onAddNote ? (
+          <span className="article-tools__added" aria-live="polite">
+            {quoteAdded ? 'Quote added to Notebook.' : ''}
+          </span>
+        ) : null}
         <BevelButton
           className="article-tools__rate"
           disabled={!speechReady}

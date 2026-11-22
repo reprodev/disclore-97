@@ -43,8 +43,24 @@ function devExtractApi(): Plugin {
   };
 }
 
+/**
+ * Splits the production bundle so no chunk passes Vite's 500 kB warning: React and React DOM in one
+ * vendor chunk, and the four built-in discs (pure data) in another. Build-only: Vitest does not bundle.
+ */
+function manualChunks(id: string): string | undefined {
+  const path = id.replace(/\\/g, '/');
+  if (/\/node_modules\/(react|react-dom|scheduler)\//.test(path)) return 'react-vendor';
+  if (path.includes('/src/discs/')) return 'discs';
+  return undefined;
+}
+
 export default defineConfig({
   plugins: [react(), devExtractApi()],
+  build: {
+    rollupOptions: {
+      output: { manualChunks },
+    },
+  },
   test: {
     environment: 'jsdom',
     testTimeout: 15000,

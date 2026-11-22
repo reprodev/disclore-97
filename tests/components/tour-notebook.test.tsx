@@ -430,7 +430,7 @@ describe('Notebook dialog', () => {
       r.readAsText(blobs[0]!);
     });
     expect(text).toBe('[The Moat] A fact.');
-    await waitFor(() => expect(within(dialog()).getByText('Notebook exported.')).toBeTruthy());
+    await waitFor(() => expect(within(dialog()).getByText('Notebook exported (.txt).')).toBeTruthy());
   });
 
   it('says so when the browser cannot save the file', async () => {

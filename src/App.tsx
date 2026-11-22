@@ -25,7 +25,10 @@ import { loadDisc } from './discs/loader';
 import { loadBookmarks, saveBookmarks, toggleBookmark } from './library/bookmarks';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
 import { applyTheme, loadTheme, saveTheme } from './library/theme';
-import { appendNote, formatNote, loadNotes, saveNotes } from './library/notebook';
+import { appendNote, formatNote, loadNotes, loadPinnedNotes, saveNotes, savePinnedNotes, togglePinnedNotes } from './library/notebook';
+import { decodeNotes } from './model/noteShare';
+import type { SharedNotes } from './model/noteShare';
+import { SharedNotesDialog } from './components/SharedNotesDialog';
 import { loadVisited, markVisited, saveVisited } from './library/visited';
 import {
   MAX_IMAGE_BYTES,
@@ -124,6 +127,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   /** The Research Notebook dialog: null when closed, otherwise the disc whose notes it shows. */
   const [notebookDiscId, setNotebookDiscId] = useState<string | null>(null);
+  /** Notes that arrived in a ?notes= link, shown in the Shared Notes dialog. */
+  const [sharedNotes, setSharedNotes] = useState<SharedNotes | null>(null);
   /** Zero-based stop of Take a Tour. A different disc starts again at the first stop. */
   const [tourStop, setTourStop] = useState(0);
   /** Progress through the open disc's flashcard deck. Null means a fresh deck. */
@@ -228,6 +233,14 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
 
   /** The disc the Notebook belongs to: the open disc, else the last one opened, else the first. */
   const notebookTarget = disc ?? discs.find((d) => d.disc_id === lastDiscId) ?? discs[0];
+  /** Notebooks pinned to the desktop, saved under disclore97.pinnedNotes. */
+  const [pinnedNotes, setPinnedNotes] = useState<string[]>(() => loadPinnedNotes(bookmarkStorage));
+  const togglePin = (discId: string) => {
+    const next = togglePinnedNotes(pinnedNotes, discId);
+    setPinnedNotes(next);
+    savePinnedNotes(bookmarkStorage, next);
+  };
+
   const addNote = (sectionTitle: string, fact: string) => {
     if (!disc) return;
     saveNotes(bookmarkStorage, disc.disc_id, appendNote(loadNotes(bookmarkStorage, disc.disc_id), formatNote(sectionTitle, fact)));
@@ -389,7 +402,13 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   useEffect(() => {
     if (linkApplied.current || !hasDeepLink(link)) return;
     linkApplied.current = true;
-    if (link.topic !== undefined) {
+    if (link.notes !== undefined) {
+      const shared = decodeNotes(link.notes);
+      if (shared) setSharedNotes(shared);
+      else setImageNotice({ title: 'Shared Notes Link', message: 'This shared notes link is damaged or incomplete, so there is nothing to show.', details: [] });
+    }
+    // A notes link shows its dialog; a topic in the same link would open a second modal, so it waits.
+    if (link.topic !== undefined && link.notes === undefined) {
       setBurnSample(link.topic);
       setBurnOpen(true);
       return;
@@ -488,7 +507,13 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   return (
     <div className="desktop">
       <div className="desktop__work app-shell">
-        <DesktopIcons discs={discs} onOpenDisc={openDisc} onOpenReadMe={openReadMe} />
+        <DesktopIcons
+          discs={discs}
+          onOpenDisc={openDisc}
+          onOpenReadMe={openReadMe}
+          pinnedNotes={pinnedNotes}
+          onOpenNotes={(id) => setNotebookDiscId(id)}
+        />
         <DiscBrowser
           discs={discs}
           openDiscId={nav.discId}
@@ -585,10 +610,21 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
         ) : null}
         {notebookDiscId !== null && discs.some((d) => d.disc_id === notebookDiscId) ? (
           <NotebookDialog
+            discs={discs}
             discId={notebookDiscId}
-            discTitle={discs.find((d) => d.disc_id === notebookDiscId)!.title}
             storage={bookmarkStorage}
+            pinned={pinnedNotes}
+            {...(bookmarkStorage ? { onTogglePin: togglePin } : {})}
             onClose={() => setNotebookDiscId(null)}
+          />
+        ) : null}
+        {sharedNotes ? (
+          <SharedNotesDialog
+            shared={sharedNotes}
+            discs={discs}
+            fallbackDiscId={disc?.disc_id ?? lastDiscId ?? undefined}
+            storage={bookmarkStorage}
+            onClose={() => setSharedNotes(null)}
           />
         ) : null}
         {shortcutsOpen ? <ShortcutsDialog onClose={() => setShortcutsOpen(false)} /> : null}

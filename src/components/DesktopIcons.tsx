@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { playClick, playSpinUp } from '../audio/audio';
+import { shortDiscTitle } from '../library/notebook';
 import type { DiscManifest } from '../model/manifest';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
@@ -16,6 +17,10 @@ export interface DesktopIconsProps {
   discs: DiscManifest[];
   onOpenDisc: (discId: string) => void;
   onOpenReadMe: () => void;
+  /** Disc ids whose notes are pinned to the desktop. Each mounted one gets a Notes.txt shortcut. */
+  pinnedNotes?: readonly string[];
+  /** Opens the Research Notebook on a disc's notes. */
+  onOpenNotes?: (discId: string) => void;
 }
 
 interface Shortcut {
@@ -29,7 +34,7 @@ interface Shortcut {
  * Win95 desktop shortcuts in a left column. Click selects, double-click or
  * Enter opens. Labels are white on the teal desktop.
  */
-export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe }: DesktopIconsProps) {
+export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = [], onOpenNotes }: DesktopIconsProps) {
   const [selected, setSelected] = useState<string | null>(null);
 
   const shortcuts: Shortcut[] = [
@@ -51,6 +56,24 @@ export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe }: DesktopIconsPr
         onOpenReadMe();
       },
     },
+    // Pinned notebooks, in the order they were pinned. A pin for a disc that is not mounted shows nothing.
+    ...(onOpenNotes
+      ? pinnedNotes.flatMap((id) => {
+          const d = discs.find((x) => x.disc_id === id);
+          if (!d) return [];
+          return [
+            {
+              id: `notes:${id}`,
+              label: `${shortDiscTitle(d.title)} Notes.txt`,
+              icon: 'notepad' as IconName,
+              open: () => {
+                playClick();
+                onOpenNotes(id);
+              },
+            },
+          ];
+        })
+      : []),
   ];
 
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>, s: Shortcut) => {

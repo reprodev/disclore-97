@@ -94,3 +94,79 @@
     page-break-after: avoid;
   }
 }
+
+/*
+ * Printing the Research Notebook. While the notebook is open it puts `notes-printing` on <body>.
+ * In print, the desktop, taskbar, other dialogs, and the notebook's own title bar, selector, pad,
+ * and buttons are hidden, and only its notes page prints, in dark ink on ivory paper.
+ */
+@media print {
+  body.notes-printing,
+  body.notes-printing .desktop,
+  body.notes-printing .desktop__work {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body.notes-printing .desktop > :not(.desktop__work),
+  body.notes-printing .desktop__work > :not(.modal-layer),
+  body.notes-printing .modal-layer:not(:has(.notebook-dialog)) {
+    display: none;
+  }
+
+  body.notes-printing .modal-layer {
+    position: static;
+    display: block;
+    padding: 0;
+    background: transparent;
+  }
+
+  body.notes-printing .window.notebook-dialog {
+    position: static;
+    display: block;
+    width: auto;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.notes-printing .notebook-dialog .window-title-bar,
+  body.notes-printing .notebook-dialog__body > :not(.notebook-dialog__page) {
+    display: none;
+  }
+
+  body.notes-printing .notebook-dialog .window-content,
+  body.notes-printing .notebook-dialog__body {
+    display: block;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+  }
+
+  body.notes-printing .notebook-dialog__page {
+    display: block;
+    color: var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  body.notes-printing .notebook-dialog__heading {
+    page-break-after: avoid;
+  }
+
+  body.notes-printing .notebook-dialog__print-text {
+    font-size: 11pt;
+    white-space: pre-wrap;
+    word-break: break-word;
+    orphans: 3;
+    widows: 3;
+  }
+}

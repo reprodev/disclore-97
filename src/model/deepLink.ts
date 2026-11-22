@@ -5,12 +5,14 @@
  *   ?disc=<disc_id>&section=<section_id>
  *   ?disc=<disc_id>&view=diagram|timeline|keepmaze|tour|flashcards|gallery
  *   ?topic=<query>
+ *   ?notes=<encoded>   (shared Research Notebook notes, see noteShare.ts)
  *
  * Parsing and resolving are pure and never throw. Anything unknown or malformed is ignored.
  * No React and no DOM.
  */
 import type { DiscManifest } from './manifest';
 import type { View } from './nav';
+import { MAX_SHARE_ENCODED } from './noteShare';
 import { hasTimeline } from './timeline';
 
 export const DEEP_VIEWS = ['diagram', 'timeline', 'keepmaze', 'tour', 'flashcards', 'gallery'] as const;
@@ -21,6 +23,8 @@ export interface DeepLink {
   section?: string;
   view?: DeepView;
   topic?: string;
+  /** The raw ?notes= value. It is only checked for its alphabet and length here: decodeNotes() does the rest. */
+  notes?: string;
 }
 
 const MAX_ID = 200;
@@ -52,15 +56,18 @@ export function parseDeepLink(search: string): DeepLink {
   const section = id(params.get('section'));
   const view = params.get('view')?.trim().toLowerCase();
   const t = topic(params.get('topic'));
+  const n = params.get('notes')?.trim();
   if (disc) out.disc = disc;
   if (section) out.section = section;
   if (view && (DEEP_VIEWS as readonly string[]).includes(view)) out.view = view as DeepView;
   if (t) out.topic = t;
+  if (n && n.length <= MAX_SHARE_ENCODED && /^[A-Za-z0-9_-]+$/.test(n)) out.notes = n;
   return out;
 }
 
 /** Whether the link asks for anything at all. */
-export const hasDeepLink = (link: DeepLink): boolean => link.disc !== undefined || link.topic !== undefined;
+export const hasDeepLink = (link: DeepLink): boolean =>
+  link.disc !== undefined || link.topic !== undefined || link.notes !== undefined;
 
 /**
  * Where a link points among the mounted discs. Null when the disc is unknown. An unknown section,
