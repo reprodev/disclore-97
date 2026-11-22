@@ -152,10 +152,15 @@ The next pass tidied the multimedia controls and gave the app a fuller 1997 soun
 
 Kiro shaped the project at three levels.
 
-- **Steering.** `.kiro/steering/disclore-97-design-system.md` is one always-included file. It sets the Win95 look, the procedural-audio rules, the manifest and dungeon invariants, and the deployment rules. Every later change was held to it, and two static tests turned its rules into checks that fail the build.
+- **Steering.** Two always-included files. `.kiro/steering/disclore-97-design-system.md` sets the Win95 look, the procedural-audio rules, the manifest and dungeon invariants, and the deployment rules. `.kiro/steering/disclore-97-architecture.md` was added later and codifies the layering: the pure compiler (no fetch, DOM, or React), the SSRF and safe-media rules, and the requirement that `/api/extract` and `/api/topic` stay in sync between `functions/api/` and `vite.config.ts`. Two static tests turn the rules into checks that fail the build.
+- **Hooks.** Two agent hooks in `.kiro/hooks/` run on file save: the static scans (`tests/static.test.ts` and `tests/dynamic-static.test.ts`) when anything under `src/` is saved, and the property tests (`tests/properties/`) when a file under `src/model/` or `src/discs/` is saved. A rule break shows up seconds after the edit, not at the end of a pass.
 - **Specs.** Two specs in `.kiro/specs/` drove the large features, each with requirements, design, and a dependency-ordered task list. `disclore-97-core` produced the app, the validator, the BFS solver, and the two built-in discs. `dynamic-disc-compiler` produced Burn New CD-R Disc: source adapters, the seeded compiler, the library, and 25 correctness properties.
 - **Default-mode passes.** Everything after the specs was done as iterative conversations in Kiro's default mode: the Win95 desktop and boot splash, the 1997 palette, blueprint diagrams, the dev middleware, the multimedia experience, Wikipedia topics, and the soundscape. Each pass was small, ended with the same three commands (`npm test`, `npm run build`, `npm run lint`), and was held to the steering file and the static tests. When a pass hit a rule, such as the ban on stray absolute URLs in `src/`, the fix was made to fit the rule rather than to bend it.
-## 14. Verification today
+## 14. Disc images
+
+A disc is only a manifest, so it can live in a file. File > Save Disc Image (.json) downloads the open disc, and Mount Disc Image (.json)... (in the File menu and under Utilities on the Home window) loads one back. The mount path trusts nothing: `JSON.parse`, then `loadDisc(parsed, false)`, the gate every burned disc already passes. Rejections (bad JSON, the wrong shape, an unsafe picture address, an unsolvable dungeon, an ID that collides with a built-in disc, or a file over 5 MB) show a Win95 message box and mount nothing. The test suite round-trips every built-in disc and a burned disc with pictures, then tries malformed and hostile files.
+
+## 15. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance

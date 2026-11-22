@@ -198,3 +198,47 @@
   display: flex;
   justify-content: flex-end;
 }
+
+/* Win95 message box: Mount Disc Image errors and similar notices. */
+.window.message-dialog {
+  width: min(480px, 100%);
+  max-height: 100%;
+}
+
+.message-dialog .window-content {
+  overflow: auto;
+}
+
+.message-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.message-dialog__message,
+.message-dialog__footnote {
+  margin: 0;
+}
+
+.message-dialog__details {
+  margin: 0;
+  padding: 6px 8px 6px 22px;
+  max-height: 140px;
+  overflow: auto;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.message-dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.disc-image-input {
+  display: none;
+}

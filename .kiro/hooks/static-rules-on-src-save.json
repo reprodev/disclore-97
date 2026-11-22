@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Static rules check on src save",
+      "trigger": "PostFileSave",
+      "description": "When a file under src/ is saved, run the two static repository scans (hex colors only in tokens.css, border-radius 0, no gradients or blur, AudioContext only in src/audio, no stray absolute URLs, compiler purity).",
+      "matcher": "(^|[\\\\/])src[\\\\/]",
+      "action": {
+        "type": "command",
+        "command": "npx vitest run tests/static.test.ts tests/dynamic-static.test.ts",
+        "timeout": 120
+      }
+    }
+  ]
+}

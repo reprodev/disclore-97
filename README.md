@@ -45,7 +45,7 @@ src/
   adapters/    Source readers for Burn New CD-R Disc: github, webpage, topic, markdown, burn.
   extract/     Server-side logic shared by the Pages Functions: SSRF guard, HTML extractor,
                /api/extract handler, /api/topic handler.
-  library/     localStorage persistence for burned discs.
+  library/     localStorage persistence for burned discs, and disc image (.json) save and mount.
   audio/       The only code that touches AudioContext (effects and ambience), plus Web Speech narration.
   components/  Win95 components: windows, viewers, MediaReel, Picture Viewer, KeepMaze UI.
   discs/       The two built-in discs and the loader.
@@ -79,6 +79,15 @@ Four source kinds are supported:
 | **webpage** | A public web page, fetched through `/api/extract`. The text and safe `og:image`, `twitter:image`, and `<img>` pictures are extracted. |
 | **topic** | A free-text topic, looked up on English Wikipedia through `/api/topic`. The article text, section headings, and pictures become a disc. |
 | **markdown** | Markdown text you paste in. |
+
+### Save and mount disc images
+
+Any disc can be exported and shared as a plain `.json` file.
+
+- **File > Save Disc Image (.json)** (when a disc is open) downloads the disc's manifest as `<disc_id>.json`.
+- **File > Mount Disc Image (.json)...**, or the **Mount Disc Image** card under Utilities on the Home window, opens a file picker. The file goes through `JSON.parse` and then `loadDisc(parsed, false)`, the same validator and BFS solver every burned disc passes, including the safe-media rules. A file that is not JSON, not a disc, too large (over 5 MB), reuses a built-in disc's ID, or fails validation is rejected with a Win95 message box that lists the first problems, and nothing is mounted. A valid disc opens and is added to the `localStorage` library.
+
+Because a disc image is just the manifest, it works offline and can be edited by hand. The validator is the only gatekeeper, so treat images from other people like any other downloaded file.
 
 **Topic fallback.** If the lookup fails (offline, no matching article, a disambiguation page, or no `/api/topic` function), the burn still succeeds. It builds an **offline study outline** that says plainly that it is an outline and not an encyclopedia article.
 

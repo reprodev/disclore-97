@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FetchLike } from './adapters/types';
 import { ambienceKindFor, playBurnComplete, playSpinUp, setAmbienceKind } from './audio/audio';
 import { BurnDialog } from './components/BurnDialog';
@@ -7,6 +7,7 @@ import { BootSplash } from './components/BootSplash';
 import { DesktopIcons } from './components/DesktopIcons';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
+import { MessageDialog } from './components/MessageDialog';
 import { HotspotViewer } from './components/HotspotViewer';
 import { KeepMazeUI } from './components/KeepMazeUI';
 import { NotepadWindow } from './components/NotepadWindow';
@@ -15,6 +16,14 @@ import type { ActiveWindowInfo } from './components/Taskbar';
 import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
+import {
+  MAX_IMAGE_BYTES,
+  discImageFileName,
+  parseDiscImage,
+  readFileText,
+  saveTextFile,
+  serializeDiscImage,
+} from './library/discImage';
 import type { StorageLike } from './library/discLibrary';
 import type { DiscManifest, ValidationError } from './model/manifest';
 import {
@@ -87,6 +96,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
   const [burnOpen, setBurnOpen] = useState(false);
   const [saveNotice, setSaveNotice] = useState(false);
+  /** A notice about a disc image that could not be mounted or saved, shown as a Win95 message box. */
+  const [imageNotice, setImageNotice] = useState<{ title: string; message: string; details: string[]; footnote?: string } | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const { discs, failures, removable } = useMemo(() => {
     const ok: DiscManifest[] = [];
@@ -133,6 +145,57 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     playBurnComplete();
     setBurnOpen(false);
   };
+  /** Saves the open disc as a .json disc image download. */
+  const saveImage = () => {
+    if (!disc) return;
+    if (!saveTextFile(discImageFileName(disc), serializeDiscImage(disc))) {
+      setImageNotice({
+        title: 'Save Disc Image',
+        message: 'This browser could not save the disc image file.',
+        details: [],
+      });
+    }
+  };
+
+  const openImagePicker = () => imageInputRef.current?.click();
+
+  /** Mounts a chosen .json disc image: parse, validate, add to the library, and open it. */
+  const mountImage = async (file: File) => {
+    const reject = (message: string, details: string[] = [], footnote?: string) =>
+      setImageNotice({ title: 'Mount Disc Image', message, details, ...(footnote ? { footnote } : {}) });
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      reject('That file is too large to be a disc image.');
+      return;
+    }
+    let text: string;
+    try {
+      text = await readFileText(file);
+    } catch {
+      reject('The file could not be read.');
+      return;
+    }
+    const parsed = parseDiscImage(text);
+    if (!parsed.ok) {
+      const shown = parsed.errors.map((e) => `${e.path}: ${e.message}`);
+      reject(parsed.message, shown, parsed.errors.length > 0 ? 'Nothing was mounted.' : undefined);
+      return;
+    }
+    const m = parsed.manifest;
+    const builtIn = discSources.some(
+      (s) => typeof s === 'object' && s !== null && (s as { disc_id?: unknown }).disc_id === m.disc_id,
+    );
+    if (builtIn) {
+      reject(`This disc image has the same ID ("${m.disc_id}") as a built-in disc, so it cannot be mounted.`);
+      return;
+    }
+    setBurned((b) => [...b.filter((x) => x.disc_id !== m.disc_id), m]);
+    const saved = library.save(m);
+    setSaveNotice(!saved.saved);
+    openDisc(m.disc_id);
+    playSpinUp();
+  };
+
   const removeDisc = (discId: string) => {
     library.remove(discId);
     setBurned((b) => b.filter((x) => x.disc_id !== discId));
@@ -263,6 +326,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onOpenReadMe={openReadMe}
           onReplaySplash={() => setStage('splash')}
           onBurnNew={() => setBurnOpen(true)}
+          onSaveImage={saveImage}
+          onMountImage={openImagePicker}
           onRemoveDisc={removeDisc}
           removableIds={removable}
         />
@@ -278,6 +343,28 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           <p role="status" className="app-not-found">
             The disc is open, but it could not be saved to this browser.
           </p>
+        ) : null}
+        <input
+          ref={imageInputRef}
+          type="file"
+          className="disc-image-input"
+          accept=".json,application/json"
+          aria-label="Mount Disc Image file"
+          tabIndex={-1}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = '';
+            if (file) void mountImage(file);
+          }}
+        />
+        {imageNotice ? (
+          <MessageDialog
+            title={imageNotice.title}
+            message={imageNotice.message}
+            details={imageNotice.details}
+            footnote={imageNotice.footnote}
+            onClose={() => setImageNotice(null)}
+          />
         ) : null}
         {readMeOpen ? (
           <NotepadWindow

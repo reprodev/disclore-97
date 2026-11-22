@@ -47,6 +47,10 @@ export interface DiscBrowserProps {
   onMinimize?: () => void;
   /** Opens the Burn dialog. Omit to hide the File menu item and the launcher buttons. */
   onBurnNew?: () => void;
+  /** Saves the open disc as a .json disc image. Omit to hide the File menu item. */
+  onSaveImage?: () => void;
+  /** Opens the file picker to mount a .json disc image. Omit to hide the menu item and launcher card. */
+  onMountImage?: () => void;
   /** Removes a burned disc from the library. */
   onRemoveDisc?: (discId: string) => void;
   /** Ids of burned discs that may be removed. */
@@ -91,6 +95,8 @@ export function DiscBrowser({
   onOpenReadMe,
   onReplaySplash,
   onBurnNew,
+  onSaveImage,
+  onMountImage,
   onRemoveDisc,
   removableIds,
 }: DiscBrowserProps) {
@@ -138,6 +144,8 @@ export function DiscBrowser({
                 items: [
                   { label: 'Load Disc...', onSelect: () => setLoadOverId(disc.disc_id) },
                   ...(onBurnNew ? [{ label: 'Burn New Disc...', onSelect: onBurnNew }] : []),
+                  ...(onSaveImage ? [{ label: 'Save Disc Image (.json)', onSelect: onSaveImage }] : []),
+                  ...(onMountImage ? [{ label: 'Mount Disc Image (.json)...', onSelect: onMountImage }] : []),
                   { label: 'Close Disc', onSelect: onCloseDisc },
                 ],
               },
@@ -232,6 +240,7 @@ export function DiscBrowser({
         onOpenReadMe={onOpenReadMe}
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
+        onMountImage={onMountImage}
         minimized={minimized}
         onMinimize={onMinimize}
       />

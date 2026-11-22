@@ -19,6 +19,8 @@ export interface HomeLauncherProps {
   onReplaySplash?: () => void;
   /** Opens the Burn dialog. Omit to disable the card. */
   onBurnNew?: () => void;
+  /** Opens the file picker to mount a .json disc image. Omit to hide the card. */
+  onMountImage?: () => void;
   /** Hides the Home window without closing it. The parent owns this state. */
   minimized?: boolean;
   onMinimize?: () => void;
@@ -83,6 +85,7 @@ export function HomeLauncher({
   onOpenReadMe,
   onReplaySplash,
   onBurnNew,
+  onMountImage,
   minimized = false,
   onMinimize,
 }: HomeLauncherProps) {
@@ -147,6 +150,14 @@ export function HomeLauncher({
                   text="Turn a GitHub repo, web page, or topic into a disc."
                   onClick={onBurnNew}
                 />
+                {onMountImage ? (
+                  <Card
+                    icon="cd"
+                    title="Mount Disc Image (.json)..."
+                    text="Open a disc you saved earlier, from a file on this computer."
+                    onClick={onMountImage}
+                  />
+                ) : null}
                 <Card
                   icon="notepad"
                   title="About / ReadMe.txt"

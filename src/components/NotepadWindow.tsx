@@ -17,7 +17,11 @@ Compile your own disc from:
 - A web page address (the text and pictures are read by a small server function).
 - A topic. The topic is looked up on English Wikipedia and built into a disc with its text and pictures. If you are offline, or nothing matches, you get an offline study outline instead, and it says so.
 - Markdown text that you paste in.
-Burned discs are checked by the same safety checks as the built-in ones, then kept in this browser (up to 10 discs). They never leave your device.
+Burned discs are checked by the same safety checks as the built-in ones, then kept in this browser (up to 10 discs). They never leave your device unless you save one.
+
+DISC IMAGES
+- File > Save Disc Image (.json) writes the open disc to a file on your computer.
+- File > Mount Disc Image (.json)..., or the Mount Disc Image card on the Home window, opens a saved file. It runs the same safety checks as a burned disc. If the file is not valid JSON, is not a disc, or holds anything unsafe (for example a picture that is not a public secure image address), a message box says why and nothing is mounted. A valid disc opens and is added to the library.
 
 READING
 - Chronology strip: dated entries for the article, laid out along a timeline.

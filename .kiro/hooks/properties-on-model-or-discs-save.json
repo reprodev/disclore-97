@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Property tests on model or discs save",
+      "trigger": "PostFileSave",
+      "description": "When a file under src/model/ or src/discs/ is saved, run the property-based tests in tests/properties/ (validator, solver, game, and compiler properties).",
+      "matcher": "(^|[\\\\/])src[\\\\/](model|discs)[\\\\/]",
+      "action": {
+        "type": "command",
+        "command": "npx vitest run tests/properties/",
+        "timeout": 180
+      }
+    }
+  ]
+}
