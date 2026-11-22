@@ -12,7 +12,7 @@ import { BootSplash } from '../../src/components/BootSplash';
 import { DidYouKnow } from '../../src/components/DidYouKnow';
 import { Taskbar } from '../../src/components/Taskbar';
 import type { StorageLike } from '../../src/library/discLibrary';
-import { HAUNTED_CLASS, SOLSTICE_CLASS, THEME_KEY, applyTheme, loadTheme, nextTheme, saveTheme } from '../../src/library/theme';
+import { HAUNTED_CLASS, CHRISTMAS_CLASS, THEME_KEY, applyTheme, loadTheme, nextTheme, saveTheme } from '../../src/library/theme';
 import { DEEP_VIEWS, hasDeepLink, parseDeepLink, resolveDeepLink, shareQuery, topicQuery } from '../../src/model/deepLink';
 import { EDITIONS, THEMES, editionOf, prefersDisc } from '../../src/model/editions';
 import type { DiscManifest } from '../../src/model/manifest';
@@ -93,7 +93,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   Reflect.deleteProperty(navigator, 'clipboard');
-  root.classList.remove(HAUNTED_CLASS, SOLSTICE_CLASS);
+  root.classList.remove(HAUNTED_CLASS, CHRISTMAS_CLASS);
   __setContextFactory(null);
 });
 
@@ -246,11 +246,11 @@ describe('Start menu', () => {
     await user.click(item(/^Edition Switcher/));
     const sub = within(startMenu()).getByRole('menu', { name: 'Edition Switcher' });
     const radios = within(sub).getAllByRole('menuitemradio');
-    expect(radios.map((r) => r.textContent!.replace('\u2022', ''))).toEqual(["Classic '97", 'Haunted Edition', 'Winter Solstice']);
+    expect(radios.map((r) => r.textContent!.replace('\u2022', ''))).toEqual(["Classic '97", 'Haunted Edition', 'Christmas Edition']);
     expect(radios.map((r) => r.getAttribute('aria-checked'))).toEqual(['true', 'false', 'false']);
     await user.click(radios[2]!);
-    expect(root.classList.contains(SOLSTICE_CLASS)).toBe(true);
-    expect(storage.map.get(THEME_KEY)).toBe('solstice');
+    expect(root.classList.contains(CHRISTMAS_CLASS)).toBe(true);
+    expect(storage.map.get(THEME_KEY)).toBe('christmas');
     await openStart(user);
     await user.click(item(/^Edition Switcher/));
     const again = within(within(startMenu()).getByRole('menu', { name: 'Edition Switcher' })).getAllByRole('menuitemradio');
@@ -499,9 +499,12 @@ describe('edition storage', () => {
     expect(loadTheme(s)).toBe('classic');
     s.setItem(THEME_KEY, 'haunted');
     expect(loadTheme(s)).toBe('haunted');
-    saveTheme(s, 'solstice');
-    expect(s.map.get(THEME_KEY)).toBe('solstice');
-    expect(loadTheme(s)).toBe('solstice');
+    saveTheme(s, 'christmas');
+    expect(s.map.get(THEME_KEY)).toBe('christmas');
+    expect(loadTheme(s)).toBe('christmas');
+    // The Winter Solstice edition became the Christmas Edition: an old save still loads, as Christmas.
+    s.setItem(THEME_KEY, 'solstice');
+    expect(loadTheme(s)).toBe('christmas');
     saveTheme(s, 'classic');
     expect(s.map.has(THEME_KEY)).toBe(false);
     for (const bad of ['', 'classic', 'Haunted', 'winter', '{"x":1}']) {
@@ -515,18 +518,18 @@ describe('edition storage', () => {
   it('applyTheme keeps exactly one edition class on the element', () => {
     const el = document.createElement('div');
     applyTheme(el, 'haunted');
-    expect([HAUNTED_CLASS, SOLSTICE_CLASS].filter((c) => el.classList.contains(c))).toEqual([HAUNTED_CLASS]);
-    applyTheme(el, 'solstice');
-    expect([HAUNTED_CLASS, SOLSTICE_CLASS].filter((c) => el.classList.contains(c))).toEqual([SOLSTICE_CLASS]);
+    expect([HAUNTED_CLASS, CHRISTMAS_CLASS].filter((c) => el.classList.contains(c))).toEqual([HAUNTED_CLASS]);
+    applyTheme(el, 'christmas');
+    expect([HAUNTED_CLASS, CHRISTMAS_CLASS].filter((c) => el.classList.contains(c))).toEqual([CHRISTMAS_CLASS]);
     applyTheme(el, 'classic');
-    expect(el.classList.contains(HAUNTED_CLASS) || el.classList.contains(SOLSTICE_CLASS)).toBe(false);
+    expect(el.classList.contains(HAUNTED_CLASS) || el.classList.contains(CHRISTMAS_CLASS)).toBe(false);
   });
 
-  it('cycles Classic, Haunted, Winter Solstice, and back', () => {
-    expect([...THEMES]).toEqual(['classic', 'haunted', 'solstice']);
+  it('cycles Classic, Haunted, Christmas Edition, and back', () => {
+    expect([...THEMES]).toEqual(['classic', 'haunted', 'christmas']);
     expect(nextTheme('classic')).toBe('haunted');
-    expect(nextTheme('haunted')).toBe('solstice');
-    expect(nextTheme('solstice')).toBe('classic');
+    expect(nextTheme('haunted')).toBe('christmas');
+    expect(nextTheme('christmas')).toBe('classic');
   });
 });
 
@@ -545,15 +548,15 @@ describe('edition copy and content', () => {
     const b = home('haunted');
     expect(eyebrow()).toBe('Multimedia Encyclopedia \u2022 Haunted Edition');
     b.unmount();
-    home('solstice');
-    expect(eyebrow()).toBe('Multimedia Encyclopedia \u2022 Winter Solstice Edition');
+    home('christmas');
+    expect(eyebrow()).toBe('Multimedia Encyclopedia \u2022 Christmas Edition');
   });
 
   it('the boot splash subtitle follows the edition', () => {
     for (const [theme, text] of [
       ['classic', 'Multimedia Encyclopedia \u2022 1997 Edition'],
       ['haunted', 'Multimedia Encyclopedia \u2022 Haunted Edition'],
-      ['solstice', 'Multimedia Encyclopedia \u2022 Winter Solstice Edition'],
+      ['christmas', 'Multimedia Encyclopedia \u2022 Christmas Edition'],
     ] as const) {
       const { unmount } = render(<BootSplash onDone={() => undefined} edition={theme} />);
       expect(document.querySelector('.boot-subtitle')!.textContent).toBe(text);
@@ -571,11 +574,11 @@ describe('edition copy and content', () => {
     expect(root.classList.contains(HAUNTED_CLASS)).toBe(true);
     expect(eyebrow()).toBe('Multimedia Encyclopedia \u2022 Haunted Edition');
     await user.click(screen.getByRole('button', { name: /Edition: Haunted Edition/ }));
-    expect(root.classList.contains(SOLSTICE_CLASS)).toBe(true);
+    expect(root.classList.contains(CHRISTMAS_CLASS)).toBe(true);
     expect(root.classList.contains(HAUNTED_CLASS)).toBe(false);
-    expect(storage.map.get(THEME_KEY)).toBe('solstice');
-    await user.click(screen.getByRole('button', { name: /Edition: Winter Solstice/ }));
-    expect(root.classList.contains(SOLSTICE_CLASS)).toBe(false);
+    expect(storage.map.get(THEME_KEY)).toBe('christmas');
+    await user.click(screen.getByRole('button', { name: /Edition: Christmas Edition/ }));
+    expect(root.classList.contains(CHRISTMAS_CLASS)).toBe(false);
     expect(storage.map.has(THEME_KEY)).toBe(false);
     await user.click(screen.getByText('Castle Disc'));
     await user.click(screen.getByRole('menuitem', { name: 'View' }));
@@ -587,7 +590,7 @@ describe('edition copy and content', () => {
     const want: Record<string, string[]> = {
       classic: ['Halloween', 'Gothic fiction', 'CD-ROM'],
       haunted: ['Halloween', 'Gothic fiction', 'Ghostlore'],
-      solstice: ['Winter solstice', 'Aurora', 'Lighthouse'],
+      christmas: ['Christmas', 'A Christmas Carol', 'Christmas tree'],
     };
     for (const theme of THEMES) {
       const user = userEvent.setup();
@@ -602,14 +605,14 @@ describe('edition copy and content', () => {
 
   it('a sample burn button asks for that edition topic', async () => {
     const user = userEvent.setup();
-    home('solstice');
+    home('christmas');
     await user.click(screen.getByRole('tab', { name: /^Burned/ }));
-    await user.click(screen.getByRole('button', { name: 'Burn Sample: Aurora' }));
+    await user.click(screen.getByRole('button', { name: 'Burn Sample: A Christmas Carol' }));
     expect(screen.getByRole('dialog', { name: 'Burn New CD-R Disc...' })).toBeTruthy();
   });
 
   describe('Did You Know? bias', () => {
-    const first = (edition: 'classic' | 'haunted' | 'solstice', discs: DiscManifest[]) => {
+    const first = (edition: 'classic' | 'haunted' | 'christmas', discs: DiscManifest[]) => {
       const { container, unmount } = render(<DidYouKnow discs={discs} onOpenSection={() => undefined} random={() => 0} edition={edition} />);
       const text = container.querySelector('.spotlight__fact')!.textContent;
       unmount();
@@ -619,7 +622,7 @@ describe('edition copy and content', () => {
     it('starts from the edition theme disc when one is mounted', () => {
       expect(first('classic', [castles, halloween])).toBe('Moats are ditches of water.');
       expect(first('haunted', [castles, halloween])).toBe('Samhain is celebrated on 31 October.');
-      expect(first('solstice', [halloween, castles])).toBe('Moats are ditches of water.');
+      expect(first('christmas', [halloween, castles])).toBe('Moats are ditches of water.');
       expect(first('classic', [halloween, castles])).toBe('Samhain is celebrated on 31 October.');
     });
 
@@ -639,8 +642,10 @@ describe('edition copy and content', () => {
     it('prefersDisc matches built-in ids and burned discs by title', () => {
       expect(prefersDisc('haunted', 'halloween', 'x')).toBe(true);
       expect(prefersDisc('haunted', 'burned-1', 'Gothic fiction')).toBe(true);
-      expect(prefersDisc('solstice', 'burned-2', 'Winter solstice')).toBe(true);
-      expect(prefersDisc('solstice', 'castles', 'Castle Disc')).toBe(true);
+      expect(prefersDisc('christmas', 'burned-2', 'A Christmas Carol')).toBe(true);
+      expect(prefersDisc('christmas', 'burned-3', 'History of the Yule log')).toBe(true);
+      expect(prefersDisc('christmas', 'castles', 'Castle Disc')).toBe(true);
+      expect(prefersDisc('christmas', 'retro-dialup', 'Retro Computing')).toBe(false);
       expect(prefersDisc('classic', 'halloween', 'Halloween')).toBe(false);
       expect(editionOf('classic').themeDiscIds).toEqual([]);
     });
@@ -657,7 +662,7 @@ describe('Edition tokens', () => {
   const vars = (text: string) => new Map(Array.from(text.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)).map((m) => [m[1]!, m[2]!.trim()]));
   const classic = vars(css.slice(0, css.indexOf('}')));
   const haunted = vars(blockOf(':root.theme-haunted'));
-  const solstice = vars(blockOf(':root.theme-solstice'));
+  const christmas = vars(blockOf(':root.theme-christmas'));
 
   const luminance = (hex: string) => {
     const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
@@ -668,22 +673,22 @@ describe('Edition tokens', () => {
     return (hi! + 0.05) / (lo! + 0.05);
   };
 
-  it('Winter Solstice overrides only existing tokens, and the same set as Haunted', () => {
-    for (const name of solstice.keys()) expect(classic.has(name), name).toBe(true);
-    expect([...solstice.keys()].sort()).toEqual([...haunted.keys()].sort());
-    for (const [name, value] of solstice) {
+  it('Christmas Edition overrides only existing tokens, and the same set as Haunted', () => {
+    for (const name of christmas.keys()) expect(classic.has(name), name).toBe(true);
+    expect([...christmas.keys()].sort()).toEqual([...haunted.keys()].sort());
+    for (const [name, value] of christmas) {
       if (name.startsWith('--color-')) expect(value, name).toMatch(/^#[0-9A-Fa-f]{6}$/);
     }
   });
 
-  it('Winter Solstice differs from Classic in its main tokens: evergreen, frost-ivory, hearth gold', () => {
+  it('Christmas Edition differs from Classic in its main tokens: evergreen pine, frost-ivory, candle gold, cranberry', () => {
     for (const name of ['--color-title-bg', '--color-desktop', '--color-paper', '--color-gold', '--color-crimson', '--color-surface']) {
-      expect(solstice.get(name), name).not.toBe(classic.get(name));
-      expect(solstice.get(name), name).not.toBe(haunted.get(name));
+      expect(christmas.get(name), name).not.toBe(classic.get(name));
+      expect(christmas.get(name), name).not.toBe(haunted.get(name));
     }
     // Evergreen: the green channel leads on the title bar and the desktop.
     for (const name of ['--color-title-bg', '--color-desktop']) {
-      const [r, g, b] = [1, 3, 5].map((i) => parseInt(solstice.get(name)!.slice(i, i + 2), 16));
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(christmas.get(name)!.slice(i, i + 2), 16));
       expect(g!).toBeGreaterThan(r!);
       expect(g!).toBeGreaterThan(b!);
     }
@@ -691,7 +696,7 @@ describe('Edition tokens', () => {
 
   it.each([
     ['Haunted', () => haunted],
-    ['Winter Solstice', () => solstice],
+    ['Christmas Edition', () => christmas],
   ])('%s keeps ink, title text, and crimson above 7:1 contrast', (_name, get) => {
     const t = (n: string) => get().get(n)!;
     for (const surface of ['--color-paper', '--color-surface', '--color-tooltip-bg', '--color-parchment', '--color-gold-light']) {
@@ -704,6 +709,6 @@ describe('Edition tokens', () => {
   });
 
   it('adds no radius, gradient, blur, or box-shadow', () => {
-    expect(blockOf(':root.theme-solstice')).not.toMatch(/radius|gradient|blur|box-shadow/i);
+    expect(blockOf(':root.theme-christmas')).not.toMatch(/radius|gradient|blur|box-shadow/i);
   });
 });

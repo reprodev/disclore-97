@@ -268,12 +268,13 @@ export function playChime(): void {
       noise(c, 'lowpass', 320, t, 0.9, 0.06);
       return;
     }
-    if (edition === 'solstice') {
-      // Crisp, crystalline fifths.
+    if (edition === 'christmas') {
+      // Crisp, celebratory bell fifths, with a sleigh-bell sparkle on top.
       crystal(c, 783.99, t, 0.5, 0.26);
       crystal(c, 1174.66, t + 0.1, 0.5, 0.26);
       crystal(c, 1567.98, t + 0.2, 0.7, 0.24);
       crystal(c, 2349.32, t + 0.3, 0.9, 0.18);
+      noise(c, 'highpass', 7000, t + 0.3, 0.35, 0.05, true);
       return;
     }
     warmChord(c, [523.25], t, 0.16, 0.32);
@@ -285,7 +286,7 @@ export function playChime(): void {
 
 /**
  * Played when the edition changes. Classic '97 is a warm major triad, the Haunted Edition a minor bell
- * chime, and Winter Solstice a crystalline fifth.
+ * chime, and the Christmas Edition a crisp, celebratory bell fifth.
  */
 export function playEditionSwitch(next: Theme): void {
   play((c, t) => {
@@ -294,7 +295,7 @@ export function playEditionSwitch(next: Theme): void {
       bell(c, 261.63, t + 0.14, 1.2, 0.24);
       bell(c, 329.63, t + 0.28, 1.4, 0.22);
       bell(c, 110, t, 1.6, 0.18);
-    } else if (next === 'solstice') {
+    } else if (next === 'christmas') {
       crystal(c, 1046.5, t, 0.9, 0.28);
       crystal(c, 1567.98, t, 1.0, 0.24);
       crystal(c, 2093, t + 0.12, 0.8, 0.14);
@@ -418,7 +419,7 @@ function editionLayer(c: AudioContext, bus: GainNode): void {
     ambienceDrone(c, bus, 'sine', 73.42 * 2.76, 0.03);
     const wind = ambienceNoise(c, bus, 'bandpass', 380, 0.2);
     ambienceLfo(c, wind.filter.frequency, 0.07, 160);
-  } else if (edition === 'solstice') {
+  } else if (edition === 'christmas') {
     const fifth = ambienceDrone(c, bus, 'sine', 523.25, 0.04);
     ambienceLfo(c, fifth.gain, 0.12, 0.015);
     ambienceDrone(c, bus, 'sine', 783.99, 0.03);

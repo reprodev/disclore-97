@@ -142,62 +142,66 @@
 
 
 /*
- * Winter Solstice Edition. Switched on by the `theme-solstice` class on <html> (View > Edition).
- * Deep evergreen desktop and title bars, frost-ivory paper, pale frost-green window surfaces, hearth-gold
- * accents, and holly-berry crimson. Ink stays near black, so ink on every surface and light text on the
- * title bar keep a contrast ratio above 7:1. Token names are unchanged: only values differ.
+ * Christmas Edition. Switched on by the `theme-christmas` class on <html> (View > Edition).
+ * A 1997 holiday CD-ROM: evergreen-pine desktop and title bars, a starry winter-night sky, frost-ivory
+ * paper, pale pine-frost window surfaces, warm candle-gold accents, and cranberry and holly crimson.
+ * Ink stays near black, so ink on every surface and light text on the title bar keep a contrast ratio
+ * above 7:1. Token names are unchanged: only values differ.
  */
-:root.theme-solstice {
-  --color-surface: #B9C7BE;
-  --color-title-bg: #0F3D2E;
-  --color-title-text: #F6F9F2;
-  --color-bevel-hi: #EAF1EC;
-  --color-bevel-shadow: #5A6E63;
+:root.theme-christmas {
+  --color-surface: #C2D1C5;
+  --color-title-bg: #134A30;
+  --color-title-text: #FFF8EC;
+  --color-bevel-hi: #EEF4EF;
+  --color-bevel-shadow: #5B7064;
   --color-bevel-edge: #050A07;
-  --color-tooltip-bg: #F8EBC4;
+  --color-tooltip-bg: #FBEFCC;
 
-  --color-desktop: #0A2A20;
-  --color-paper: #F1F5EF;
-  --color-ink: #070D0A;
-  --color-parchment: #DDE6DC;
-  --color-parchment-dark: #A9BBAE;
-  --color-watermark-ink: #8FA396;
-  --color-parchment-tint: #CBD8CD;
+  --color-desktop: #0B2A1C;
+  --color-paper: #FBF6EC;
+  --color-ink: #0A0E0B;
+  --color-parchment: #EDE5D0;
+  --color-parchment-dark: #B9AD8C;
+  --color-watermark-ink: #9C9A80;
+  --color-parchment-tint: #DFD7BF;
 
-  --color-stone-light: #C4D0C8;
-  --color-stone: #8DA095;
-  --color-stone-dark: #4F6157;
+  --color-stone-light: #C9D3CB;
+  --color-stone: #8E9F93;
+  --color-stone-dark: #4C5E52;
 
-  /* Hearth gold */
-  --color-gold-light: #F2CB78;
-  --color-gold: #D9A03A;
-  --color-gold-dark: #7F5412;
+  /* Warm candle gold */
+  --color-gold-light: #F5C76A;
+  --color-gold: #DC9C2E;
+  --color-gold-dark: #7A4E0E;
 
-  /* Holly berry */
-  --color-crimson-light: #B8404F;
-  --color-crimson: #7A1823;
-  --color-crimson-dark: #441017;
+  /* Cranberry and holly crimson */
+  --color-crimson-light: #C23A4E;
+  --color-crimson: #8C1430;
+  --color-crimson-dark: #4A0C18;
 
-  --color-forest-light: #4FA06A;
-  --color-forest: #1A5A3A;
-  --color-forest-dark: #0C3320;
+  /* Evergreen pine */
+  --color-forest-light: #3F9A5E;
+  --color-forest: #175A36;
+  --color-forest-dark: #0B341F;
 
-  --color-night: #0A2A20;
-  --color-night-light: #14503D;
-  --color-console-bg: #123F31;
-  --color-console-text: #F6F9F2;
-  --color-console-accent: #F2CB78;
-  --color-console-dim: #D9A03A;
-  --color-dungeon-bg: #101C17;
-  --color-dungeon-stone: #3B4A42;
-  --color-flame: #F08A24;
-  --color-flame-hot: #FFD966;
+  /* Starry winter night */
+  --color-night: #0B1A2C;
+  --color-night-light: #1A3350;
+  --color-console-bg: #123A28;
+  --color-console-text: #FFF8EC;
+  --color-console-accent: #F5C76A;
+  --color-console-dim: #DC9C2E;
+  --color-dungeon-bg: #10191A;
+  --color-dungeon-stone: #3A4744;
+  --color-flame: #F28A1E;
+  --color-flame-hot: #FFD860;
 
   /* Crisp, airy serif with open letter-spacing on the masthead */
   --font-display: Cambria, "Book Antiqua", Georgia, serif;
   --display-tracking: 0.16em;
   --display-weight: normal;
 }
+
 
 * {
   border-radius: 0;

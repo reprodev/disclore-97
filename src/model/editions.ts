@@ -3,10 +3,20 @@
  * Pure data and functions. No React and no DOM.
  */
 
-export type Theme = 'classic' | 'haunted' | 'solstice';
+export type Theme = 'classic' | 'haunted' | 'christmas';
 
 /** The order the Edition control cycles through. */
-export const THEMES: readonly Theme[] = ['classic', 'haunted', 'solstice'];
+export const THEMES: readonly Theme[] = ['classic', 'haunted', 'christmas'];
+
+/** Edition ids from earlier versions, and the edition each one became. */
+export const LEGACY_THEMES: Readonly<Record<string, Theme>> = { solstice: 'christmas' };
+
+/** Any value to a known edition: a current id, a legacy id, or else Classic '97. Never throws. */
+export function toTheme(value: unknown): Theme {
+  if (typeof value !== 'string') return 'classic';
+  if ((THEMES as readonly string[]).includes(value)) return value as Theme;
+  return LEGACY_THEMES[value] ?? 'classic';
+}
 
 export interface SampleBurn {
   label: string;
@@ -15,7 +25,7 @@ export interface SampleBurn {
 
 export interface Edition {
   id: Theme;
-  /** Short name used in menus: "Classic '97", "Haunted Edition", "Winter Solstice". */
+  /** Short name used in menus: "Classic '97", "Haunted Edition", "Christmas Edition". */
   name: string;
   /** Line above the DISCLORE 97 title on the Home window. */
   eyebrow: string;
@@ -50,27 +60,28 @@ export const EDITIONS: Record<Theme, Edition> = {
     themeDiscIds: ['halloween'],
     themeWords: /halloween|samhain|ghost|gothic|haunt|folklore|spook|vampire|witch/i,
   },
-  solstice: {
-    id: 'solstice',
-    name: 'Winter Solstice',
-    eyebrow: 'Multimedia Encyclopedia \u2022 Winter Solstice Edition',
-    bootSubtitle: 'Multimedia Encyclopedia \u2022 Winter Solstice Edition',
-    sampleBurns: [burn('Winter solstice'), burn('Aurora'), burn('Lighthouse')],
-    // Keeps and hearths: the built-in disc closest to a winter fortress.
+  christmas: {
+    id: 'christmas',
+    name: 'Christmas Edition',
+    eyebrow: 'Multimedia Encyclopedia \u2022 Christmas Edition',
+    bootSubtitle: 'Multimedia Encyclopedia \u2022 Christmas Edition',
+    sampleBurns: [burn('Christmas'), burn('A Christmas Carol'), burn('Christmas tree')],
+    // Festive, historic, and castle discs: great halls and feasts suit the season.
     themeDiscIds: ['castles'],
-    themeWords: /solstice|winter|aurora|lighthouse|snow|frost|yule|hearth/i,
+    themeWords: /christmas|yule|carol|advent|nativity|festive|holiday|winter|snow|castle|keep|histor/i,
   },
 };
 
-export const editionOf = (theme: Theme): Edition => EDITIONS[theme];
+/** The edition's copy and content. An unknown or legacy id gets its replacement, or Classic '97, so this never returns undefined. */
+export const editionOf = (theme: Theme): Edition => EDITIONS[toTheme(theme)];
 
 /** The edition after this one, wrapping around. */
 export function nextTheme(theme: Theme): Theme {
-  return THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]!;
+  return THEMES[(THEMES.indexOf(toTheme(theme)) + 1) % THEMES.length]!;
 }
 
 /** Whether a disc suits the edition (by id, or by words in its title). The classic edition prefers none. */
 export function prefersDisc(theme: Theme, discId: string, discTitle: string): boolean {
-  const e = EDITIONS[theme];
+  const e = editionOf(theme);
   return e.themeDiscIds.includes(discId) || (e.themeWords !== null && e.themeWords.test(discTitle));
 }

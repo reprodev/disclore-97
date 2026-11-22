@@ -55,7 +55,7 @@ afterEach(() => {
   stopAmbience();
   setMuted(false);
   __setContextFactory(null);
-  document.documentElement.classList.remove('theme-haunted', 'theme-solstice');
+  document.documentElement.classList.remove('theme-haunted', 'theme-christmas', 'theme-solstice');
 });
 
 // ---- Artwork ----------------------------------------------------------------------------------
@@ -98,16 +98,29 @@ describe('HeroArt per edition', () => {
     expect(svg.innerHTML).toContain('var(--color-gold-light)'); // the amber moon
   });
 
-  it('Winter Solstice draws pines, a stepped aurora, and a lit lighthouse', () => {
-    const svg = hero('solstice');
-    expect(svg.getAttribute('data-edition')).toBe('solstice');
-    expect(svg.getAttribute('aria-label')).toMatch(/pines.*lighthouse.*aurora/);
-    expect(svg.querySelectorAll('polygon').length).toBeGreaterThan(20);
-    // The aurora is flat stepped columns: 20 columns of 4 bands, in forest-light, sky, and gold.
-    const auroraBands = Array.from(svg.querySelectorAll('rect')).filter((r) => r.getAttribute('width') === '10' && r.getAttribute('fill') !== 'var(--color-night-light)');
-    expect(auroraBands.length).toBeGreaterThanOrEqual(60);
-    expect(svg.innerHTML).toContain('var(--color-forest-light)');
-    expect(svg.querySelectorAll('.hero-torch').length).toBeGreaterThanOrEqual(2); // the lantern room and its beam
+  it('Christmas draws snow-dusted evergreens, a starry night, a lit keep and cottage, and a golden star', () => {
+    const svg = hero('christmas');
+    expect(svg.getAttribute('data-edition')).toBe('christmas');
+    expect(svg.getAttribute('aria-label')).toMatch(/Snow-dusted evergreens.*starry winter night.*keep and cottage.*amber windows.*golden star/);
+    // The golden star: one 16-point polygon (8 tips and 8 notches) in candle gold, with a glint.
+    const star = Array.from(svg.querySelectorAll('polygon')).find((p) => p.getAttribute('points')!.trim().split(/\s+/).length === 16)!;
+    expect(star.getAttribute('fill')).toBe('var(--color-gold-light)');
+    expect(star.classList.contains('hero-glint')).toBe(true);
+    // Four evergreens, each dusted with snow (paper-colored polygons on the boughs).
+    expect(svg.querySelectorAll('g').length).toBe(4);
+    for (const tree of Array.from(svg.querySelectorAll('g'))) {
+      expect(tree.querySelector('polygon[fill="var(--color-paper)"]')).not.toBeNull();
+    }
+    // Warm amber windows on the keep and the cottage, which flicker like candlelight.
+    const lit = svg.querySelectorAll('.hero-torch');
+    expect(lit.length).toBeGreaterThanOrEqual(6);
+    expect(Array.from(lit).some((r) => r.getAttribute('fill') === 'var(--color-gold-light)')).toBe(true);
+    expect(Array.from(lit).some((r) => r.getAttribute('fill') === 'var(--color-gold)')).toBe(true);
+    // Starry night and falling snow: many single-unit pixels.
+    const pixels = Array.from(svg.querySelectorAll('rect')).filter((r) => r.getAttribute('width') === '1' && r.getAttribute('height') === '1');
+    expect(pixels.length).toBeGreaterThanOrEqual(25);
+    expect(svg.innerHTML).toContain('var(--color-night)');
+    expect(svg.innerHTML).toContain('var(--color-crimson)'); // the cranberry banner and holly berry
   });
 
   it('every edition is flat token art, and the three are different pictures', () => {
@@ -143,13 +156,32 @@ describe('EngravedWatermarks per edition', () => {
     expect(el.querySelectorAll('.home-mark--slot1, .home-mark--slot2, .home-mark--slot3, .home-mark--slot4')).toHaveLength(4);
   });
 
-  it('Winter Solstice has an 8-point compass star, a snowflake, evergreens, and a lantern', () => {
-    const el = marks('solstice');
-    expect(names(el)).toEqual(['compass', 'snowflake', 'pine', 'lantern']);
-    const star = el.querySelector('.home-mark--compass polygon')!;
+  it('Christmas has a holiday star, a snowflake, an evergreen tree, and a candle', () => {
+    const el = marks('christmas');
+    expect(names(el)).toEqual(['star', 'snowflake', 'tree', 'candle']);
+    const star = el.querySelector('.home-mark--star polygon')!;
     expect(star.getAttribute('points')!.trim().split(/\s+/)).toHaveLength(16); // 8 outer and 8 inner points
     expect(el.querySelectorAll('.home-mark--snowflake g')).toHaveLength(6);
-    expect(el.querySelectorAll('.home-mark--pine polygon').length).toBeGreaterThanOrEqual(9);
+    expect(el.querySelectorAll('.home-mark--tree circle')).toHaveLength(5); // baubles
+    expect(el.querySelectorAll('.home-mark--tree polygon')).toHaveLength(2); // the treetop star and the tree
+    expect(el.querySelector('.home-mark--candle rect')).not.toBeNull(); // the candle
+    expect(el.querySelectorAll('.home-mark--candle path').length).toBeGreaterThanOrEqual(4); // flame, wick, handle, holly
+  });
+
+  it('an unknown or legacy edition draws the right art instead of failing', () => {
+    const editionOfArt = (value: string) => {
+      const { container, unmount } = render(
+        <>
+          <EngravedWatermarks edition={value as Theme} />
+          <HeroArt edition={value as Theme} />
+        </>,
+      );
+      const out = [container.querySelector('.home-marks')!.getAttribute('data-edition'), container.querySelector('svg.boot-hero__art')!.getAttribute('data-edition')];
+      unmount();
+      return out;
+    };
+    expect(editionOfArt('solstice')).toEqual(['christmas', 'christmas']);
+    expect(editionOfArt('bogus')).toEqual(['classic', 'classic']);
   });
 
   it('is decorative, flat, and token-colored in every edition', () => {
@@ -192,7 +224,7 @@ describe('the Home window and boot splash show the edition artwork', () => {
     await user.click(screen.getByRole('button', { name: /Edition: Classic '97/ }));
     expect(container.querySelector('.home-hero__emblem svg')!.getAttribute('data-edition')).toBe('haunted');
     await user.click(screen.getByRole('button', { name: /Edition: Haunted Edition/ }));
-    expect(container.querySelector('.home-marks')!.getAttribute('data-edition')).toBe('solstice');
+    expect(container.querySelector('.home-marks')!.getAttribute('data-edition')).toBe('christmas');
   });
 });
 
@@ -208,7 +240,7 @@ describe('display typography tokens', () => {
   const decl = (text: string, name: string) => new RegExp(`${name}:\\s*([^;]+);`).exec(text)?.[1]?.trim();
   const root = block(':root {');
   const haunted = block(':root.theme-haunted');
-  const solstice = block(':root.theme-solstice');
+  const christmas = block(':root.theme-christmas');
 
   it(':root defines --font-display as Georgia serif', () => {
     expect(decl(root, '--font-display')).toBe('Georgia, "Times New Roman", serif');
@@ -219,12 +251,12 @@ describe('display typography tokens', () => {
     expect(v).toMatch(/^"Palatino Linotype", "Book Antiqua", Georgia, serif$/);
   });
 
-  it('Winter Solstice overrides it with a crisp Cambria stack', () => {
-    expect(decl(solstice, '--font-display')).toMatch(/^Cambria, "Book Antiqua", Georgia, serif$/);
+  it('Christmas overrides it with a crisp Cambria stack', () => {
+    expect(decl(christmas, '--font-display')).toMatch(/^Cambria, "Book Antiqua", Georgia, serif$/);
   });
 
   it('uses system font stacks only, ending in a generic family, with no web fonts anywhere', () => {
-    for (const v of [root, haunted, solstice].map((b) => decl(b, '--font-display')!)) expect(v).toMatch(/,\s*serif$/);
+    for (const v of [root, haunted, christmas].map((b) => decl(b, '--font-display')!)) expect(v).toMatch(/,\s*serif$/);
     for (const f of readdirSync(resolve(__dirname, '../../src/styles'))) {
       const text = src(`styles/${f}`);
       expect(text, f).not.toMatch(/@font-face|@import|url\(/);
@@ -232,13 +264,13 @@ describe('display typography tokens', () => {
     expect(readFileSync(resolve(__dirname, '../../index.html'), 'utf8')).not.toMatch(/fonts\.|<link[^>]+stylesheet/i);
   });
 
-  it('the masthead is tighter and bolder in Haunted, and airier in Winter Solstice', () => {
+  it('the masthead is tighter and bolder in Haunted, and airier in Christmas', () => {
     const em = (b: string) => parseFloat(decl(b, '--display-tracking')!);
     expect(em(haunted)).toBeLessThan(em(root));
-    expect(em(solstice)).toBeGreaterThan(em(root));
+    expect(em(christmas)).toBeGreaterThan(em(root));
     expect(decl(haunted, '--display-weight')).toBe('bold');
     expect(decl(root, '--display-weight')).toBe('normal');
-    expect(decl(solstice, '--display-weight')).toBe('normal');
+    expect(decl(christmas, '--display-weight')).toBe('normal');
   });
 
   it('the masthead title and the boot title use the display token, with the serif as a fallback', () => {
@@ -357,8 +389,8 @@ describe('playEditionSwitch', () => {
     expect(Math.min(...v.map((x) => x.freq))).toBeLessThan(150);
   });
 
-  it('Winter Solstice is a crystalline fifth: pure high sines a fifth apart', () => {
-    const v = cue('solstice');
+  it('Christmas is a crisp, celebratory bell fifth: pure high sines a fifth apart', () => {
+    const v = cue('christmas');
     expect(freqs(v)).toEqual(expect.arrayContaining([1046.5, 1567.98, 2093]));
     expect(v.every((x) => x.type === 'sine')).toBe(true);
     expect(Math.min(...v.map((x) => x.freq))).toBeGreaterThanOrEqual(1046);
@@ -391,8 +423,8 @@ describe('playEditionSwitch', () => {
     await user.click(screen.getByRole('button', { name: /Edition: Classic '97/ }));
     expect(spy).toHaveBeenLastCalledWith('haunted');
     await user.click(screen.getByRole('button', { name: /Edition: Haunted Edition/ }));
-    expect(spy).toHaveBeenLastCalledWith('solstice');
-    await user.click(screen.getByRole('button', { name: /Edition: Winter Solstice/ }));
+    expect(spy).toHaveBeenLastCalledWith('christmas');
+    await user.click(screen.getByRole('button', { name: /Edition: Christmas Edition/ }));
     expect(spy).toHaveBeenLastCalledWith('classic');
     expect(spy).toHaveBeenCalledTimes(3);
   });
@@ -420,8 +452,8 @@ describe('the chime and the ambience follow the edition', () => {
     expect(v).toContain(130.81); // the low bell
   });
 
-  it('turns to crisp crystalline fifths in Winter Solstice', () => {
-    const v = chime('solstice');
+  it('turns to crisp, celebratory bell fifths with a sleigh-bell sparkle in Christmas', () => {
+    const v = chime('christmas');
     expect(freqs(v)).toEqual(expect.arrayContaining([783.99, 1174.66, 1567.98, 2349.32]));
     expect(v.every((x) => x.type === 'sine')).toBe(true);
   });
@@ -445,10 +477,10 @@ describe('the chime and the ambience follow the edition', () => {
     expect(haunted.filters.some((f) => f.type === 'bandpass' && f.freq === 380)).toBe(true);
   });
 
-  it('adds crisp crystalline fifths and airy hiss in Winter Solstice', () => {
-    const solstice = ambience('solstice');
-    expect(solstice.voices).toEqual(expect.arrayContaining([523.25, 783.99]));
-    expect(solstice.filters.some((f) => f.type === 'highpass' && f.freq === 5000)).toBe(true);
+  it('adds crisp bell fifths and airy hiss in Christmas', () => {
+    const christmas = ambience('christmas');
+    expect(christmas.voices).toEqual(expect.arrayContaining([523.25, 783.99]));
+    expect(christmas.filters.some((f) => f.type === 'highpass' && f.freq === 5000)).toBe(true);
   });
 
   it('rebuilds a running ambience when the edition changes, and leaves Classic 97 as it was', () => {

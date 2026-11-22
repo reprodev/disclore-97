@@ -269,7 +269,7 @@ export function HomeLauncher({
                   <Card
                     icon="torch"
                     title={`Edition: ${edition.name}`}
-                    text="switch between Classic, Haunted, and Winter Solstice"
+                    text="switch between Classic, Haunted, and Christmas"
                     onClick={onCycleTheme}
                   />
                 ) : null}

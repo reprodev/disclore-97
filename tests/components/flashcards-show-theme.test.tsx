@@ -458,9 +458,9 @@ describe('Haunted Edition theme', () => {
     await user.click(screen.getByRole('menuitem', { name: 'View' }));
     await user.click(screen.getByRole('menuitem', { name: 'Edition: Haunted Edition' }));
     expect(root.classList.contains('theme-haunted')).toBe(false);
-    expect(storage.map.get('disclore97.theme')).toBe('solstice');
+    expect(storage.map.get('disclore97.theme')).toBe('christmas');
     await user.click(screen.getByRole('menuitem', { name: 'View' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Edition: Winter Solstice' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Edition: Christmas Edition' }));
     expect(storage.map.has('disclore97.theme')).toBe(false);
   });
 

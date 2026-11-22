@@ -111,3 +111,50 @@ body {
     display: none;
   }
 }
+/* Error boundary: a Win95 message box on the desktop instead of a blank teal screen. */
+.app-crash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.window.app-crash__box {
+  width: min(460px, 100%);
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.app-crash__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.app-crash__text {
+  margin: 0;
+}
+
+.app-crash__detail {
+  margin: 0;
+  max-height: 120px;
+  overflow: auto;
+  padding: 4px 6px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.app-crash__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
