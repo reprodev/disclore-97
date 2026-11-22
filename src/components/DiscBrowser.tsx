@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
+import type { Theme } from '../library/theme';
 import type { DiscManifest } from '../model/manifest';
 import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
@@ -32,6 +33,11 @@ export interface DiscBrowserProps {
   bookmarks?: readonly string[];
   /** Opens the Media Gallery view. Omit to hide the Gallery button and View menu item. */
   onSelectGallery?: () => void;
+  /** Opens Study Flashcards. Omit to hide the Flashcards button and View menu item. */
+  onSelectFlashcards?: () => void;
+  /** The current theme. With onToggleTheme, the View menu offers the Haunted Edition toggle and the Home window a card. */
+  theme?: Theme;
+  onToggleTheme?: () => void;
   /** Opens Take a Tour. Omit to hide the Tour button and View menu item. */
   onSelectTour?: () => void;
   /** Opens the Research Notebook. Omit to hide the Notebook button, View menu item, and Home card. */
@@ -95,6 +101,9 @@ function describeView(disc: DiscManifest, view: View | null): { trail: string[];
   if (view?.kind === 'timeline') {
     return { trail: ['Timeline'], label: 'Timeline' };
   }
+  if (view?.kind === 'flashcards') {
+    return { trail: ['Flashcards'], label: 'Study Flashcards' };
+  }
   if (view?.kind === 'tour') {
     return { trail: ['Tour'], label: 'Take a Tour' };
   }
@@ -119,6 +128,9 @@ export function DiscBrowser({
   onSelectTimeline,
   bookmarks,
   onSelectGallery,
+  onSelectFlashcards,
+  theme = 'classic',
+  onToggleTheme,
   onSelectTour,
   onOpenNotebook,
   onOpenDictionary,
@@ -176,6 +188,7 @@ export function DiscBrowser({
     const goDiagram = first.diagram === undefined ? undefined : () => onSelectDiagram(first.diagram!);
     const goTimeline = onSelectTimeline && hasTimeline(disc) ? onSelectTimeline : undefined;
     const goGallery = onSelectGallery;
+    const goFlashcards = onSelectFlashcards && disc.sections.length > 0 ? onSelectFlashcards : undefined;
     const goTour = onSelectTour && disc.sections.length > 0 ? onSelectTour : undefined;
     const goNotebook = onOpenNotebook;
     const goDictionary = onOpenDictionary ? () => onOpenDictionary() : undefined;
@@ -220,9 +233,11 @@ export function DiscBrowser({
                   { label: 'Timeline', onSelect: () => goTimeline?.() },
                   { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
                   ...(goTour ? [{ label: 'Tour', onSelect: () => goTour() }] : []),
+                  ...(goFlashcards ? [{ label: 'Flashcards', onSelect: () => goFlashcards() }] : []),
                   ...(goGallery ? [{ label: 'Gallery', onSelect: () => goGallery() }] : []),
                   ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
                   ...(goNotebook ? [{ label: 'Notebook...', onSelect: () => goNotebook() }] : []),
+                  ...(onToggleTheme ? [{ label: `Haunted Edition (${theme === 'haunted' ? 'On' : 'Off'})`, onSelect: onToggleTheme }] : []),
                 ],
               },
               ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
@@ -240,6 +255,7 @@ export function DiscBrowser({
           onDiagram={goDiagram}
           onTimeline={goTimeline}
           onKeepMaze={goKeepMaze}
+          onFlashcards={goFlashcards}
           onTour={goTour}
           onNotebook={goNotebook}
           onGallery={goGallery}
@@ -309,6 +325,8 @@ export function DiscBrowser({
         onOpenReadMe={onOpenReadMe}
         onOpenDictionary={onOpenDictionary}
         onOpenNotebook={onOpenNotebook}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}

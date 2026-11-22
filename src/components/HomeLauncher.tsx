@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { playSlideClick } from '../audio/audio';
+import type { Theme } from '../library/theme';
 import { pickRandomSection } from '../model/discSearch';
 import type { DiscManifest } from '../model/manifest';
 import type { QuickJumpMode } from '../model/nav';
@@ -20,6 +21,9 @@ export interface HomeLauncherProps {
   /** Opens a disc straight to its first diagram or dungeon. Omit to disable the cards. */
   onQuickJump?: (mode: QuickJumpMode) => void;
   onOpenReadMe?: () => void;
+  /** The current theme, and its toggle. Omit the toggle to hide the Utilities card. */
+  theme?: Theme;
+  onToggleTheme?: () => void;
   /** Opens the Research Notebook. Omit to hide the Utilities card. */
   onOpenNotebook?: () => void;
   /** Opens the Dictionary dialog. Omit to hide the Utilities card. */
@@ -105,6 +109,8 @@ export function HomeLauncher({
   onOpenReadMe,
   onOpenDictionary,
   onOpenNotebook,
+  theme = 'classic',
+  onToggleTheme,
   onReplaySplash,
   onBurnNew,
   onMountImage,
@@ -204,6 +210,13 @@ export function HomeLauncher({
                   disabled={!hasSections}
                   onClick={onQuickJump ? () => onQuickJump('tour') : undefined}
                 />
+                <Card
+                  icon="key"
+                  title="Study Flashcards"
+                  text="drill trivia and Quick Facts as index cards"
+                  disabled={!hasSections}
+                  onClick={onQuickJump ? () => onQuickJump('flashcards') : undefined}
+                />
                 {onOpenSection ? (
                   <Card
                     icon="book"
@@ -247,6 +260,14 @@ export function HomeLauncher({
                     title="Notebook..."
                     text="your study notes for a disc"
                     onClick={() => onOpenNotebook()}
+                  />
+                ) : null}
+                {onToggleTheme ? (
+                  <Card
+                    icon="torch"
+                    title={`Haunted Edition: ${theme === 'haunted' ? 'On' : 'Off'}`}
+                    text="switch the Kiroween theme"
+                    onClick={onToggleTheme}
                   />
                 ) : null}
                 <Card

@@ -17,6 +17,8 @@ export interface NavToolbarProps {
   onTimeline?: () => void;
   /** Omit when the disc has no dungeons: the button is disabled. */
   onKeepMaze?: () => void;
+  /** Opens Study Flashcards. */
+  onFlashcards?: () => void;
   /** Opens Take a Tour. */
   onTour?: () => void;
   /** Opens the Research Notebook. */
@@ -57,6 +59,7 @@ export function NavToolbar({
   onDiagram,
   onTimeline,
   onKeepMaze,
+  onFlashcards,
   onTour,
   onNotebook,
   onGallery,
@@ -75,6 +78,7 @@ export function NavToolbar({
       <Tool icon="torch" label="KeepMaze" disabled={!onKeepMaze} onClick={onKeepMaze} />
       <span className="nav-toolbar__sep" aria-hidden="true" />
       <Tool icon="castle" label="Tour" disabled={!onTour} onClick={onTour} />
+      <Tool icon="key" label="Flashcards" disabled={!onFlashcards} onClick={onFlashcards} />
       <Tool icon="cd" label="Gallery" disabled={!onGallery} onClick={onGallery} />
       <Tool icon="book" label="Dictionary" disabled={!onDictionary} onClick={onDictionary} />
       <Tool icon="notepad" label="Notebook" disabled={!onNotebook} onClick={onNotebook} />

@@ -6,6 +6,7 @@ export type View =
   | { kind: 'timeline' }
   | { kind: 'gallery' }
   | { kind: 'tour' }
+  | { kind: 'flashcards' }
   | { kind: 'keepmaze'; dungeon_id: string };
 
 export interface NavState {
@@ -49,6 +50,7 @@ export function sameView(a: View | null, b: View | null): boolean {
     case 'timeline':
     case 'gallery':
     case 'tour':
+    case 'flashcards':
       return true;
     case 'keepmaze':
       return a.dungeon_id === (b as typeof a).dungeon_id;
@@ -78,7 +80,7 @@ export function goForward(h: History): History {
 }
 
 
-export type QuickJumpMode = 'diagram' | 'keepmaze' | 'tour';
+export type QuickJumpMode = 'diagram' | 'keepmaze' | 'tour' | 'flashcards';
 
 /**
  * Chooses where a Quick Jump goes. Prefers the last disc the user opened,
@@ -94,6 +96,9 @@ export function pickQuickJump(
   for (const disc of ordered) {
     if (mode === 'diagram' && disc.diagrams[0]) {
       return { disc, view: { kind: 'diagram', diagram_id: disc.diagrams[0].diagram_id } };
+    }
+    if (mode === 'flashcards' && disc.sections.length > 0) {
+      return { disc, view: { kind: 'flashcards' } };
     }
     if (mode === 'tour' && disc.sections.length > 0) {
       return { disc, view: { kind: 'tour' } };

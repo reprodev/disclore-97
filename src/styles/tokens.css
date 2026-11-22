@@ -78,6 +78,58 @@
   --bevel-w: 2px;
 }
 
+/*
+ * Kiroween "Haunted Edition". Switched on by the `theme-haunted` class on <html> (View > Haunted Edition).
+ * Midnight indigo desktop and title bars, slate-lavender window surfaces, jack-o'-lantern amber accents,
+ * deep crimson highlights, and bone-ivory reading paper. Ink stays near black, so text on every surface
+ * keeps a contrast ratio above 7:1. Token names are unchanged: only values differ.
+ */
+:root.theme-haunted {
+  --color-surface: #A7A9C9;
+  --color-title-bg: #2B1B5E;
+  --color-title-text: #FFF3D6;
+  --color-bevel-hi: #E4E1F7;
+  --color-bevel-shadow: #55587D;
+  --color-bevel-edge: #05050F;
+  --color-tooltip-bg: #F6E3B4;
+
+  --color-desktop: #0C1030;
+  --color-paper: #EFE6CF;
+  --color-ink: #08080F;
+  --color-parchment: #E2D5B3;
+  --color-parchment-dark: #B9A97E;
+  --color-watermark-ink: #8E8466;
+  --color-parchment-tint: #D6C8A4;
+
+  --color-stone-light: #B4B6D2;
+  --color-stone: #7D80A8;
+  --color-stone-dark: #4A4D74;
+
+  /* Jack-o'-lantern amber in place of antique gold */
+  --color-gold-light: #FFB84D;
+  --color-gold: #F28A1A;
+  --color-gold-dark: #9C4A08;
+
+  --color-crimson-light: #C23049;
+  --color-crimson: #7E1228;
+  --color-crimson-dark: #470A16;
+
+  --color-forest-light: #4E9A5A;
+  --color-forest: #1F5A2E;
+  --color-forest-dark: #0F3318;
+
+  --color-night: #120A33;
+  --color-night-light: #261A5C;
+  --color-console-bg: #1A1442;
+  --color-console-text: #FFF3D6;
+  --color-console-accent: #FFB84D;
+  --color-console-dim: #F28A1A;
+  --color-dungeon-bg: #14121F;
+  --color-dungeon-stone: #3A3650;
+  --color-flame: #FF7A00;
+  --color-flame-hot: #FFD21F;
+}
+
 * {
   border-radius: 0;
 }
