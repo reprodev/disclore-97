@@ -108,7 +108,10 @@ export function collectFacts(discs: readonly DiscManifest[]): Fact[] {
 
 /** A section's first Quick Fact, or the first sentence of its first paragraph when it has none. */
 export function firstFact(section: DiscManifest['sections'][number]): string {
-  const own = (section.facts ?? []).map((f) => f.trim()).find((f) => f !== '');
+  const own = (Array.isArray(section.facts) ? section.facts : [])
+    .filter((f): f is string => typeof f === 'string')
+    .map((f) => f.trim())
+    .find((f) => f !== '');
   return own ?? firstSentence(section.paragraphs[0] ?? '');
 }
 

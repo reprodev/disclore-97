@@ -23,7 +23,7 @@ export function MiniMap({ dungeon, visited, currentRoomId }: MiniMapProps) {
   const known = new Set(seen);
   for (const room of dungeon.rooms) {
     if (!seen.has(room.room_id)) continue;
-    for (const exit of room.exits) known.add(exit.to);
+    for (const exit of room.exits ?? []) known.add(exit.to);
   }
 
   const pos = (id: string) => {
@@ -39,7 +39,7 @@ export function MiniMap({ dungeon, visited, currentRoomId }: MiniMapProps) {
     if (!seen.has(room.room_id)) continue;
     const a = pos(room.room_id);
     if (!a) continue;
-    room.exits.forEach((exit, i) => {
+    (room.exits ?? []).forEach((exit, i) => {
       const b = pos(exit.to);
       if (!b || !known.has(exit.to)) return;
       edges.push({

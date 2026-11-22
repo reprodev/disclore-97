@@ -261,9 +261,12 @@ interface Run {
   ch: string;
 }
 
-function runs(rows: string[], yOffset = 0): Run[] {
+/** Rectangles for a pixel map. A missing map (an unknown icon, or a stale hot-reloaded module) draws nothing instead of throwing. */
+function runs(rows: readonly string[] | undefined, yOffset = 0): Run[] {
   const out: Run[] = [];
+  if (!Array.isArray(rows)) return out;
   rows.forEach((row, y) => {
+    if (typeof row !== 'string') return;
     let x = 0;
     while (x < row.length) {
       const ch = row[x]!;
@@ -292,7 +295,8 @@ export interface PixelIconProps {
 /** Pixel-art icon drawn as flat SVG rects on a 16x16 grid. Decorative only. */
 export function PixelIcon({ name, size = 16, muted = false, className }: PixelIconProps) {
   const style: CSSProperties = { width: size, height: size };
-  const cells = runs(MAPS[name]);
+  // An unknown name draws the CD-ROM, so a bad name can never take the screen down.
+  const cells = runs(MAPS[name] ?? MAPS.cd);
   const cross = name === 'speaker' && muted ? runs(MUTE_CROSS, 4) : [];
   return (
     <svg

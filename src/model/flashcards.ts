@@ -65,7 +65,7 @@ export function buildFlashcards(disc: DiscManifest): Flashcard[] {
 
   for (const section of disc.sections) {
     const title = pick(section.title, section.section_id);
-    const facts = (section.facts ?? []).map(clean).filter((f) => f !== '');
+    const facts = (Array.isArray(section.facts) ? section.facts : []).map(clean).filter((f) => f !== '');
     const texts = facts.length > 0 ? facts : [pick(firstFact(section), section.title, section.section_id)];
     texts.forEach((back, n) =>
       add({

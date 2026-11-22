@@ -26,7 +26,7 @@ export function layoutRooms(dungeon: Dungeon): MapLayout {
     const queue: string[] = [ENTRANCE_ROOM_ID];
     for (let head = 0; head < queue.length; head++) {
       const id = queue[head]!;
-      for (const exit of byId.get(id)!.exits) {
+      for (const exit of byId.get(id)!.exits ?? []) {
         if (byId.has(exit.to) && !depth.has(exit.to)) {
           depth.set(exit.to, depth.get(id)! + 1);
           queue.push(exit.to);

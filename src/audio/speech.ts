@@ -49,7 +49,10 @@ export function speak(
   rate = 1,
 ): boolean {
   const s = synth();
-  const texts = paragraphs.map((p) => p.trim()).filter((p) => p !== '');
+  const texts = (Array.isArray(paragraphs) ? paragraphs : [])
+    .filter((p): p is string => typeof p === 'string')
+    .map((p) => p.trim())
+    .filter((p) => p !== '');
   if (!s || isMuted() || texts.length === 0) return false;
 
   if (!hooked) {
