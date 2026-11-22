@@ -1,7 +1,8 @@
 import type { KeyboardEvent } from 'react';
 import { playPageFlip } from '../audio/audio';
 import { SHAPE_ANIMS } from '../model/manifest';
-import type { Diagram, Shape } from '../model/manifest';
+import { firstFact } from '../model/discSearch';
+import type { Diagram, Section, Shape } from '../model/manifest';
 import { Tooltip } from './Tooltip';
 import '../styles/hotspot.css';
 
@@ -9,8 +10,23 @@ export interface HotspotViewerProps {
   diagram: Diagram;
   /** Called with the hotspot's section_id. */
   onNavigate: (sectionId: string) => void;
+  /** Sections of the disc. When given, a pin shows a preview card with its article's title and first fact. */
+  sections?: Section[];
   /** Hotspots that cite this section are drawn highlighted. */
   highlightSectionId?: string | null;
+}
+
+/** The preview card for a pin: the target article's title and its first Quick Fact. */
+function previewCard(sections: Section[] | undefined, sectionId: string) {
+  const section = sections?.find((s) => s.section_id === sectionId);
+  if (!section) return undefined;
+  const fact = firstFact(section);
+  return (
+    <>
+      <span className="pin-card__title">{section.title}</span>
+      {fact ? <span className="pin-card__fact">{fact}</span> : null}
+    </>
+  );
 }
 
 function renderShape(shape: Shape, i: number) {
@@ -55,7 +71,7 @@ function renderShape(shape: Shape, i: number) {
  * Tooltip renders HTML, so hotspots sit in an overlay positioned by percent
  * rather than inside the shapes SVG.
  */
-export function HotspotViewer({ diagram, onNavigate, highlightSectionId }: HotspotViewerProps) {
+export function HotspotViewer({ diagram, onNavigate, sections, highlightSectionId }: HotspotViewerProps) {
   const activate = (sectionId: string) => {
     playPageFlip();
     onNavigate(sectionId);
@@ -81,7 +97,7 @@ export function HotspotViewer({ diagram, onNavigate, highlightSectionId }: Hotsp
         };
         return (
           <div key={`${h.section_id}-${i}`} className="hotspot-anchor" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
-            <Tooltip text={h.label}>
+            <Tooltip text={h.label} card={previewCard(sections, h.section_id)} alignEnd={h.x > 60}>
               <svg className="hotspot-marker" viewBox="-8 -8 16 16" aria-hidden={false}>
                 <g
                   role="button"

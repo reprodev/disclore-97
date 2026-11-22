@@ -558,3 +558,24 @@
   color: var(--color-bevel-shadow);
   border-top: 1px solid var(--color-bevel-shadow);
 }
+
+/* Inline cross-links: a mention of another article, drawn as a link-styled button. */
+.article-xlink {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--color-title-bg);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.article-xlink:hover {
+  color: var(--color-crimson);
+}
+
+.article-xlink:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+}

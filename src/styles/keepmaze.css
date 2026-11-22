@@ -456,3 +456,50 @@
   background: var(--color-dungeon-stone);
   border: 1px dashed var(--color-stone-dark);
 }
+
+/* MindMaze stats in the Quest card: Score, Streak, and Torches. */
+.quest-card__stats {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-gold);
+}
+
+.quest-card__stat dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-bevel-shadow);
+}
+
+.quest-card__stat dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.torches {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.torches__torch {
+  display: inline-flex;
+}
+
+.torches__torch[data-lit="false"] {
+  opacity: 0.25;
+}
+
+.keepmaze__peek-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-crimson);
+}
+
+.certificate__rank {
+  margin: 4px 0;
+  font-size: 14px;
+  color: var(--color-crimson);
+}

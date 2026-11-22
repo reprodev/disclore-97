@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
+import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
@@ -25,6 +26,10 @@ export interface DiscBrowserProps {
   onSelectSection: (sectionId: string) => void;
   onSelectDiagram: (diagramId: string) => void;
   onSelectDungeon: (dungeonId: string) => void;
+  /** Opens the disc-wide Timeline view. Omit to hide the Timeline button and View menu item. */
+  onSelectTimeline?: () => void;
+  /** Bookmarked section ids of the open disc, shown as a list in the sidebar. */
+  bookmarks?: readonly string[];
   /** Current view in the open disc. Drives the sidebar highlight, breadcrumb, and status bar. */
   view?: View | null;
   /** Content for the right-hand pane. When omitted, a welcome page is shown. */
@@ -75,6 +80,9 @@ function describeView(disc: DiscManifest, view: View | null): { trail: string[];
     const title = disc.diagrams.find((d) => d.diagram_id === view.diagram_id)?.title ?? view.diagram_id;
     return { trail: ['Diagrams', title], label: `Diagram: ${title}` };
   }
+  if (view?.kind === 'timeline') {
+    return { trail: ['Timeline'], label: 'Timeline' };
+  }
   if (view?.kind === 'keepmaze') {
     const title = disc.dungeons.find((d) => d.dungeon_id === view.dungeon_id)?.title ?? view.dungeon_id;
     return { trail: ['Dungeons', title], label: `KeepMaze: ${title}` };
@@ -90,6 +98,8 @@ export function DiscBrowser({
   onSelectSection,
   onSelectDiagram,
   onSelectDungeon,
+  onSelectTimeline,
+  bookmarks,
   view = null,
   main,
   canBack = false,
@@ -140,6 +150,7 @@ export function DiscBrowser({
     const goForward = () => onForward?.();
     const goHome = () => onHome?.();
     const goDiagram = first.diagram === undefined ? undefined : () => onSelectDiagram(first.diagram!);
+    const goTimeline = onSelectTimeline && hasTimeline(disc) ? onSelectTimeline : undefined;
     const goKeepMaze = first.dungeon === undefined ? undefined : () => onSelectDungeon(first.dungeon!);
     const { trail, label } = describeView(disc, view);
 
@@ -178,6 +189,7 @@ export function DiscBrowser({
                 label: 'View',
                 items: [
                   { label: 'Diagram', onSelect: () => goDiagram?.() },
+                  { label: 'Timeline', onSelect: () => goTimeline?.() },
                   { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
                 ],
               },
@@ -193,6 +205,7 @@ export function DiscBrowser({
           onHome={goHome}
           onDiscs={() => setLoadOverId(disc.disc_id)}
           onDiagram={goDiagram}
+          onTimeline={goTimeline}
           onKeepMaze={goKeepMaze}
         />
         <Breadcrumb discTitle={disc.title} trail={trail} onHome={goHome} />
@@ -205,6 +218,7 @@ export function DiscBrowser({
             onSelectSection={onSelectSection}
             onSelectDiagram={onSelectDiagram}
             onSelectDungeon={onSelectDungeon}
+            bookmarks={bookmarks}
           />
           <div className="disc-main">
             {main ?? (

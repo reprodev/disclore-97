@@ -242,3 +242,10 @@
 .disc-image-input {
   display: none;
 }
+
+/* Bookmarks list in the contents sidebar. */
+.disc-bookmarks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -13,6 +13,8 @@ export interface NavToolbarProps {
   onDiscs: () => void;
   /** Omit when the disc has no diagrams: the button is disabled. */
   onDiagram?: () => void;
+  /** Omit when no section has timeline entries: the button is disabled. */
+  onTimeline?: () => void;
   /** Omit when the disc has no dungeons: the button is disabled. */
   onKeepMaze?: () => void;
 }
@@ -45,6 +47,7 @@ export function NavToolbar({
   onHome,
   onDiscs,
   onDiagram,
+  onTimeline,
   onKeepMaze,
 }: NavToolbarProps) {
   return (
@@ -56,6 +59,7 @@ export function NavToolbar({
       <Tool icon="cd" label="Discs" onClick={onDiscs} />
       <span className="nav-toolbar__sep" aria-hidden="true" />
       <Tool icon="diagram" label="Diagram" disabled={!onDiagram} onClick={onDiagram} />
+      <Tool icon="notepad" label="Timeline" disabled={!onTimeline} onClick={onTimeline} />
       <Tool icon="torch" label="KeepMaze" disabled={!onKeepMaze} onClick={onKeepMaze} />
     </div>
   );

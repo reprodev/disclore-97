@@ -10,11 +10,13 @@ import { ErrorList } from './components/ErrorList';
 import { MessageDialog } from './components/MessageDialog';
 import { HotspotViewer } from './components/HotspotViewer';
 import { KeepMazeUI } from './components/KeepMazeUI';
+import { TimelineView } from './components/TimelineView';
 import { NotepadWindow } from './components/NotepadWindow';
 import { Taskbar } from './components/Taskbar';
 import type { ActiveWindowInfo } from './components/Taskbar';
 import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
+import { loadBookmarks, saveBookmarks, toggleBookmark } from './library/bookmarks';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
 import {
   MAX_IMAGE_BYTES,
@@ -94,6 +96,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     createDiscLibrary(storage ?? (sources === undefined ? getBrowserStorage() : undefined)),
   );
   const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
+  // Bookmarks share the library's storage: the browser's localStorage unless a test or embedder supplies one.
+  const [bookmarkStorage] = useState(() => storage ?? (sources === undefined ? getBrowserStorage() : undefined));
+  const [marks, setMarks] = useState<string[]>([]);
   const [burnOpen, setBurnOpen] = useState(false);
   /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
   const [burnSample, setBurnSample] = useState<string | null>(null);
@@ -130,6 +135,19 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   useEffect(() => {
     setAmbienceKind(ambienceKindFor(ambienceDiscId));
   }, [ambienceDiscId]);
+
+  // Load the open disc's bookmarks when the disc changes.
+  const marksDiscId = disc?.disc_id;
+  useEffect(() => {
+    setMarks(disc ? loadBookmarks(bookmarkStorage, disc.disc_id, new Set(disc.sections.map((s) => s.section_id))) : []);
+  }, [marksDiscId]);
+
+  const toggleMark = (sectionId: string) => {
+    if (!disc) return;
+    const next = toggleBookmark(marks, sectionId);
+    setMarks(next);
+    saveBookmarks(bookmarkStorage, disc.disc_id, next);
+  };
 
   const openDisc = (discId: string) => {
     setDiagramFocus(null);
@@ -283,13 +301,24 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           discTitle={disc.title}
           diagrams={disc.diagrams}
           onShowInDiagram={showInDiagram}
+          bookmarked={marks.includes(v.section_id)}
+          onToggleBookmark={() => toggleMark(v.section_id)}
           {...(disc.media ? { media: disc.media } : {})}
         />
       );
+    } else if (v.kind === 'timeline') {
+      main = <TimelineView disc={disc} onSelectSection={goSection} />;
     } else if (v.kind === 'diagram') {
       const diagram = disc.diagrams.find((d) => d.diagram_id === v.diagram_id);
       if (diagram) {
-        main = <HotspotViewer diagram={diagram} onNavigate={goSection} highlightSectionId={diagramFocus} />;
+        main = (
+          <HotspotViewer
+            diagram={diagram}
+            sections={disc.sections}
+            onNavigate={goSection}
+            highlightSectionId={diagramFocus}
+          />
+        );
       }
     } else {
       const dungeon = disc.dungeons.find((d) => d.dungeon_id === v.dungeon_id);
@@ -326,6 +355,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onSelectSection={goSection}
           onSelectDiagram={(diagram_id) => visit({ kind: 'diagram', diagram_id })}
           onSelectDungeon={(dungeon_id) => visit({ kind: 'keepmaze', dungeon_id })}
+          onSelectTimeline={() => visit({ kind: 'timeline' })}
+          bookmarks={marks}
           view={nav.view}
           main={main}
           canBack={canGoBack(history)}

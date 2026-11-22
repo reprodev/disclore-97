@@ -1,0 +1,129 @@
+/* Explore History: a horizontal strip of century columns on parchment. */
+.timeline {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 12px 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+  background: var(--color-parchment);
+}
+
+.timeline__title {
+  margin: 0 0 2px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-crimson);
+}
+
+.timeline__lede {
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--color-wood-dark);
+  border-bottom: 3px double var(--color-gold-dark);
+}
+
+.timeline__strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 0 0 8px;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.timeline__era {
+  flex: 0 0 210px;
+  min-width: 0;
+}
+
+/* The rule along the top of the strip, with a square tick where each century starts. */
+.timeline__era-title {
+  position: relative;
+  margin: 0 0 8px;
+  padding: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-title-bg);
+  border-bottom: 2px solid var(--color-bevel-edge);
+}
+
+.timeline__era-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  background: var(--color-gold);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.timeline__events {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline__event {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-align: left;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  cursor: default;
+}
+
+.timeline__event:hover,
+.timeline__event:focus-visible {
+  background: var(--color-tooltip-bg);
+}
+
+.timeline__event:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -4px;
+}
+
+.timeline__event:active {
+  border-color: var(--color-bevel-edge) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-edge);
+}
+
+.timeline__when {
+  font-weight: bold;
+  color: var(--color-crimson);
+}
+
+.timeline__text {
+  line-height: 1.3;
+}
+
+.timeline__badge {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  color: var(--color-title-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--color-title-bg);
+  border: 1px solid var(--color-bevel-edge);
+}

@@ -13,6 +13,8 @@ export interface ContentsSidebarProps {
   onSelectSection: (sectionId: string) => void;
   onSelectDiagram: (diagramId: string) => void;
   onSelectDungeon: (dungeonId: string) => void;
+  /** Bookmarked section ids. A Bookmarks list shows when there is at least one. */
+  bookmarks?: readonly string[];
 }
 
 /** Persistent contents tree with a live "Find in Disc..." filter over sections. */
@@ -22,6 +24,7 @@ export function ContentsSidebar({
   onSelectSection,
   onSelectDiagram,
   onSelectDungeon,
+  bookmarks = [],
 }: ContentsSidebarProps) {
   const [query, setQuery] = useState('');
   const inputId = useId();
@@ -31,6 +34,10 @@ export function ContentsSidebar({
   const activeSection = view?.kind === 'section' ? view.section_id : null;
   const activeDiagram = view?.kind === 'diagram' ? view.diagram_id : null;
   const activeDungeon = view?.kind === 'keepmaze' ? view.dungeon_id : null;
+
+  const marked = bookmarks
+    .map((id) => disc.sections.find((s) => s.section_id === id))
+    .filter((s): s is NonNullable<typeof s> => s !== undefined);
 
   const entryClass = (active: boolean) => (active ? 'disc-entry disc-entry--active' : 'disc-entry');
 
@@ -76,6 +83,29 @@ export function ContentsSidebar({
         </ul>
         {filtering && shown.length === 0 ? <p className="disc-find__empty">No sections match.</p> : null}
       </section>
+
+      {marked.length > 0 ? (
+        <section className="disc-group" aria-label="Bookmarks">
+          <h2 className="disc-group-title">
+            <PixelIcon name="key" />
+            Bookmarks
+          </h2>
+          <ul className="disc-bookmarks">
+            {marked.map((s) => (
+              <li key={s.section_id}>
+                <BevelButton
+                  className="disc-entry disc-entry--bookmark"
+                  aria-label={`Go to bookmark: ${s.title}`}
+                  onClick={() => onSelectSection(s.section_id)}
+                >
+                  <PixelIcon name="book" />
+                  <span>{s.title}</span>
+                </BevelButton>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="disc-group">
         <h2 className="disc-group-title">

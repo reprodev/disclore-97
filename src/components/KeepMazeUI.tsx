@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { playDoorUnlock, playTorch, playVictoryFanfare } from '../audio/audio';
-import { gameReducer, initGame } from '../model/game';
+import { gameReducer, initGame, scholarRank, STARTING_TORCHES } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
 import { ENTRANCE_ROOM_ID } from '../model/manifest';
 import type { DiscManifest, Dungeon } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import { DungeonViewport } from './DungeonViewport';
 import { MiniMap } from './MiniMap';
+import { PixelIcon } from './PixelIcon';
 import '../styles/keepmaze.css';
 
 export interface KeepMazeUIProps {
@@ -127,7 +128,18 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
                 <dt>Incorrect answers</dt>
                 <dd>{state.incorrect}</dd>
               </div>
+              <div className="certificate__stat">
+                <dt>Score</dt>
+                <dd>{state.score}</dd>
+              </div>
+              <div className="certificate__stat">
+                <dt>Best streak</dt>
+                <dd>{state.bestStreak}</dd>
+              </div>
             </dl>
+            <p className="certificate__rank">
+              Scholar Rank: <strong>{scholarRank(state.score, state.moves)}</strong>
+            </p>
             <p className="keepmaze__message certificate__result" role="status">
               Victory! You reached the throne room in {state.moves} moves with {state.incorrect}{' '}
               incorrect answers.
@@ -201,6 +213,28 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
           <p className="quest-card__progress">
             Rooms explored: {visited.length} of {dungeon.rooms.length}
           </p>
+          <dl className="quest-card__stats" aria-label="Knowledge stats">
+            <div className="quest-card__stat">
+              <dt>Score</dt>
+              <dd>{state.score}</dd>
+            </div>
+            <div className="quest-card__stat">
+              <dt>Streak</dt>
+              <dd>{state.streak}</dd>
+            </div>
+            <div className="quest-card__stat">
+              <dt>Torches</dt>
+              <dd>
+                <span className="torches" role="img" aria-label={`${state.torches} of ${STARTING_TORCHES} torches lit`}>
+                  {Array.from({ length: STARTING_TORCHES }, (_, i) => (
+                    <span key={i} className="torches__torch" data-lit={i < state.torches ? 'true' : 'false'}>
+                      <PixelIcon name="torch" />
+                    </span>
+                  ))}
+                </span>
+              </dd>
+            </div>
+          </dl>
       {!pending && !state.lastWrong && (
         <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
       )}
@@ -217,9 +251,10 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
           <BevelButton
             className="keepmaze__peek-button"
             aria-expanded={peekId === pending.question.question_id}
-            onClick={() =>
-              setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id))
-            }
+            onClick={() => {
+              dispatch({ type: 'peek' });
+              setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id));
+            }}
           >
             Peek Hint
           </BevelButton>
@@ -228,6 +263,9 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
               <p className="keepmaze__peek-title">{peekSection.title}</p>
               <p className="keepmaze__peek-text">{firstSentence(peekSection.paragraphs[0] ?? '')}</p>
             </div>
+          ) : null}
+          {pending.hinted ? (
+            <p className="keepmaze__peek-note">Hint used: a right answer is worth 50 points.</p>
           ) : null}
         </div>
       )}

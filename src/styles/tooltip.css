@@ -21,3 +21,37 @@
   font-size: 11px;
   color: var(--color-bevel-edge);
 }
+
+/* Diagram pin preview: a small Win95 card with the article title and its first Quick Fact. */
+.tooltip-bubble--card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 190px;
+  padding: 4px 6px;
+  white-space: normal;
+  border-width: 2px;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+
+.tooltip-bubble--card[hidden] {
+  display: none;
+}
+
+.tooltip-bubble--end {
+  left: auto;
+  right: 0;
+}
+
+.pin-card__title {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--color-title-bg);
+}
+
+.pin-card__fact {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.3;
+}

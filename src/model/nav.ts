@@ -3,6 +3,7 @@ import type { DiscManifest } from './manifest';
 export type View =
   | { kind: 'section'; section_id: string }
   | { kind: 'diagram'; diagram_id: string }
+  | { kind: 'timeline' }
   | { kind: 'keepmaze'; dungeon_id: string };
 
 export interface NavState {
@@ -43,6 +44,8 @@ export function sameView(a: View | null, b: View | null): boolean {
       return a.section_id === (b as typeof a).section_id;
     case 'diagram':
       return a.diagram_id === (b as typeof a).diagram_id;
+    case 'timeline':
+      return true;
     case 'keepmaze':
       return a.dungeon_id === (b as typeof a).dungeon_id;
   }

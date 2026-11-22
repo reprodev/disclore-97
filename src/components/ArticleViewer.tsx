@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { isMuted, playPageFlip, subscribeMuted } from '../audio/audio';
 import { isSpeechAvailable, speak, stopSpeaking } from '../audio/speech';
 import type { Diagram, MediaItem, Section } from '../model/manifest';
+import { linkSegments } from '../model/crossLinks';
 import { relatedSections } from '../model/topics';
 import { BevelButton } from './BevelButton';
 import { CiteDialog } from './CiteDialog';
@@ -21,6 +22,9 @@ export interface ArticleViewerProps {
   diagrams?: Diagram[];
   /** Opens a diagram with the hotspot for the active section highlighted. */
   onShowInDiagram?: (diagramId: string, sectionId: string) => void;
+  /** Whether this article is bookmarked. With onToggleBookmark, shows the Bookmark button. */
+  bookmarked?: boolean;
+  onToggleBookmark?: () => void;
   /** Pictures of the open disc. When non-empty, the Media Frame and Multimedia Reel replace the plate. */
   media?: MediaItem[];
 }
@@ -32,6 +36,8 @@ export function ArticleViewer({
   discTitle,
   diagrams,
   onShowInDiagram,
+  bookmarked = false,
+  onToggleBookmark,
   media,
 }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
@@ -87,6 +93,8 @@ export function ArticleViewer({
     ? (diagrams ?? []).find((d) => d.hotspots.some((h) => h.section_id === sectionId))
     : undefined;
   const canCite = discTitle !== undefined;
+  /** Other articles of this disc whose titles may be linked from the text. */
+  const linkTargets = sections.filter((s) => s.section_id !== sectionId);
   const reel = media ?? [];
   const speechReady = isSpeechAvailable();
 
@@ -128,6 +136,11 @@ export function ArticleViewer({
           </BevelButton>
         ) : null}
         {canCite ? <BevelButton onClick={() => setCiteOpen(true)}>Cite / Print Preview</BevelButton> : null}
+        {onToggleBookmark ? (
+          <BevelButton className="article-tools__toggle" aria-pressed={bookmarked} onClick={onToggleBookmark}>
+            {bookmarked ? 'Bookmarked' : 'Bookmark'}
+          </BevelButton>
+        ) : null}
         <BevelButton
           className="article-tools__toggle"
           aria-pressed={speaking}
@@ -188,7 +201,20 @@ export function ArticleViewer({
           data-speaking={progress?.current === i + 2 ? 'true' : undefined}
           aria-current={progress?.current === i + 2 ? 'true' : undefined}
         >
-          {p}
+          {(onSelectSection ? linkSegments(p, linkTargets) : [{ text: p }]).map((seg, j) =>
+            seg.sectionId !== undefined ? (
+              <button
+                key={j}
+                type="button"
+                className="article-xlink"
+                onClick={() => onSelectSection?.(seg.sectionId!)}
+              >
+                {seg.text}
+              </button>
+            ) : (
+              <Fragment key={j}>{seg.text}</Fragment>
+            ),
+          )}
         </p>
       ))}
       {timeline.length > 0 ? (

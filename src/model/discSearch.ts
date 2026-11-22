@@ -106,6 +106,12 @@ export function collectFacts(discs: readonly DiscManifest[]): Fact[] {
   return result;
 }
 
+/** A section's first Quick Fact, or the first sentence of its first paragraph when it has none. */
+export function firstFact(section: DiscManifest['sections'][number]): string {
+  const own = (section.facts ?? []).map((f) => f.trim()).find((f) => f !== '');
+  return own ?? firstSentence(section.paragraphs[0] ?? '');
+}
+
 /** A section chosen from all discs, uniformly, using `rng` (a [0, 1) generator). Null when there are none. */
 export function pickRandomSection(discs: readonly DiscManifest[], rng: () => number): SectionRef | null {
   const all: SectionRef[] = [];
