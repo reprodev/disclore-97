@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { playChime } from '../audio/audio';
+import { editionOf } from '../model/editions';
+import type { Theme } from '../model/editions';
 import { BevelButton } from './BevelButton';
 import { HeroArt, InitBar } from './SplashArt';
 import '../styles/splash.css';
@@ -27,6 +29,8 @@ export interface BootSplashProps {
   onDone: () => void;
   /** Auto-advance delay in milliseconds. */
   delayMs?: number;
+  /** The edition on show: it sets the subtitle. Defaults to Classic '97. */
+  edition?: Theme;
 }
 
 /**
@@ -34,7 +38,7 @@ export interface BootSplashProps {
  * after 10 seconds, or at once on click, Enter, Escape, or Skip. Reduced motion
  * only simplifies the CSS animation. It never dismisses the splash.
  */
-export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashProps) {
+export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS, edition = 'classic' }: BootSplashProps) {
   const finished = useRef(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
@@ -76,7 +80,7 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS }: BootSplashPro
 
           <div className="boot-titleblock">
             <h1 className="boot-title">DiscLore '97</h1>
-            <p className="boot-subtitle">Multimedia Encyclopedia &bull; 1997 Edition</p>
+            <p className="boot-subtitle">{editionOf(edition).bootSubtitle}</p>
             <p className="boot-seal">KeepMaze Engine &bull; Procedural Audio</p>
           </div>
 

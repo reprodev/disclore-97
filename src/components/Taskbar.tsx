@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { playClick, playSpinUp } from '../audio/audio';
+import { playClick } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
 import { AmbienceToggle } from './AmbienceToggle';
 import { MuteToggle } from './MuteToggle';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
+import { StartMenu } from './StartMenu';
+import type { StartMenuActions } from './StartMenu';
 import '../styles/taskbar.css';
 
 export interface ActiveWindowInfo {
@@ -30,6 +32,8 @@ export interface TaskbarProps {
   onToggleReadMe?: () => void;
   /** Lights the Drive D: indicator while a disc is in the drive. */
   driveActive?: boolean;
+  /** What the Start menu items do. An item with no action is dimmed. */
+  startActions?: StartMenuActions;
 }
 
 /** Local time as HH:MM, 24-hour. */
@@ -67,9 +71,11 @@ export function Taskbar({
   readMeMinimized = false,
   onToggleReadMe,
   driveActive = false,
+  startActions,
 }: TaskbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const startRef = useRef<HTMLButtonElement | null>(null);
 
   // Close the menu when the pointer goes down anywhere outside the taskbar.
   useEffect(() => {
@@ -82,49 +88,30 @@ export function Taskbar({
   }, [menuOpen]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') setMenuOpen(false);
-  };
-
-  const pick = (fn: () => void) => () => {
-    playClick();
-    setMenuOpen(false);
-    fn();
+    if (e.key === 'Escape' && menuOpen) {
+      setMenuOpen(false);
+      startRef.current?.focus();
+    }
   };
 
   return (
     <div ref={rootRef} className="taskbar" role="toolbar" aria-label="Taskbar" onKeyDown={onKeyDown}>
       {menuOpen ? (
-        <div className="startmenu" role="menu" aria-label="Start menu">
-          <div className="startmenu__banner" aria-hidden="true">
-            <span>DiscLore 97</span>
-          </div>
-          <div className="startmenu__items">
-            {discs.map((d) => (
-              <button
-                key={d.disc_id}
-                type="button"
-                role="menuitem"
-                className="startmenu__item"
-                onClick={pick(() => {
-                  playSpinUp();
-                  onOpenDisc(d.disc_id);
-                })}
-              >
-                <PixelIcon name="cd" size={32} />
-                <span>{d.title}</span>
-              </button>
-            ))}
-            <div className="startmenu__sep" role="separator" />
-            <button type="button" role="menuitem" className="startmenu__item" onClick={pick(onCloseAll)}>
-              <PixelIcon name="key" size={32} />
-              <span>Close All Windows</span>
-            </button>
-          </div>
-        </div>
+        <StartMenu
+          {...startActions}
+          discs={discs}
+          onOpenDisc={onOpenDisc}
+          onCloseAll={onCloseAll}
+          onClose={() => {
+            setMenuOpen(false);
+            startRef.current?.focus();
+          }}
+        />
       ) : null}
 
       <button
         type="button"
+        ref={startRef}
         className="taskbar__start"
         aria-label="Start menu"
         aria-haspopup="menu"

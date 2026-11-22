@@ -22,6 +22,8 @@ export interface PackShelfProps {
   onRemoveDisc?: (discId: string) => void;
   /** Burns a sample disc about a topic. When given, the empty Burned CD-Rs tab offers three quick-start buttons. */
   onBurnSample?: (topic: string) => void;
+  /** The sample burns to offer. Defaults to the Classic '97 list. */
+  sampleBurns?: readonly { label: string; topic: string }[];
 }
 
 /** Quick-start burns offered while the library has no burned discs: a button label and the topic to look up. */
@@ -43,7 +45,7 @@ const TABS: readonly PackFilter[] = ['all', 'builtin', 'burned'];
  * scrolling shelf with a compact two-column grid of disc cards. Each card has an origin tag,
  * and burned discs add Save .json and Eject buttons.
  */
-export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemoveDisc, onBurnSample }: PackShelfProps) {
+export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemoveDisc, onBurnSample, sampleBurns = SAMPLE_BURNS }: PackShelfProps) {
   const [filter, setFilter] = useState<PackFilter>('all');
   const uid = useId();
   const isBurned = (d: DiscManifest) => removableIds?.has(d.disc_id) ?? false;
@@ -108,7 +110,7 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
             </p>
             {filter === 'burned' && onBurnSample ? (
               <div className="pack-samples" role="group" aria-label="Sample burns">
-                {SAMPLE_BURNS.map((s) => (
+                {sampleBurns.map((s) => (
                   <BevelButton key={s.topic} className="pack-sample" onClick={() => onBurnSample(s.topic)}>
                     {s.label}
                   </BevelButton>

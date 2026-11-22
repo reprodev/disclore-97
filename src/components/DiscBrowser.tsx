@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playSpinUp } from '../audio/audio';
 import type { Theme } from '../library/theme';
+import { editionOf } from '../model/editions';
 import type { DiscManifest } from '../model/manifest';
 import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
@@ -35,9 +36,11 @@ export interface DiscBrowserProps {
   onSelectGallery?: () => void;
   /** Opens Study Flashcards. Omit to hide the Flashcards button and View menu item. */
   onSelectFlashcards?: () => void;
-  /** The current theme. With onToggleTheme, the View menu offers the Haunted Edition toggle and the Home window a card. */
+  /** The current edition. With onCycleTheme, the View menu offers an Edition item that cycles it, and the Home window a card. */
   theme?: Theme;
-  onToggleTheme?: () => void;
+  onCycleTheme?: () => void;
+  /** Copies a link that reopens the current disc and view. Omit to hide View > Copy Share Link. */
+  onCopyShareLink?: () => void;
   /** Opens Take a Tour. Omit to hide the Tour button and View menu item. */
   onSelectTour?: () => void;
   /** Opens the Research Notebook. Omit to hide the Notebook button, View menu item, and Home card. */
@@ -130,7 +133,8 @@ export function DiscBrowser({
   onSelectGallery,
   onSelectFlashcards,
   theme = 'classic',
-  onToggleTheme,
+  onCycleTheme,
+  onCopyShareLink,
   onSelectTour,
   onOpenNotebook,
   onOpenDictionary,
@@ -237,7 +241,8 @@ export function DiscBrowser({
                   ...(goGallery ? [{ label: 'Gallery', onSelect: () => goGallery() }] : []),
                   ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
                   ...(goNotebook ? [{ label: 'Notebook...', onSelect: () => goNotebook() }] : []),
-                  ...(onToggleTheme ? [{ label: `Haunted Edition (${theme === 'haunted' ? 'On' : 'Off'})`, onSelect: onToggleTheme }] : []),
+                  ...(onCycleTheme ? [{ label: `Edition: ${editionOf(theme).name}`, onSelect: onCycleTheme }] : []),
+                  ...(onCopyShareLink ? [{ label: 'Copy Share Link', onSelect: onCopyShareLink }] : []),
                 ],
               },
               ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
@@ -326,7 +331,7 @@ export function DiscBrowser({
         onOpenDictionary={onOpenDictionary}
         onOpenNotebook={onOpenNotebook}
         theme={theme}
-        onToggleTheme={onToggleTheme}
+        onCycleTheme={onCycleTheme}
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}

@@ -36,7 +36,9 @@ import {
   serializeDiscImage,
 } from './library/discImage';
 import type { StorageLike } from './library/discLibrary';
+import { nextTheme } from './library/theme';
 import type { Theme } from './library/theme';
+import { hasDeepLink, parseDeepLink, resolveDeepLink, shareQuery } from './model/deepLink';
 import type { DeckState } from './model/flashcards';
 import type { DiscManifest, ValidationError } from './model/manifest';
 import {
@@ -70,6 +72,8 @@ export interface AppProps {
   fetch?: FetchLike;
   /** Storage for burned discs. Defaults to localStorage only when sources is omitted. */
   storage?: StorageLike;
+  /** The URL query string to read a deep link from (for example "?disc=castles&section=moat"). Defaults to the page's own. */
+  search?: string;
 }
 
 interface Shell {
@@ -79,10 +83,12 @@ interface Shell {
 
 const initialShell: Shell = { nav: initialNav, history: initialHistory };
 
-export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps) {
+export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: AppProps) {
   const discSources = sources ?? prebakedDiscs;
+  /** A shared link, read once on load. A link to a disc or a topic skips the boot splash. */
+  const [link] = useState(() => parseDeepLink(search ?? (typeof window !== 'undefined' ? window.location.search : '')));
   const [stage, setStage] = useState<'splash' | 'home'>(
-    (skipSplash ?? sources !== undefined) ? 'home' : 'splash',
+    (hasDeepLink(link) || (skipSplash ?? sources !== undefined)) ? 'home' : 'splash',
   );
   const [lastDiscId, setLastDiscId] = useState<string | null>(null);
   const [shell, setShell] = useState<Shell>(initialShell);
@@ -209,11 +215,11 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     applyTheme(document.documentElement, theme);
     return () => applyTheme(document.documentElement, 'classic');
   }, [theme]);
-  const toggleTheme = () => {
-    const next: Theme = theme === 'haunted' ? 'classic' : 'haunted';
+  const setEdition = (next: Theme) => {
     setTheme(next);
     saveTheme(bookmarkStorage, next);
   };
+  const cycleTheme = () => setEdition(nextTheme(theme));
 
   /** The disc the Notebook belongs to: the open disc, else the last one opened, else the first. */
   const notebookTarget = disc ?? discs.find((d) => d.disc_id === lastDiscId) ?? discs[0];
@@ -373,6 +379,40 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     if (r.state !== nav) visit(r.state.view);
   };
 
+  // A shared link is applied once, after the discs are known: a topic starts its burn, a disc opens on its view.
+  const linkApplied = useRef(false);
+  useEffect(() => {
+    if (linkApplied.current || !hasDeepLink(link)) return;
+    linkApplied.current = true;
+    if (link.topic !== undefined) {
+      setBurnSample(link.topic);
+      setBurnOpen(true);
+      return;
+    }
+    const target = resolveDeepLink(link, discs);
+    if (!target) return;
+    setLastDiscId(target.discId);
+    setShell({ nav: { discId: target.discId, view: target.view }, history: pushView(initialHistory, target.view) });
+  }, []);
+
+  /** Copies a link that reopens the current disc and view. Without clipboard access, it is shown in a message box. */
+  const [shareCopied, setShareCopied] = useState(false);
+  useEffect(() => {
+    if (!shareCopied) return;
+    const id = window.setTimeout(() => setShareCopied(false), 3000);
+    return () => window.clearTimeout(id);
+  }, [shareCopied]);
+  const copyShareLink = async () => {
+    if (!disc) return;
+    const url = window.location.href.split(/[?#]/)[0] + shareQuery(disc.disc_id, nav.view);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+    } catch {
+      setImageNotice({ title: 'Copy Share Link', message: 'Copy this link to share the page:', details: [url] });
+    }
+  };
+
   let main = null;
   // The taskbar tab follows the main window: the open disc, or the Home launcher when none is open.
   const active: ActiveWindowInfo = disc
@@ -435,7 +475,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   if (stage === 'splash') {
     return (
       <div className="desktop desktop--boot">
-        <BootSplash onDone={() => setStage('home')} />
+        <BootSplash onDone={() => setStage('home')} edition={theme} />
       </div>
     );
   }
@@ -457,7 +497,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onSelectTour={() => visit({ kind: 'tour' })}
           onSelectFlashcards={() => visit({ kind: 'flashcards' })}
           theme={theme}
-          onToggleTheme={toggleTheme}
+          onCycleTheme={cycleTheme}
+          onCopyShareLink={() => void copyShareLink()}
           onOpenNotebook={notebookTarget ? () => setNotebookDiscId(notebookTarget.disc_id) : undefined}
           onOpenDictionary={(word) => setDictionary({ word: word ?? '' })}
           onOpenShortcuts={() => setShortcutsOpen(true)}
@@ -498,6 +539,11 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
         {failures.map((errors, i) => (
           <ErrorList key={i} errors={errors} />
         ))}
+        {shareCopied ? (
+          <p role="status" className="app-not-found">
+            Link copied to the clipboard.
+          </p>
+        ) : null}
         {saveNotice ? (
           <p role="status" className="app-not-found">
             The disc is open, but it could not be saved to this browser.
@@ -570,6 +616,20 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
         readMeMinimized={readMeMinimized}
         onToggleReadMe={() => setReadMeMinimized((m) => !m)}
         driveActive={disc !== undefined}
+        startActions={{
+          onBurnNew: () => {
+            setBurnSample(null);
+            setBurnOpen(true);
+          },
+          onMountImage: openImagePicker,
+          onOpenDictionary: () => setDictionary({ word: '' }),
+          onTour: () => quickJump('tour'),
+          onFlashcards: () => quickJump('flashcards'),
+          onOpenReadMe: openReadMe,
+          onReplaySplash: () => setStage('splash'),
+          onSetTheme: setEdition,
+          theme,
+        }}
       />
     </div>
   );

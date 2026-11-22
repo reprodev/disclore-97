@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { collectFacts } from '../model/discSearch';
+import { prefersDisc } from '../model/editions';
+import type { Theme } from '../model/editions';
 import type { DiscManifest } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import '../styles/home.css';
@@ -10,6 +12,8 @@ export interface DidYouKnowProps {
   onOpenSection: (discId: string, sectionId: string) => void;
   /** [0, 1) generator that picks the first fact. Defaults to Math.random. */
   random?: () => number;
+  /** The active edition. The first fact comes from a disc that suits it, when one is mounted. */
+  edition?: Theme;
 }
 
 /**
@@ -17,13 +21,16 @@ export interface DidYouKnowProps {
  * disc and article it came from. Next Fact steps through the facts, moving from disc to disc.
  * Open Article jumps to the article that holds it.
  */
-export function DidYouKnow({ discs, onOpenSection, random = Math.random }: DidYouKnowProps) {
+export function DidYouKnow({ discs, onOpenSection, random = Math.random, edition = 'classic' }: DidYouKnowProps) {
   const facts = useMemo(() => collectFacts(discs), [discs]);
   const [start] = useState(() => random());
   const [step, setStep] = useState(0);
 
   if (facts.length === 0) return null;
-  const at = (Math.floor(start * facts.length) + step) % facts.length;
+  // Start from a fact of an edition-themed disc when there is one. Next Fact then walks every disc as usual.
+  const themed = facts.flatMap((f, i) => (prefersDisc(edition, f.discId, f.discTitle) ? [i] : []));
+  const base = themed.length > 0 ? themed[Math.min(themed.length - 1, Math.floor(start * themed.length))]! : Math.floor(start * facts.length);
+  const at = (base + step) % facts.length;
   const fact = facts[at]!;
 
   return (

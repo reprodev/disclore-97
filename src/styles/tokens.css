@@ -79,7 +79,7 @@
 }
 
 /*
- * Kiroween "Haunted Edition". Switched on by the `theme-haunted` class on <html> (View > Haunted Edition).
+ * Kiroween "Haunted Edition". Switched on by the `theme-haunted` class on <html> (View > Edition).
  * Midnight indigo desktop and title bars, slate-lavender window surfaces, jack-o'-lantern amber accents,
  * deep crimson highlights, and bone-ivory reading paper. Ink stays near black, so text on every surface
  * keeps a contrast ratio above 7:1. Token names are unchanged: only values differ.
@@ -128,6 +128,60 @@
   --color-dungeon-stone: #3A3650;
   --color-flame: #FF7A00;
   --color-flame-hot: #FFD21F;
+}
+
+
+/*
+ * Winter Solstice Edition. Switched on by the `theme-solstice` class on <html> (View > Edition).
+ * Deep evergreen desktop and title bars, frost-ivory paper, pale frost-green window surfaces, hearth-gold
+ * accents, and holly-berry crimson. Ink stays near black, so ink on every surface and light text on the
+ * title bar keep a contrast ratio above 7:1. Token names are unchanged: only values differ.
+ */
+:root.theme-solstice {
+  --color-surface: #B9C7BE;
+  --color-title-bg: #0F3D2E;
+  --color-title-text: #F6F9F2;
+  --color-bevel-hi: #EAF1EC;
+  --color-bevel-shadow: #5A6E63;
+  --color-bevel-edge: #050A07;
+  --color-tooltip-bg: #F8EBC4;
+
+  --color-desktop: #0A2A20;
+  --color-paper: #F1F5EF;
+  --color-ink: #070D0A;
+  --color-parchment: #DDE6DC;
+  --color-parchment-dark: #A9BBAE;
+  --color-watermark-ink: #8FA396;
+  --color-parchment-tint: #CBD8CD;
+
+  --color-stone-light: #C4D0C8;
+  --color-stone: #8DA095;
+  --color-stone-dark: #4F6157;
+
+  /* Hearth gold */
+  --color-gold-light: #F2CB78;
+  --color-gold: #D9A03A;
+  --color-gold-dark: #7F5412;
+
+  /* Holly berry */
+  --color-crimson-light: #B8404F;
+  --color-crimson: #7A1823;
+  --color-crimson-dark: #441017;
+
+  --color-forest-light: #4FA06A;
+  --color-forest: #1A5A3A;
+  --color-forest-dark: #0C3320;
+
+  --color-night: #0A2A20;
+  --color-night-light: #14503D;
+  --color-console-bg: #123F31;
+  --color-console-text: #F6F9F2;
+  --color-console-accent: #F2CB78;
+  --color-console-dim: #D9A03A;
+  --color-dungeon-bg: #101C17;
+  --color-dungeon-stone: #3B4A42;
+  --color-flame: #F08A24;
+  --color-flame-hot: #FFD966;
 }
 
 * {

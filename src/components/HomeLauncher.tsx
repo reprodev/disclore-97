@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { playSlideClick } from '../audio/audio';
 import type { Theme } from '../library/theme';
+import { editionOf } from '../model/editions';
 import { pickRandomSection } from '../model/discSearch';
 import type { DiscManifest } from '../model/manifest';
 import type { QuickJumpMode } from '../model/nav';
@@ -23,7 +24,7 @@ export interface HomeLauncherProps {
   onOpenReadMe?: () => void;
   /** The current theme, and its toggle. Omit the toggle to hide the Utilities card. */
   theme?: Theme;
-  onToggleTheme?: () => void;
+  onCycleTheme?: () => void;
   /** Opens the Research Notebook. Omit to hide the Utilities card. */
   onOpenNotebook?: () => void;
   /** Opens the Dictionary dialog. Omit to hide the Utilities card. */
@@ -110,7 +111,7 @@ export function HomeLauncher({
   onOpenDictionary,
   onOpenNotebook,
   theme = 'classic',
-  onToggleTheme,
+  onCycleTheme,
   onReplaySplash,
   onBurnNew,
   onMountImage,
@@ -132,6 +133,7 @@ export function HomeLauncher({
     playSlideClick();
     onOpenSection(pick.discId, pick.sectionId);
   };
+  const edition = editionOf(theme);
   const packs = `${discs.length} Expansion ${discs.length === 1 ? 'Pack' : 'Packs'} Ready`;
 
   return (
@@ -151,7 +153,7 @@ export function HomeLauncher({
             <HeroArt />
           </div>
           <div className="home-hero__text">
-            <p className="home-hero__eyebrow">Multimedia Encyclopedia &bull; 1997 Edition</p>
+            <p className="home-hero__eyebrow">{edition.eyebrow}</p>
             <h1 className="home-hero__title" aria-label="DiscLore '97">
               <span className="home-hero__word" aria-hidden="true">
                 DiscLore
@@ -182,8 +184,9 @@ export function HomeLauncher({
               onSaveDiscImage={onSaveDiscImage}
               onRemoveDisc={onRemoveDisc}
               onBurnSample={onBurnSample}
+              sampleBurns={edition.sampleBurns}
             />
-            {onOpenSection ? <DidYouKnow discs={discs} onOpenSection={onOpenSection} random={random} /> : null}
+            {onOpenSection ? <DidYouKnow discs={discs} onOpenSection={onOpenSection} random={random} edition={theme} /> : null}
           </Group>
 
           <div className="home__side">
@@ -262,12 +265,12 @@ export function HomeLauncher({
                     onClick={() => onOpenNotebook()}
                   />
                 ) : null}
-                {onToggleTheme ? (
+                {onCycleTheme ? (
                   <Card
                     icon="torch"
-                    title={`Haunted Edition: ${theme === 'haunted' ? 'On' : 'Off'}`}
-                    text="switch the Kiroween theme"
-                    onClick={onToggleTheme}
+                    title={`Edition: ${edition.name}`}
+                    text="switch between Classic, Haunted, and Winter Solstice"
+                    onClick={onCycleTheme}
                   />
                 ) : null}
                 <Card

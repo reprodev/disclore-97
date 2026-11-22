@@ -445,19 +445,22 @@ describe('Haunted Edition theme', () => {
     expect(el.classList.contains(HAUNTED_CLASS)).toBe(false);
   });
 
-  it('the View menu toggle switches the class on <html> and saves the choice', async () => {
+  it('the View menu Edition item switches the class on <html> and saves the choice', async () => {
     const user = userEvent.setup();
     const storage = memoryStorage();
     render(<App sources={[deckDisc]} storage={storage} />);
     await openDisc(user, 'Deck Disc');
     expect(root.classList.contains('theme-haunted')).toBe(false);
     await user.click(screen.getByRole('menuitem', { name: 'View' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Haunted Edition (Off)' }));
+    await user.click(screen.getByRole('menuitem', { name: "Edition: Classic '97" }));
     expect(root.classList.contains('theme-haunted')).toBe(true);
     expect(storage.map.get('disclore97.theme')).toBe('haunted');
     await user.click(screen.getByRole('menuitem', { name: 'View' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Haunted Edition (On)' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Edition: Haunted Edition' }));
     expect(root.classList.contains('theme-haunted')).toBe(false);
+    expect(storage.map.get('disclore97.theme')).toBe('solstice');
+    await user.click(screen.getByRole('menuitem', { name: 'View' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Edition: Winter Solstice' }));
     expect(storage.map.has('disclore97.theme')).toBe(false);
   });
 
@@ -472,14 +475,14 @@ describe('Haunted Edition theme', () => {
     expect(root.classList.contains('theme-haunted')).toBe(true);
   });
 
-  it('the Home window has a compact toggle too', async () => {
+  it('the Home window has an Edition card that cycles it too', async () => {
     const user = userEvent.setup();
     const storage = memoryStorage();
     render(<App sources={[deckDisc]} storage={storage} />);
-    await user.click(screen.getByRole('button', { name: /Haunted Edition: Off/ }));
+    await user.click(screen.getByRole('button', { name: /Edition: Classic '97/ }));
     expect(root.classList.contains('theme-haunted')).toBe(true);
     expect(storage.map.get('disclore97.theme')).toBe('haunted');
-    expect(screen.getByRole('button', { name: /Haunted Edition: On/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Edition: Haunted Edition/ })).toBeTruthy();
   });
 });
 
