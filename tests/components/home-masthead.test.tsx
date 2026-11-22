@@ -135,10 +135,11 @@ describe('editorial action rail', () => {
   it('lists Quick Jump Modes as icon, bold title, and italic one-line subtitle', () => {
     renderHome();
     const quick = rows('Quick Jump Modes');
-    expect(quick.map(title)).toEqual(['Interactive Diagrams', 'KeepMaze Quest', 'Surprise Me!']);
+    expect(quick.map(title)).toEqual(['Interactive Diagrams', 'KeepMaze Quest', 'Take a Tour', 'Surprise Me!']);
     expect(quick.map(sub)).toEqual([
       'find and jump straight to pin diagrams',
       'explore the trivia dungeon',
+      'a guided walk through a disc, stop by stop',
       'open a random article from any disc',
     ]);
   });

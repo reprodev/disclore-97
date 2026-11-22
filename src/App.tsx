@@ -7,6 +7,8 @@ import { BootSplash } from './components/BootSplash';
 import { DesktopIcons } from './components/DesktopIcons';
 import { DictionaryDialog } from './components/DictionaryDialog';
 import { MediaGallery } from './components/MediaGallery';
+import { NotebookDialog } from './components/NotebookDialog';
+import { TourView } from './components/TourView';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
 import { MessageDialog } from './components/MessageDialog';
@@ -21,6 +23,7 @@ import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
 import { loadBookmarks, saveBookmarks, toggleBookmark } from './library/bookmarks';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
+import { appendNote, formatNote, loadNotes, saveNotes } from './library/notebook';
 import { loadVisited, markVisited, saveVisited } from './library/visited';
 import {
   MAX_IMAGE_BYTES,
@@ -109,6 +112,10 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   /** The Dictionary dialog: null when closed, otherwise the word it opened with ('' for none). */
   const [dictionary, setDictionary] = useState<{ word: string } | null>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  /** The Research Notebook dialog: null when closed, otherwise the disc whose notes it shows. */
+  const [notebookDiscId, setNotebookDiscId] = useState<string | null>(null);
+  /** Zero-based stop of Take a Tour. A different disc starts again at the first stop. */
+  const [tourStop, setTourStop] = useState(0);
   const [burnOpen, setBurnOpen] = useState(false);
   /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
   const [burnSample, setBurnSample] = useState<string | null>(null);
@@ -183,6 +190,18 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [discIsOpen]);
+
+  // A different disc starts its tour again at the first stop.
+  useEffect(() => {
+    setTourStop(0);
+  }, [marksDiscId]);
+
+  /** The disc the Notebook belongs to: the open disc, else the last one opened, else the first. */
+  const notebookTarget = disc ?? discs.find((d) => d.disc_id === lastDiscId) ?? discs[0];
+  const addNote = (sectionTitle: string, fact: string) => {
+    if (!disc) return;
+    saveNotes(bookmarkStorage, disc.disc_id, appendNote(loadNotes(bookmarkStorage, disc.disc_id), formatNote(sectionTitle, fact)));
+  };
 
   const toggleMark = (sectionId: string) => {
     if (!disc) return;
@@ -290,7 +309,13 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   const quickJump = (mode: QuickJumpMode) => {
     const target = pickQuickJump(discs, lastDiscId, mode);
     if (!target) {
-      setNotFound(mode === 'diagram' ? 'No interactive diagrams are available.' : 'No KeepMaze dungeons are available.');
+      setNotFound(
+        mode === 'diagram'
+          ? 'No interactive diagrams are available.'
+          : mode === 'tour'
+            ? 'No tours are available.'
+            : 'No KeepMaze dungeons are available.',
+      );
       return;
     }
     setDiagramFocus(null);
@@ -346,9 +371,12 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           bookmarked={marks.includes(v.section_id)}
           onToggleBookmark={() => toggleMark(v.section_id)}
           onLookUpWord={(word) => setDictionary({ word })}
+          {...(bookmarkStorage ? { onAddNote: addNote } : {})}
           {...(disc.media ? { media: disc.media } : {})}
         />
       );
+    } else if (v.kind === 'tour') {
+      main = <TourView disc={disc} stop={tourStop} onStop={setTourStop} onOpenSection={goSection} />;
     } else if (v.kind === 'gallery') {
       main = <MediaGallery disc={disc} onOpenSection={goSection} />;
     } else if (v.kind === 'timeline') {
@@ -403,6 +431,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onSelectDungeon={(dungeon_id) => visit({ kind: 'keepmaze', dungeon_id })}
           onSelectTimeline={() => visit({ kind: 'timeline' })}
           onSelectGallery={() => visit({ kind: 'gallery' })}
+          onSelectTour={() => visit({ kind: 'tour' })}
+          onOpenNotebook={notebookTarget ? () => setNotebookDiscId(notebookTarget.disc_id) : undefined}
           onOpenDictionary={(word) => setDictionary({ word: word ?? '' })}
           onOpenShortcuts={() => setShortcutsOpen(true)}
           bookmarks={marks}
@@ -474,6 +504,14 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
             onClose={closeReadMe}
             onMinimize={() => setReadMeMinimized(true)}
             minimized={readMeMinimized}
+          />
+        ) : null}
+        {notebookDiscId !== null && discs.some((d) => d.disc_id === notebookDiscId) ? (
+          <NotebookDialog
+            discId={notebookDiscId}
+            discTitle={discs.find((d) => d.disc_id === notebookDiscId)!.title}
+            storage={bookmarkStorage}
+            onClose={() => setNotebookDiscId(null)}
           />
         ) : null}
         {shortcutsOpen ? <ShortcutsDialog onClose={() => setShortcutsOpen(false)} /> : null}

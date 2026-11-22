@@ -11,6 +11,7 @@ import { CiteDialog } from './CiteDialog';
 import { MediaReel } from './MediaReel';
 import { Plate } from './Plate';
 import '../styles/article.css';
+import '../styles/notebook.css';
 
 export interface ArticleViewerProps {
   sections: Section[];
@@ -31,6 +32,8 @@ export interface ArticleViewerProps {
   media?: MediaItem[];
   /** Called with a single word the reader double-clicked in the text. Opens the Dictionary. */
   onLookUpWord?: (word: string) => void;
+  /** Adds a Quick Fact to the disc's Research Notebook. When omitted, the + Note buttons are not shown. */
+  onAddNote?: (sectionTitle: string, fact: string) => void;
 }
 
 export function ArticleViewer({
@@ -44,6 +47,7 @@ export function ArticleViewer({
   onToggleBookmark,
   media,
   onLookUpWord,
+  onAddNote,
 }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [citeOpen, setCiteOpen] = useState(false);
@@ -58,6 +62,8 @@ export function ArticleViewer({
   const [findQuery, setFindQuery] = useState('');
   const [findIndex, setFindIndex] = useState(0);
   const findInputRef = useRef<HTMLInputElement | null>(null);
+  /** The fact just added to the Notebook, shown briefly as confirmation. */
+  const [noteAdded, setNoteAdded] = useState(false);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
 
@@ -79,6 +85,16 @@ export function ArticleViewer({
     const el = ref.current?.querySelector<HTMLElement>('[data-speaking="true"]');
     el?.scrollIntoView?.({ block: 'nearest' });
   }, [speakingAt]);
+
+  // The confirmation belongs to one article and fades after a moment.
+  useEffect(() => {
+    setNoteAdded(false);
+  }, [sectionId]);
+  useEffect(() => {
+    if (!noteAdded) return;
+    const id = window.setTimeout(() => setNoteAdded(false), 2500);
+    return () => window.clearTimeout(id);
+  }, [noteAdded]);
 
   // Each article starts at its first match.
   useEffect(() => {
@@ -305,9 +321,28 @@ export function ArticleViewer({
               <h2 className="article-callout__title">Quick Facts</h2>
               <ul className="article-callout__list">
                 {facts.map((f, i) => (
-                  <li key={i}>{f}</li>
+                  <li key={i}>
+                    {f}
+                    {onAddNote ? (
+                      <BevelButton
+                        className="article-callout__add"
+                        aria-label={`Add to Notebook: ${f}`}
+                        onClick={() => {
+                          onAddNote(section.title, f);
+                          setNoteAdded(true);
+                        }}
+                      >
+                        + Note
+                      </BevelButton>
+                    ) : null}
+                  </li>
                 ))}
               </ul>
+              {onAddNote ? (
+                <p className="article-callout__added" aria-live="polite">
+                  {noteAdded ? 'Added to Notebook.' : ''}
+                </p>
+              ) : null}
             </section>
           </div>
         ) : null}

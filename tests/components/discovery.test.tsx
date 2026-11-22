@@ -404,7 +404,7 @@ describe('Surprise Me!', () => {
     const names = within(group)
       .getAllByRole('button')
       .map((b) => b.querySelector('.home-card__title')!.textContent);
-    expect(names).toEqual(['Interactive Diagrams', 'KeepMaze Quest', 'Surprise Me!']);
+    expect(names).toEqual(['Interactive Diagrams', 'KeepMaze Quest', 'Take a Tour', 'Surprise Me!']);
   });
 
   it('opens a random article from any disc', async () => {

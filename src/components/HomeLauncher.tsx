@@ -20,6 +20,8 @@ export interface HomeLauncherProps {
   /** Opens a disc straight to its first diagram or dungeon. Omit to disable the cards. */
   onQuickJump?: (mode: QuickJumpMode) => void;
   onOpenReadMe?: () => void;
+  /** Opens the Research Notebook. Omit to hide the Utilities card. */
+  onOpenNotebook?: () => void;
   /** Opens the Dictionary dialog. Omit to hide the Utilities card. */
   onOpenDictionary?: (word?: string) => void;
   onReplaySplash?: () => void;
@@ -102,6 +104,7 @@ export function HomeLauncher({
   onQuickJump,
   onOpenReadMe,
   onOpenDictionary,
+  onOpenNotebook,
   onReplaySplash,
   onBurnNew,
   onMountImage,
@@ -194,6 +197,13 @@ export function HomeLauncher({
                   disabled={!hasDungeons}
                   onClick={onQuickJump ? () => onQuickJump('keepmaze') : undefined}
                 />
+                <Card
+                  icon="castle"
+                  title="Take a Tour"
+                  text="a guided walk through a disc, stop by stop"
+                  disabled={!hasSections}
+                  onClick={onQuickJump ? () => onQuickJump('tour') : undefined}
+                />
                 {onOpenSection ? (
                   <Card
                     icon="book"
@@ -229,6 +239,14 @@ export function HomeLauncher({
                     title="Dictionary..."
                     text="look up a word on every mounted disc"
                     onClick={() => onOpenDictionary()}
+                  />
+                ) : null}
+                {onOpenNotebook ? (
+                  <Card
+                    icon="notepad"
+                    title="Notebook..."
+                    text="your study notes for a disc"
+                    onClick={() => onOpenNotebook()}
                   />
                 ) : null}
                 <Card

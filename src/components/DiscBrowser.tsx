@@ -32,6 +32,10 @@ export interface DiscBrowserProps {
   bookmarks?: readonly string[];
   /** Opens the Media Gallery view. Omit to hide the Gallery button and View menu item. */
   onSelectGallery?: () => void;
+  /** Opens Take a Tour. Omit to hide the Tour button and View menu item. */
+  onSelectTour?: () => void;
+  /** Opens the Research Notebook. Omit to hide the Notebook button, View menu item, and Home card. */
+  onOpenNotebook?: () => void;
   /** Opens the Dictionary dialog. Omit to hide the Dictionary button, View menu item, and Home card. */
   onOpenDictionary?: (word?: string) => void;
   /** Opens the Keyboard Shortcuts dialog. Omit to hide the Help menu. */
@@ -91,6 +95,9 @@ function describeView(disc: DiscManifest, view: View | null): { trail: string[];
   if (view?.kind === 'timeline') {
     return { trail: ['Timeline'], label: 'Timeline' };
   }
+  if (view?.kind === 'tour') {
+    return { trail: ['Tour'], label: 'Take a Tour' };
+  }
   if (view?.kind === 'gallery') {
     return { trail: ['Gallery'], label: 'Media Gallery' };
   }
@@ -112,6 +119,8 @@ export function DiscBrowser({
   onSelectTimeline,
   bookmarks,
   onSelectGallery,
+  onSelectTour,
+  onOpenNotebook,
   onOpenDictionary,
   onOpenShortcuts,
   visited,
@@ -167,6 +176,8 @@ export function DiscBrowser({
     const goDiagram = first.diagram === undefined ? undefined : () => onSelectDiagram(first.diagram!);
     const goTimeline = onSelectTimeline && hasTimeline(disc) ? onSelectTimeline : undefined;
     const goGallery = onSelectGallery;
+    const goTour = onSelectTour && disc.sections.length > 0 ? onSelectTour : undefined;
+    const goNotebook = onOpenNotebook;
     const goDictionary = onOpenDictionary ? () => onOpenDictionary() : undefined;
     const goKeepMaze = first.dungeon === undefined ? undefined : () => onSelectDungeon(first.dungeon!);
     const { trail, label } = describeView(disc, view);
@@ -208,8 +219,10 @@ export function DiscBrowser({
                   { label: 'Diagram', onSelect: () => goDiagram?.() },
                   { label: 'Timeline', onSelect: () => goTimeline?.() },
                   { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
+                  ...(goTour ? [{ label: 'Tour', onSelect: () => goTour() }] : []),
                   ...(goGallery ? [{ label: 'Gallery', onSelect: () => goGallery() }] : []),
                   ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
+                  ...(goNotebook ? [{ label: 'Notebook...', onSelect: () => goNotebook() }] : []),
                 ],
               },
               ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
@@ -227,6 +240,8 @@ export function DiscBrowser({
           onDiagram={goDiagram}
           onTimeline={goTimeline}
           onKeepMaze={goKeepMaze}
+          onTour={goTour}
+          onNotebook={goNotebook}
           onGallery={goGallery}
           onDictionary={goDictionary}
         />
@@ -293,6 +308,7 @@ export function DiscBrowser({
         onQuickJump={onQuickJump}
         onOpenReadMe={onOpenReadMe}
         onOpenDictionary={onOpenDictionary}
+        onOpenNotebook={onOpenNotebook}
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}
