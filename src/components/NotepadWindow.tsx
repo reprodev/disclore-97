@@ -35,6 +35,11 @@ READING
 - Cite / Print Preview: shows a page-style preview and a Copy Citation button.
 - Read Aloud: your browser's own voice reads the article, one paragraph at a time. The paragraph being read is highlighted, and the button shows how far it has got, for example Stop (2/5). The 1x / 1.2x button next to it sets the speed. Use Stop or the Sound button to silence it.
 
+LOOKING THINGS UP
+- Dictionary: the Dictionary button on the toolbar, View > Dictionary..., and the Dictionary card on the Home window open a word finder. Double-click a single word in an article to open it with that word filled in. As you type, it lists where the word appears on every open disc: article titles, Quick Facts, and sentences. Click a result to open that article. Press Look Up to fetch a short definition, which needs a connection. If the word is not found or you are offline, the matches from your discs are still shown.
+- Media Gallery: the Gallery button shows a contact sheet for the open disc. If the disc has pictures, click one to open it in the Picture Viewer. If it has none, each article is shown as an illustration plate, and a click opens that article.
+- Read articles: the contents list puts a check mark beside every article you have opened and shows how many you have read, for example 3 / 10 read. This is kept on this computer for each disc.
+- Find in Article: the Find in Article button opens a search bar for the open article. Matches are highlighted, and Previous match, Next match, or Enter and Shift+Enter step through them. Escape closes the bar.
 PICTURES
 - When a disc has pictures, the Multimedia Reel shows them in a picture frame with Prev, Next, Enlarge, and a Frame X / Y counter.
 - Click a picture, or press Enlarge, to open the Picture Viewer. This is the only place the slideshow plays: Play and Pause step through the pictures every four seconds, and closing the window pauses it. Space starts and pauses the show, Arrow Left and Arrow Right change picture, the thumbnail strip jumps to a picture, and Escape closes the window.

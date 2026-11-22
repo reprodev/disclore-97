@@ -19,6 +19,10 @@ A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Br
 - **Diagram pin previews.** Hovering or focusing a numbered pin shows a Win95 preview card with the target article's title and its first Quick Fact (or its first sentence), before you click.
 - **Inline cross-links.** When a paragraph mentions another article's title from the same disc, the words become a link. It is built in pure React from text pieces (`src/model/crossLinks.ts`), never from HTML. The article itself is never linked, each target is linked at most once per paragraph, longer titles win over shorter overlapping ones, and titles under four characters are skipped.
 - **Bookmarks.** A **Bookmark / Bookmarked** toggle in the article tools saves the article in `localStorage` per disc (`disclore97.bookmarks.<disc_id>`, apart from the burned-disc library). A **Bookmarks** list appears in the contents sidebar once there is at least one.
+- **Encarta Dictionary.** A **Dictionary** toolbar button, a **View > Dictionary...** item, and a **Dictionary...** card in the Home Utilities open a Win95 dialog. Double-clicking a single word in an article opens it pre-filled with that word. While you type, it lists whole-word matches from every mounted disc: section titles, Quick Facts, and body sentences (`findMentions` in `src/model/discSearch.ts`). Press **Look Up** for a short plain-text definition from `/api/define`, which calls the free Dictionary API. If the word is not found or the network is down, the dialog says so and keeps the disc matches, so it still works offline.
+- **Media Gallery.** A **Gallery** toolbar button and **View > Gallery** item open a contact sheet for the open disc. A disc with extracted pictures shows every picture with its caption, and clicking one opens the Picture Viewer at that frame. A built-in or offline disc has no pictures, so each article's SVG plate is shown instead, and clicking a plate opens that article.
+- **Study progress.** Each article you open is remembered per disc in `localStorage` as `disclore97.visited.<disc_id>`, apart from bookmarks and the burned-disc library. The contents sidebar puts a check mark on read articles and shows an "X / Y read" note.
+- **Find in Article.** A **Find in Article** toggle in the article tools opens a search bar with Previous match, Next match, and an "X of Y" counter. Enter goes to the next match, Shift+Enter to the previous, and Escape closes the bar. Matches are highlighted with `<mark>`. The text is split in pure React (`src/model/findInText.ts`), so cross-links stay buttons and no HTML is built.
 - **KeepMaze.** A trivia dungeon with a Quest card, a mini-map with a legend, Peek Hint, and a torchlight pulse on each room. Maze layouts are verified with breadth-first search (BFS), so the exit is always reachable.
 - **KeepMaze MindMaze scoring.** The Quest card shows **Score**, **Streak**, and **Torches**. A right answer earns 100 points plus a streak bonus of 10 per answer already in a row (capped at +50), or 50 points with no bonus if Peek Hint was used. A wrong answer resets the streak and dims one of three torches. The score never goes down and torches stop at zero, so a player can never be locked out of finishing the maze. The Victory Certificate is stamped with Score, Best Streak, and a **Scholar Rank** (Royal Archivist, Court Scholar, Keep Explorer, or Torchbearer), set by the share of the best possible score for the moves taken. The rules are pure functions in `src/model/game.ts`.
 - **1997 palette.** Royal Sapphire, Warm Ivory, Burgundy, and Antique Gold, on top of the seven required Win95 chrome colors. All colors live in `src/styles/tokens.css`.
@@ -52,13 +56,13 @@ src/
                media rules, and the seeded disc compiler (model/compile/).
   adapters/    Source readers for Burn New CD-R Disc: github, webpage, topic, markdown, burn.
   extract/     Server-side logic shared by the Pages Functions: SSRF guard, HTML extractor,
-               /api/extract handler, /api/topic handler.
+               /api/extract, /api/topic and /api/define handlers.
   library/     localStorage persistence for burned discs, and disc image (.json) save and mount.
   audio/       The only code that touches AudioContext (effects and ambience), plus Web Speech narration.
   components/  Win95 components: windows, viewers, MediaReel, Picture Viewer, KeepMaze UI.
   discs/       The four built-in discs and the loader.
   styles/      CSS, with all colors defined once in tokens.css.
-functions/api/ Cloudflare Pages Functions: extract.ts and topic.ts.
+functions/api/ Cloudflare Pages Functions: extract.ts, topic.ts and define.ts.
 ```
 
 The model layer has no React and no DOM. The compiler is pure and seeded, so the same source always gives the same disc, apart from pictures, which never change the seed.
@@ -109,12 +113,13 @@ Because a disc image is just the manifest, it works offline and can be edited by
 
 ### The server functions
 
-Two optional Cloudflare Pages Functions do the work the browser cannot. The app builds and runs without them. Only the `webpage` and `topic` sources need them, and the topic source falls back to the outline.
+Three optional Cloudflare Pages Functions do the work the browser cannot. The app builds and runs without them. Only the `webpage` and `topic` sources need the first two, and the topic source falls back to the outline. The Dictionary needs `/api/define` only for its online definition and falls back to matches from the mounted discs.
 
 | Route | File | Shared logic | What it does |
 | --- | --- | --- | --- |
 | `/api/extract?url=...` | `functions/api/extract.ts` | `src/extract/handler.ts` | Fetches a public web page and returns its title, headings, paragraphs, and pictures. |
 | `/api/topic?q=...` | `functions/api/topic.ts` | `src/extract/topicHandler.ts` | Searches English Wikipedia and returns the best article's text and pictures. |
+| `/api/define?word=...` | `functions/api/define.ts` | `src/extract/defineHandler.ts` | Looks one English word up in the free Dictionary API and returns up to three short meanings. The word must be a single run of letters, and the host is fixed in code. |
 
 `/api/extract` has an SSRF guard. It rejects non-HTTP(S) URLs and private, loopback, and link-local addresses, and it re-checks every redirect. The guard cannot fully prevent DNS rebinding, because the hostname is resolved again when the request is made. Treat it as defense in depth, not a complete barrier. `/api/topic` only ever calls the English Wikipedia API, and the search text is passed as data.
 
@@ -151,7 +156,7 @@ The app is a static site plus optional Pages Functions. Use these settings:
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
 
-Cloudflare Pages picks up `functions/api/extract.ts` and `functions/api/topic.ts` automatically. No API keys or environment variables are needed.
+Cloudflare Pages picks up `functions/api/extract.ts`, `functions/api/topic.ts` and `functions/api/define.ts` automatically. No API keys or environment variables are needed.
 
 ## Attribution and Content Licensing
 
