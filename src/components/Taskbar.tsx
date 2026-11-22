@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { playClick, playSpinUp } from '../audio/audio';
 import type { DiscManifest } from '../model/manifest';
+import { AmbienceToggle } from './AmbienceToggle';
 import { MuteToggle } from './MuteToggle';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
@@ -188,6 +189,7 @@ export function Taskbar({
           <PixelIcon name="cd" size={16} />
           <span className="taskbar__led" aria-hidden="true" />
         </span>
+        <AmbienceToggle />
         <MuteToggle />
         <TrayClock />
       </div>

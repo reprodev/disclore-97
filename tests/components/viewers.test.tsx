@@ -12,6 +12,8 @@ const audio = vi.hoisted(() => {
     playPageFlip: vi.fn(),
     playTorch: vi.fn(),
     playDoorUnlock: vi.fn(),
+    playVictoryFanfare: vi.fn(),
+    playSlideClick: vi.fn(),
     isMuted: () => muted,
     setMuted: (m: boolean) => {
       muted = m;
@@ -265,6 +267,7 @@ describe('KeepMazeUI (Req 12.x)', () => {
     expect(msg.textContent).toMatch(/Victory/);
     expect(msg.textContent).toContain('2 moves');
     expect(msg.textContent).toContain('1 incorrect');
+    expect(audio.playVictoryFanfare).toHaveBeenCalledTimes(1);
     await user.click(screen.getByRole('button', { name: 'Restart' }));
     expect(screen.getByText('A cold gate.')).toBeTruthy();
     expect(screen.getByText('Moves: 0')).toBeTruthy();

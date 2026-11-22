@@ -202,3 +202,7 @@
 .taskbar__tabs {
   gap: 2px;
 }
+
+.ambience-toggle {
+  min-width: 0;
+}

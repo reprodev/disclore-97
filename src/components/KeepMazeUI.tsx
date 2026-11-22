@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { playDoorUnlock, playTorch } from '../audio/audio';
+import { playDoorUnlock, playTorch, playVictoryFanfare } from '../audio/audio';
 import { gameReducer, initGame } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
 import { ENTRANCE_ROOM_ID } from '../model/manifest';
@@ -54,6 +54,11 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, rng = Math.random }: 
   useEffect(() => {
     if (started) playTorch();
   }, [started, state.roomId]);
+
+  // Fanfare once, when the throne room is reached.
+  useEffect(() => {
+    if (state.won) playVictoryFanfare();
+  }, [state.won]);
 
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);

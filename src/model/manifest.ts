@@ -68,10 +68,17 @@ export interface Section {
  * Colors are `currentColor`, `none`, or `var(--...)`; no hex literals.
  */
 export type Shape =
-  | { kind: 'rect'; x: number; y: number; width: number; height: number; fill?: string; stroke?: string }
-  | { kind: 'circle'; cx: number; cy: number; r: number; fill?: string; stroke?: string }
-  | { kind: 'line'; x1: number; y1: number; x2: number; y2: number; stroke?: string }
-  | { kind: 'polygon'; points: [number, number][]; fill?: string; stroke?: string };
+  | { kind: 'rect'; x: number; y: number; width: number; height: number; fill?: string; stroke?: string; anim?: ShapeAnim }
+  | { kind: 'circle'; cx: number; cy: number; r: number; fill?: string; stroke?: string; anim?: ShapeAnim }
+  | { kind: 'line'; x1: number; y1: number; x2: number; y2: number; stroke?: string; anim?: ShapeAnim }
+  | { kind: 'polygon'; points: [number, number][]; fill?: string; stroke?: string; anim?: ShapeAnim };
+
+/**
+ * Optional micro-animation for a built-in shape: a blinking cursor, a flickering flame, or a glint.
+ * Only these three names are valid. They are drawn with CSS and stop for reduced motion.
+ */
+export type ShapeAnim = 'blink' | 'flicker' | 'glint';
+export const SHAPE_ANIMS: readonly ShapeAnim[] = ['blink', 'flicker', 'glint'];
 
 /** A clickable point on a diagram. `x` and `y` must be within 0..100 inclusive. */
 export interface Hotspot {

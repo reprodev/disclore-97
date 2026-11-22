@@ -77,7 +77,7 @@ export function HeroArt() {
       <circle cx={100} cy={40} r={11} fill={C.gold} />
       <circle cx={100} cy={40} r={8} fill={C.surface} />
       <circle cx={100} cy={40} r={3} fill={C.night} />
-      <polygon points="88,28 96,24 98,26 90,32" fill={C.paper} />
+      <polygon className="hero-glint" points="88,28 96,24 98,26 90,32" fill={C.paper} />
 
       {/* Ground */}
       <rect x={0} y={66} width={200} height={14} fill={C.forestDark} />
@@ -95,11 +95,11 @@ export function HeroArt() {
       {merlons([26, 31, 36, 41, 45], 19, 3, C.stoneDark)}
       <rect x={36} y={8} width={1} height={11} fill={C.paper} />
       <polygon points="37,8 47,11 37,14" fill={C.crimson} />
-      <rect x={35} y={30} width={4} height={7} fill={C.gold} />
-      <rect x={30} y={44} width={3} height={5} fill={C.gold} />
-      <rect x={42} y={44} width={3} height={5} fill={C.gold} />
-      <rect x={13} y={42} width={2} height={5} fill={C.gold} />
-      <rect x={57} y={42} width={2} height={5} fill={C.gold} />
+      <rect className="hero-torch" x={35} y={30} width={4} height={7} fill={C.gold} />
+      <rect className="hero-torch hero-torch--b" x={30} y={44} width={3} height={5} fill={C.gold} />
+      <rect className="hero-torch" x={42} y={44} width={3} height={5} fill={C.gold} />
+      <rect className="hero-torch hero-torch--b" x={13} y={42} width={2} height={5} fill={C.gold} />
+      <rect className="hero-torch" x={57} y={42} width={2} height={5} fill={C.gold} />
       <rect x={33} y={54} width={8} height={12} fill={C.ink} />
       <polygon points="33,54 37,50 41,54" fill={C.ink} />
 
@@ -114,7 +114,7 @@ export function HeroArt() {
       <rect x={148} y={35} width={26} height={2} fill={C.phosDim} />
       <rect x={148} y={40} width={14} height={2} fill={C.phos} />
       <rect x={148} y={45} width={22} height={2} fill={C.phosDim} />
-      <rect x={148} y={49} width={4} height={3} fill={C.phos} />
+      <rect className="hero-cursor" x={148} y={49} width={4} height={3} fill={C.phos} />
       <rect x={156} y={58} width={16} height={4} fill={C.surface} />
       <rect x={150} y={62} width={28} height={4} fill={C.shadow} />
       <rect x={182} y={54} width={3} height={2} fill={C.crimsonLight} />

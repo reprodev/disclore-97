@@ -39,6 +39,8 @@ export function ArticleViewer({
   /** Narration progress, 1-based paragraph number out of the total. Null when not speaking. */
   const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
   const speaking = progress !== null;
+  /** Reading speed: normal, or brisk. */
+  const [rate, setRate] = useState<1 | 1.2>(1);
   const [muted, setMuted] = useState(isMuted);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
@@ -53,6 +55,14 @@ export function ArticleViewer({
     setProgress(null);
     return () => stopSpeaking();
   }, [sectionId]);
+
+  // Keep the paragraph being read in view.
+  const speakingAt = progress?.current ?? 0;
+  useEffect(() => {
+    if (speakingAt === 0) return;
+    const el = ref.current?.querySelector<HTMLElement>('[data-speaking="true"]');
+    el?.scrollIntoView?.({ block: 'nearest' });
+  }, [speakingAt]);
 
   // Mute stops speech itself (see speech.ts). This only keeps the button in step.
   useEffect(() => subscribeMuted(setMuted), []);
@@ -80,21 +90,37 @@ export function ArticleViewer({
   const reel = media ?? [];
   const speechReady = isSpeechAvailable();
 
+  /** Narrates the title and paragraphs from item rom (0 is the title). Progress counts the whole list. */
+  const startSpeech = (from: number, speed: number) => {
+    const texts = [section.title, ...section.paragraphs];
+    speak(
+      texts.slice(from),
+      () => setProgress(null),
+      (current, total) => setProgress({ current: current + from, total: total + from }),
+      speed,
+    );
+  };
+
   const toggleSpeech = () => {
     if (speaking) {
       stopSpeaking();
       return;
     }
-    speak(
-      [section.title, ...section.paragraphs],
-      () => setProgress(null),
-      (current, total) => setProgress({ current, total }),
-    );
+    startSpeech(0, rate);
+  };
+
+  /** Switches between 1x and 1.2x. While narrating, it carries on from the current paragraph at the new speed. */
+  const toggleRate = () => {
+    const next = rate === 1 ? 1.2 : 1;
+    setRate(next);
+    if (progress) startSpeech(progress.current - 1, next);
   };
 
   return (
     <article ref={ref} className="article-viewer">
-      <h1 className="article-title">{section.title}</h1>
+      <h1 className={progress?.current === 1 ? 'article-title article-title--speaking' : 'article-title'} data-speaking={progress?.current === 1 ? 'true' : undefined}>
+        {section.title}
+      </h1>
       <div className="article-tools" role="group" aria-label="Article tools">
         {diagramLink ? (
           <BevelButton onClick={() => onShowInDiagram?.(diagramLink.diagram_id, sectionId)}>
@@ -116,6 +142,14 @@ export function ArticleViewer({
           onClick={toggleSpeech}
         >
           {progress ? `Stop (${progress.current}/${progress.total})` : 'Read Aloud'}
+        </BevelButton>
+        <BevelButton
+          className="article-tools__rate"
+          disabled={!speechReady}
+          title={`Reading speed: ${rate === 1 ? 'normal' : 'brisk'}. Click to change.`}
+          onClick={toggleRate}
+        >
+          {rate === 1 ? '1x' : '1.2x'}
         </BevelButton>
       </div>
       <aside className="article-aside">
@@ -142,7 +176,18 @@ export function ArticleViewer({
         ) : null}
       </aside>
       {section.paragraphs.map((p, i) => (
-        <p key={i} className={i === 0 ? 'article-paragraph article-paragraph--lead' : 'article-paragraph'}>
+        <p
+          key={i}
+          className={[
+            'article-paragraph',
+            i === 0 ? 'article-paragraph--lead' : '',
+            progress?.current === i + 2 ? 'article-paragraph--speaking' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          data-speaking={progress?.current === i + 2 ? 'true' : undefined}
+          aria-current={progress?.current === i + 2 ? 'true' : undefined}
+        >
           {p}
         </p>
       ))}

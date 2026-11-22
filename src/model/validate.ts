@@ -1,8 +1,9 @@
-import { ENTRANCE_ROOM_ID, THRONE_ROOM_ID } from './manifest';
+import { ENTRANCE_ROOM_ID, SHAPE_ANIMS, THRONE_ROOM_ID } from './manifest';
 import type {
   DiscManifest,
   Dungeon,
   ErrorCode,
+  ShapeAnim,
   ValidationError,
   ValidationResult,
 } from './manifest';
@@ -131,6 +132,9 @@ export function validateManifest(input: unknown): ValidationResult {
               err(pp, 'wrong-type', `Expected [number, number] at ${pp}`);
             }
           });
+        }
+        if ('anim' in sh && sh.anim !== undefined && !SHAPE_ANIMS.includes(sh.anim as ShapeAnim)) {
+          err(`${sp}.anim`, 'wrong-type', `Unknown shape animation at ${sp}.anim`);
         }
         for (const k of ['fill', 'stroke']) {
           if (k in sh && sh[k] !== undefined && typeof sh[k] !== 'string') {

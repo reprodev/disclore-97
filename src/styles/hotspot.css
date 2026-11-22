@@ -63,3 +63,64 @@
   stroke: var(--color-crimson);
   stroke-width: 2.5px;
 }
+
+/* Built-in diagram micro-animations (Shape.anim). Flat opacity steps, off for reduced motion. */
+@keyframes shape-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes shape-flicker {
+  0% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes shape-glint {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  80%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shape-anim--blink {
+  animation: shape-blink 1.1s steps(1, end) infinite;
+}
+
+.shape-anim--flicker {
+  animation: shape-flicker 1.1s steps(4, end) infinite;
+}
+
+.shape-anim--glint {
+  animation: shape-glint 3.2s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shape-anim--blink,
+  .shape-anim--flicker,
+  .shape-anim--glint {
+    animation: none;
+  }
+}

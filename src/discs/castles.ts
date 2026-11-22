@@ -154,7 +154,7 @@ export const castlesDisc: DiscManifest = {
         { kind: 'line', x1: 44, y1: 20, x2: 44, y2: 25, stroke: 'var(--color-stone-dark)' },
         { kind: 'line', x1: 56, y1: 25, x2: 56, y2: 30, stroke: 'var(--color-stone-dark)' },
         { kind: 'rect', x: 46, y: 23, width: 6, height: 9, fill: 'var(--color-stone-dark)', stroke: 'none' },
-        { kind: 'rect', x: 47, y: 24, width: 4, height: 7, fill: 'var(--color-gold-light)', stroke: 'none' },
+        { kind: 'rect', x: 47, y: 24, width: 4, height: 7, fill: 'var(--color-gold-light)', stroke: 'none', anim: 'flicker' },
         { kind: 'rect', x: 47, y: 27, width: 4, height: 1, fill: 'var(--color-gold-dark)', stroke: 'none' },
         { kind: 'rect', x: 41, y: 31, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },
         { kind: 'rect', x: 57, y: 31, width: 2, height: 5, fill: 'var(--color-ink)', stroke: 'none' },

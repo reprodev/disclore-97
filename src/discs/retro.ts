@@ -196,7 +196,7 @@ export const retroDisc: DiscManifest = {
         { kind: 'rect', x: 30, y: 19, width: 6, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
         { kind: 'rect', x: 14, y: 30, width: 12, height: 1, fill: 'var(--color-phosphor-dim)', stroke: 'none' },
         { kind: 'rect', x: 14, y: 27, width: 16, height: 1, fill: 'var(--color-phosphor)', stroke: 'none' },
-        { kind: 'rect', x: 32, y: 30, width: 3, height: 2, fill: 'var(--color-phosphor)', stroke: 'none' },
+        { kind: 'rect', x: 32, y: 30, width: 3, height: 2, fill: 'var(--color-phosphor)', stroke: 'none', anim: 'blink' },
         { kind: 'circle', cx: 36, cy: 41.5, r: 0.9, fill: 'var(--color-phosphor)', stroke: 'none' },
         { kind: 'rect', x: 14, y: 41, width: 8, height: 1, fill: 'var(--color-bevel-shadow)', stroke: 'none' },
         // Desktop case with drive bays

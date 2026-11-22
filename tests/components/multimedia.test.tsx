@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { ArticleViewer } from '../../src/components/ArticleViewer';
 import { MediaReel, REEL_INTERVAL_MS } from '../../src/components/MediaReel';
+import { VIEWER_HINT } from '../../src/components/MediaViewerModal';
 import { setMuted } from '../../src/audio/audio';
 import type { MediaItem, Section } from '../../src/model/manifest';
 
@@ -49,32 +50,29 @@ describe('MediaReel', () => {
     expect(counter()).toBe('Frame 3 / 3');
   });
 
-  it('Play advances every 4 seconds and Pause stops it', () => {
+  it('has Prev, Next, and Enlarge but no Play or Pause button', () => {
+    render(<MediaReel media={MEDIA} fallback={noPlate} />);
+    const bar = screen.getByRole('group', { name: 'Multimedia Reel controls' });
+    expect(within(bar).getAllByRole('button').map((b) => b.textContent)).toEqual(['Prev', 'Next', 'Enlarge']);
+    expect(screen.queryByRole('button', { name: 'Play' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Pause' })).toBeNull();
+    expect(counter()).toBe('Frame 1 / 3');
+  });
+
+  it('never advances by itself while the Picture Viewer is closed', () => {
     vi.useFakeTimers();
     render(<MediaReel media={MEDIA} fallback={noPlate} />);
-    expect(REEL_INTERVAL_MS).toBe(4000);
-    click('Play');
-    expect(screen.getByRole('button', { name: 'Pause' }).getAttribute('aria-pressed')).toBe('true');
-    act(() => void vi.advanceTimersByTime(3999));
-    expect(counter()).toBe('Frame 1 / 3');
-    act(() => void vi.advanceTimersByTime(1));
-    expect(counter()).toBe('Frame 2 / 3');
-    act(() => void vi.advanceTimersByTime(4000));
-    expect(counter()).toBe('Frame 3 / 3');
-    click('Pause');
     act(() => void vi.advanceTimersByTime(20000));
-    expect(counter()).toBe('Frame 3 / 3');
-    expect(screen.getByRole('button', { name: 'Play' })).toBeTruthy();
+    expect(counter()).toBe('Frame 1 / 3');
   });
 
-  it('disables the controls for a single picture', () => {
+  it('keeps Enlarge enabled and disables stepping for a single picture', () => {
     render(<MediaReel media={[MEDIA[0]]} fallback={noPlate} />);
-    for (const name of ['Prev', 'Play', 'Next']) {
-      expect((screen.getByRole('button', { name }) as HTMLButtonElement).disabled).toBe(true);
-    }
+    expect((screen.getByRole('button', { name: 'Prev' }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole('button', { name: 'Next' }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole('button', { name: 'Enlarge' }) as HTMLButtonElement).disabled).toBe(false);
     expect(counter()).toBe('Frame 1 / 1');
   });
-
   it('shows the fallback for a picture that fails to load, and keeps the caption', () => {
     const fallback = vi.fn((caption: string) => <div data-testid="plate">{caption}</div>);
     render(<MediaReel media={MEDIA} fallback={fallback} />);
@@ -118,6 +116,7 @@ describe('ArticleViewer Multimedia Reel', () => {
 describe('Read Aloud', () => {
   class FakeUtterance {
     lang = '';
+    rate = 1;
     onstart: (() => void) | null = null;
     onend: (() => void) | null = null;
     onerror: (() => void) | null = null;
@@ -216,6 +215,75 @@ describe('Read Aloud', () => {
     expect(screen.getByRole('button', { name: 'Read Aloud' })).toBeTruthy();
   });
 
+  it('highlights the paragraph being read and clears it when finished', () => {
+    installSpeech();
+    const { container } = render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    const active = () => Array.from(container.querySelectorAll('[data-speaking="true"]')).map((e) => e.textContent);
+    expect(active()).toEqual([]);
+
+    click('Read Aloud');
+    expect(active()).toEqual(['Alpha']); // the title is item 1
+    expect(container.querySelector('h1')!.className).toContain('article-title--speaking');
+
+    act(() => spoken[1].onstart?.());
+    expect(active()).toEqual(['Alpha text.']);
+    expect(container.querySelector('p[aria-current="true"]')!.className).toContain('article-paragraph--speaking');
+
+    act(() => spoken[2].onstart?.());
+    expect(active()).toEqual(['More alpha.']);
+
+    act(() => spoken[2].onend?.());
+    expect(active()).toEqual([]);
+    expect(container.querySelector('.article-paragraph--speaking')).toBeNull();
+  });
+
+  it('clears the highlight when narration is stopped', () => {
+    installSpeech();
+    const { container } = render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    click('Read Aloud');
+    act(() => spoken[1].onstart?.());
+    expect(container.querySelector('.article-paragraph--speaking')).not.toBeNull();
+    click('Stop (2/3)');
+    expect(container.querySelector('[data-speaking="true"]')).toBeNull();
+  });
+
+  it('toggles the reading speed between 1x and 1.2x and speaks at that rate', () => {
+    installSpeech();
+    render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    expect(screen.getByRole('button', { name: '1x' })).toBeTruthy();
+    click('1x');
+    expect(screen.getByRole('button', { name: '1.2x' })).toBeTruthy();
+    click('Read Aloud');
+    expect(spoken.map((u) => u.rate)).toEqual([1.2, 1.2, 1.2]);
+    act(() => spoken[2].onend?.());
+    click('1.2x');
+    expect(screen.getByRole('button', { name: '1x' })).toBeTruthy();
+    spoken = [];
+    click('Read Aloud');
+    expect(spoken.map((u) => u.rate)).toEqual([1, 1, 1]);
+  });
+
+  it('changing the speed mid-narration carries on from the current paragraph', () => {
+    installSpeech();
+    render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    click('Read Aloud');
+    act(() => spoken[1].onstart?.());
+    expect(screen.getByRole('button', { name: 'Stop (2/3)' })).toBeTruthy();
+    spoken = [];
+    click('1x');
+    expect(spoken.map((u) => [u.text, u.rate])).toEqual([
+      ['Alpha text.', 1.2],
+      ['More alpha.', 1.2],
+    ]);
+    expect(screen.getByRole('button', { name: 'Stop (2/3)' })).toBeTruthy();
+    act(() => spoken[1].onstart?.());
+    expect(screen.getByRole('button', { name: 'Stop (3/3)' })).toBeTruthy();
+  });
+
+  it('disables the speed button when speech is unavailable', () => {
+    render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
+    expect((screen.getByRole('button', { name: '1x' }) as HTMLButtonElement).disabled).toBe(true);
+  });
   it('stops on unmount', () => {
     installSpeech();
     const { unmount } = render(<ArticleViewer sections={SECTIONS} sectionId="s1" />);
@@ -385,5 +453,58 @@ describe('Picture Viewer', () => {
     expect(within(viewer()).getByText('Loading picture...')).toBeTruthy();
     fireEvent.load(within(viewer()).getByRole('img', { name: 'First picture' }));
     expect(within(viewer()).queryByText('Loading picture...')).toBeNull();
+  });
+});
+
+describe('Picture Viewer slideshow', () => {
+  const viewer = () => screen.getByRole('dialog', { name: 'Picture Viewer \u2014 Test Disc' });
+  const open = () => {
+    render(<MediaReel media={MEDIA} fallback={noPlate} title="Test Disc" />);
+    click('Enlarge');
+  };
+
+  it('has Play / Pause and the keyboard hint in the footer', () => {
+    open();
+    expect(within(viewer()).getByRole('button', { name: 'Play' })).toBeTruthy();
+    expect(VIEWER_HINT).toBe('Space: Play \u2022 \u2190/\u2192: Step \u2022 Esc: Close');
+    expect(within(viewer()).getByText(VIEWER_HINT)).toBeTruthy();
+  });
+
+  it('auto-advances every 4 seconds while playing, and Pause stops it', () => {
+    vi.useFakeTimers();
+    open();
+    expect(REEL_INTERVAL_MS).toBe(4000);
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Play' }));
+    act(() => void vi.advanceTimersByTime(3999));
+    expect(within(viewer()).getByText('Frame 1 / 3')).toBeTruthy();
+    act(() => void vi.advanceTimersByTime(1));
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Pause' }));
+    act(() => void vi.advanceTimersByTime(20000));
+    expect(within(viewer()).getByText('Frame 2 / 3')).toBeTruthy();
+  });
+
+  it('pauses when the window closes: no more steps, and it reopens paused', () => {
+    vi.useFakeTimers();
+    open();
+    fireEvent.click(within(viewer()).getByRole('button', { name: 'Play' }));
+    act(() => void vi.advanceTimersByTime(4000));
+    expect(screen.getAllByText('Frame 2 / 3')).toHaveLength(2); // the reel behind shows the same frame
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    act(() => void vi.advanceTimersByTime(20000));
+    expect(counter()).toBe('Frame 2 / 3');
+    click('Enlarge');
+    expect(within(viewer()).getByRole('button', { name: 'Play' })).toBeTruthy();
+    act(() => void vi.advanceTimersByTime(20000));
+    expect(screen.getAllByText('Frame 2 / 3')).toHaveLength(2);
+  });
+
+  it('Space toggles Play from the picture, and the reel stays free of a Play button', () => {
+    open();
+    const stage = within(viewer()).getByRole('group', { name: 'Picture' });
+    fireEvent.keyDown(stage, { key: ' ' });
+    expect(within(viewer()).getByRole('button', { name: 'Pause' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: /^(Play|Pause)$/ })).toHaveLength(1);
   });
 });

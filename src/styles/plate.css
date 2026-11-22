@@ -22,3 +22,68 @@
   text-align: center;
   color: var(--color-ink);
 }
+
+/* Subtle 1997 SVG micro-animations. All are flat opacity steps, and all stop for reduced motion. */
+@keyframes crt-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes torch-glow {
+  0% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.75;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cd-glint {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  80%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.plate__cursor {
+  animation: crt-blink 1.1s steps(1, end) infinite;
+}
+
+.plate__torch {
+  animation: torch-glow 0.9s steps(4, end) infinite;
+}
+
+.plate__glint {
+  animation: cd-glint 3.2s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate__cursor,
+  .plate__torch,
+  .plate__glint {
+    animation: none;
+  }
+
+  .plate__glint {
+    opacity: 0;
+  }
+}

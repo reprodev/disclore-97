@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from 'react';
 import { playPageFlip } from '../audio/audio';
+import { SHAPE_ANIMS } from '../model/manifest';
 import type { Diagram, Shape } from '../model/manifest';
 import { Tooltip } from './Tooltip';
 import '../styles/hotspot.css';
@@ -15,17 +16,36 @@ export interface HotspotViewerProps {
 function renderShape(shape: Shape, i: number) {
   const fill = shape.kind === 'line' ? undefined : (shape.fill ?? 'none');
   const stroke = shape.stroke ?? 'currentColor';
+  // Only the three known animation names ever become a class.
+  const className = shape.anim && SHAPE_ANIMS.includes(shape.anim) ? `shape-anim shape-anim--${shape.anim}` : undefined;
   switch (shape.kind) {
     case 'rect':
       return (
-        <rect key={i} x={shape.x} y={shape.y} width={shape.width} height={shape.height} fill={fill} stroke={stroke} />
+        <rect
+          key={i}
+          className={className}
+          x={shape.x}
+          y={shape.y}
+          width={shape.width}
+          height={shape.height}
+          fill={fill}
+          stroke={stroke}
+        />
       );
     case 'circle':
-      return <circle key={i} cx={shape.cx} cy={shape.cy} r={shape.r} fill={fill} stroke={stroke} />;
+      return <circle key={i} className={className} cx={shape.cx} cy={shape.cy} r={shape.r} fill={fill} stroke={stroke} />;
     case 'line':
-      return <line key={i} x1={shape.x1} y1={shape.y1} x2={shape.x2} y2={shape.y2} stroke={stroke} />;
+      return <line key={i} className={className} x1={shape.x1} y1={shape.y1} x2={shape.x2} y2={shape.y2} stroke={stroke} />;
     case 'polygon':
-      return <polygon key={i} points={shape.points.map((p) => p.join(',')).join(' ')} fill={fill} stroke={stroke} />;
+      return (
+        <polygon
+          key={i}
+          className={className}
+          points={shape.points.map((p) => p.join(',')).join(' ')}
+          fill={fill}
+          stroke={stroke}
+        />
+      );
   }
 }
 

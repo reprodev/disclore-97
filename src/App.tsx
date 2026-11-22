@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FetchLike } from './adapters/types';
-import { playSpinUp } from './audio/audio';
+import { ambienceKindFor, playBurnComplete, playSpinUp, setAmbienceKind } from './audio/audio';
 import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
 import { BootSplash } from './components/BootSplash';
@@ -111,6 +111,12 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
 
   const disc = discs.find((d) => d.disc_id === nav.discId);
 
+  // The ambient soundscape follows the open disc (it stays off until the Ambience button is pressed).
+  const ambienceDiscId = disc?.disc_id;
+  useEffect(() => {
+    setAmbienceKind(ambienceKindFor(ambienceDiscId));
+  }, [ambienceDiscId]);
+
   const openDisc = (discId: string) => {
     setDiagramFocus(null);
     setNotFound(null);
@@ -124,6 +130,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
     setSaveNotice(!saved.saved);
     openDisc(m.disc_id);
     playSpinUp();
+    playBurnComplete();
     setBurnOpen(false);
   };
   const removeDisc = (discId: string) => {

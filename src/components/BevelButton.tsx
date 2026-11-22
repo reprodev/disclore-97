@@ -3,11 +3,15 @@ import type { ButtonHTMLAttributes, KeyboardEvent, MouseEvent } from 'react';
 import { playClick } from '../audio/audio';
 import '../styles/button.css';
 
-export type BevelButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+export type BevelButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  /** Skips the standard click sound, for buttons that play their own. */
+  quiet?: boolean;
+};
 
 export function BevelButton({
   className,
   disabled,
+  quiet = false,
   onClick,
   onPointerDown,
   onPointerUp,
@@ -24,7 +28,7 @@ export function BevelButton({
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     if (disabled) return;
-    playClick();
+    if (!quiet) playClick();
     onClick?.(e);
   };
 

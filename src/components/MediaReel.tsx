@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { playSlideClick } from '../audio/audio';
 import type { MediaItem } from '../model/manifest';
 import { BevelButton } from './BevelButton';
-import { MediaViewerModal } from './MediaViewerModal';
+import { MediaViewerModal, SLIDESHOW_INTERVAL_MS } from './MediaViewerModal';
 import '../styles/article.css';
 
-export const REEL_INTERVAL_MS = 4000;
+export const REEL_INTERVAL_MS = SLIDESHOW_INTERVAL_MS;
 
 export interface MediaReelProps {
   media: readonly MediaItem[];
   /** Drawn in place of a picture that fails to load. */
   fallback: (caption: string) => ReactNode;
-  /** Auto-advance delay while playing. */
+  /** Slideshow delay in the Picture Viewer. */
   intervalMs?: number;
   /** Shown in the Picture Viewer caption bar. */
   title?: string;
 }
 
 /**
- * A beveled picture frame with a caption and a Multimedia Reel control bar:
- * Prev, Play / Pause (auto-advances), Next, Enlarge, and a Frame X / Y counter.
- * Pictures load with no referrer and lazily, with a "Loading picture..." note until they
- * arrive. A broken picture shows `fallback`. Clicking the picture, or Enlarge, opens the
- * Picture Viewer, which shares this reel's frame and Play state.
+ * A beveled picture frame with a caption and a compact Multimedia Reel control bar:
+ * Prev, Next, Enlarge, and a Frame X / Y counter. Pictures load with no referrer and
+ * lazily, with a "Loading picture..." note until they arrive. A broken picture shows
+ * `fallback`. Clicking the picture, or Enlarge, opens the Picture Viewer, which shares
+ * this reel's frame and is the only place the slideshow plays.
  */
 export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, title = 'Multimedia Reel' }: MediaReelProps) {
   const count = media.length;
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [broken, setBroken] = useState<ReadonlySet<string>>(() => new Set());
   const [loaded, setLoaded] = useState<ReadonlySet<string>>(() => new Set());
@@ -36,17 +36,16 @@ export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, titl
   const signature = media.map((m) => m.url).join('\n');
   useEffect(() => {
     setIndex(0);
-    setPlaying(false);
     setViewerOpen(false);
     setBroken(new Set());
     setLoaded(new Set());
   }, [signature]);
 
-  useEffect(() => {
-    if (!playing || count < 2) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % count), intervalMs);
-    return () => window.clearInterval(id);
-  }, [playing, count, intervalMs]);
+  /** Silent step, also used by the slideshow. Manual buttons add the projector click themselves. */
+  const step = useCallback(
+    (d: number) => setIndex((i) => (Math.min(i, Math.max(count - 1, 0)) + d + count) % Math.max(count, 1)),
+    [count],
+  );
 
   if (count === 0) return null;
   const at = Math.min(index, count - 1);
@@ -54,10 +53,16 @@ export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, titl
   const failed = broken.has(item.url);
   const loading = !failed && !loaded.has(item.url);
 
-  const step = (d: number) => setIndex((i) => (Math.min(i, count - 1) + d + count) % count);
   const markBroken = (url: string) => setBroken((b) => (b.has(url) ? b : new Set(b).add(url)));
   const markLoaded = (url: string) => setLoaded((l) => (l.has(url) ? l : new Set(l).add(url)));
-  const togglePlay = () => setPlaying((p) => !p);
+  const enlarge = () => {
+    playSlideClick();
+    setViewerOpen(true);
+  };
+  const manualStep = (d: number) => {
+    playSlideClick();
+    step(d);
+  };
 
   return (
     <figure className="media-frame" aria-label="Multimedia Reel">
@@ -69,7 +74,7 @@ export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, titl
             type="button"
             className="media-frame__zoom"
             aria-label={`View larger: ${item.caption}`}
-            onClick={() => setViewerOpen(true)}
+            onClick={enlarge}
           >
             <img
               key={item.url}
@@ -91,21 +96,13 @@ export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, titl
       </div>
       <figcaption className="media-frame__caption">{item.caption}</figcaption>
       <div className="media-reel" role="group" aria-label="Multimedia Reel controls">
-        <BevelButton className="media-reel__button" onClick={() => step(-1)} disabled={count < 2}>
+        <BevelButton className="media-reel__button" quiet onClick={() => manualStep(-1)} disabled={count < 2}>
           Prev
         </BevelButton>
-        <BevelButton
-          className="media-reel__button article-tools__toggle"
-          aria-pressed={playing}
-          onClick={togglePlay}
-          disabled={count < 2}
-        >
-          {playing ? 'Pause' : 'Play'}
-        </BevelButton>
-        <BevelButton className="media-reel__button" onClick={() => step(1)} disabled={count < 2}>
+        <BevelButton className="media-reel__button" quiet onClick={() => manualStep(1)} disabled={count < 2}>
           Next
         </BevelButton>
-        <BevelButton className="media-reel__button" onClick={() => setViewerOpen(true)}>
+        <BevelButton className="media-reel__button" quiet onClick={enlarge}>
           Enlarge
         </BevelButton>
         <span className="media-reel__counter">
@@ -117,13 +114,12 @@ export function MediaReel({ media, fallback, intervalMs = REEL_INTERVAL_MS, titl
           title={title}
           media={media}
           index={at}
-          playing={playing}
           broken={broken}
           loaded={loaded}
           fallback={fallback}
+          intervalMs={intervalMs}
           onStep={step}
           onSelect={setIndex}
-          onTogglePlay={togglePlay}
           onLoad={markLoaded}
           onError={markBroken}
           onClose={() => setViewerOpen(false)}
