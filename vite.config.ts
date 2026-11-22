@@ -4,9 +4,10 @@ import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { handleExtract } from './src/extract/handler';
 import { handleTopic } from './src/extract/topicHandler';
+import { handleDefine } from './src/extract/defineHandler';
 
 /**
- * Dev-only: serves /api/extract and /api/topic from `npm run dev` by calling the same handlers the
+ * Dev-only: serves /api/extract, /api/topic and /api/define from `npm run dev` by calling the same handlers the
  * Cloudflare Pages Functions use. `apply: 'serve'` keeps it out of `vite build`, and
  * functions/api/extract.ts is untouched, so production behavior does not change.
  */
@@ -18,7 +19,7 @@ function devExtractApi(): Plugin {
       server.middlewares.use(async (req, res, next) => {
         const rawUrl = req.url ?? '';
         const path = rawUrl.split('?')[0];
-        if (path !== '/api/extract' && path !== '/api/topic') {
+        if (path !== '/api/extract' && path !== '/api/topic' && path !== '/api/define') {
           next();
           return;
         }
@@ -27,7 +28,8 @@ function devExtractApi(): Plugin {
             method: req.method ?? 'GET',
           });
           const deps = { fetch: (input: string, init?: RequestInit) => fetch(input, init) };
-          const response = path === '/api/topic' ? await handleTopic(request, deps) : await handleExtract(request, deps);
+          const handler = path === '/api/topic' ? handleTopic : path === '/api/define' ? handleDefine : handleExtract;
+          const response = await handler(request, deps);
           res.statusCode = response.status;
           response.headers.forEach((value, key) => res.setHeader(key, value));
           res.end(await response.text());

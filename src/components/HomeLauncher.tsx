@@ -20,6 +20,8 @@ export interface HomeLauncherProps {
   /** Opens a disc straight to its first diagram or dungeon. Omit to disable the cards. */
   onQuickJump?: (mode: QuickJumpMode) => void;
   onOpenReadMe?: () => void;
+  /** Opens the Dictionary dialog. Omit to hide the Utilities card. */
+  onOpenDictionary?: (word?: string) => void;
   onReplaySplash?: () => void;
   /** Opens the Burn dialog. Omit to disable the card. */
   onBurnNew?: () => void;
@@ -99,6 +101,7 @@ export function HomeLauncher({
   onPickDisc,
   onQuickJump,
   onOpenReadMe,
+  onOpenDictionary,
   onReplaySplash,
   onBurnNew,
   onMountImage,
@@ -218,6 +221,14 @@ export function HomeLauncher({
                     title="Mount Disc Image (.json)..."
                     text="open a disc image saved on this computer"
                     onClick={onMountImage}
+                  />
+                ) : null}
+                {onOpenDictionary ? (
+                  <Card
+                    icon="book"
+                    title="Dictionary..."
+                    text="look up a word on every mounted disc"
+                    onClick={() => onOpenDictionary()}
                   />
                 ) : null}
                 <Card

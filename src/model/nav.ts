@@ -4,6 +4,7 @@ export type View =
   | { kind: 'section'; section_id: string }
   | { kind: 'diagram'; diagram_id: string }
   | { kind: 'timeline' }
+  | { kind: 'gallery' }
   | { kind: 'keepmaze'; dungeon_id: string };
 
 export interface NavState {
@@ -45,6 +46,7 @@ export function sameView(a: View | null, b: View | null): boolean {
     case 'diagram':
       return a.diagram_id === (b as typeof a).diagram_id;
     case 'timeline':
+    case 'gallery':
       return true;
     case 'keepmaze':
       return a.dungeon_id === (b as typeof a).dungeon_id;

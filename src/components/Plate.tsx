@@ -316,21 +316,34 @@ export interface PlateProps {
   caption: string;
 }
 
-/** An inline SVG illustration plate with a printed-page frame. Flat colors only. */
-export function Plate({ kind, caption }: PlateProps) {
+export interface PlateImageProps {
+  kind?: string;
+  /** Accessible name of the drawing. */
+  label: string;
+}
+
+/** The plate drawing alone, with no frame or caption. Safe to place inside a button. */
+export function PlateImage({ kind, label }: PlateImageProps) {
   const Art = (kind !== undefined && PLATES[kind]) || Book;
   return (
+    <svg
+      className="plate__art"
+      viewBox="0 0 100 100"
+      role="img"
+      aria-label={label}
+      shapeRendering="crispEdges"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <Art />
+    </svg>
+  );
+}
+
+/** An inline SVG illustration plate with a printed-page frame. Flat colors only. */
+export function Plate({ kind, caption }: PlateProps) {
+  return (
     <figure className="plate">
-      <svg
-        className="plate__art"
-        viewBox="0 0 100 100"
-        role="img"
-        aria-label={caption}
-        shapeRendering="crispEdges"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        <Art />
-      </svg>
+      <PlateImage kind={kind} label={caption} />
       <figcaption className="plate__caption">{caption}</figcaption>
     </figure>
   );

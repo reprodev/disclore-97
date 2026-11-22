@@ -30,6 +30,12 @@ export interface DiscBrowserProps {
   onSelectTimeline?: () => void;
   /** Bookmarked section ids of the open disc, shown as a list in the sidebar. */
   bookmarks?: readonly string[];
+  /** Opens the Media Gallery view. Omit to hide the Gallery button and View menu item. */
+  onSelectGallery?: () => void;
+  /** Opens the Dictionary dialog. Omit to hide the Dictionary button, View menu item, and Home card. */
+  onOpenDictionary?: (word?: string) => void;
+  /** Section ids of the open disc that were already read. */
+  visited?: readonly string[];
   /** Current view in the open disc. Drives the sidebar highlight, breadcrumb, and status bar. */
   view?: View | null;
   /** Content for the right-hand pane. When omitted, a welcome page is shown. */
@@ -83,6 +89,9 @@ function describeView(disc: DiscManifest, view: View | null): { trail: string[];
   if (view?.kind === 'timeline') {
     return { trail: ['Timeline'], label: 'Timeline' };
   }
+  if (view?.kind === 'gallery') {
+    return { trail: ['Gallery'], label: 'Media Gallery' };
+  }
   if (view?.kind === 'keepmaze') {
     const title = disc.dungeons.find((d) => d.dungeon_id === view.dungeon_id)?.title ?? view.dungeon_id;
     return { trail: ['Dungeons', title], label: `KeepMaze: ${title}` };
@@ -100,6 +109,9 @@ export function DiscBrowser({
   onSelectDungeon,
   onSelectTimeline,
   bookmarks,
+  onSelectGallery,
+  onOpenDictionary,
+  visited,
   view = null,
   main,
   canBack = false,
@@ -151,6 +163,8 @@ export function DiscBrowser({
     const goHome = () => onHome?.();
     const goDiagram = first.diagram === undefined ? undefined : () => onSelectDiagram(first.diagram!);
     const goTimeline = onSelectTimeline && hasTimeline(disc) ? onSelectTimeline : undefined;
+    const goGallery = onSelectGallery;
+    const goDictionary = onOpenDictionary ? () => onOpenDictionary() : undefined;
     const goKeepMaze = first.dungeon === undefined ? undefined : () => onSelectDungeon(first.dungeon!);
     const { trail, label } = describeView(disc, view);
 
@@ -191,6 +205,8 @@ export function DiscBrowser({
                   { label: 'Diagram', onSelect: () => goDiagram?.() },
                   { label: 'Timeline', onSelect: () => goTimeline?.() },
                   { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
+                  ...(goGallery ? [{ label: 'Gallery', onSelect: () => goGallery() }] : []),
+                  ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
                 ],
               },
             ]}
@@ -207,6 +223,8 @@ export function DiscBrowser({
           onDiagram={goDiagram}
           onTimeline={goTimeline}
           onKeepMaze={goKeepMaze}
+          onGallery={goGallery}
+          onDictionary={goDictionary}
         />
         <Breadcrumb discTitle={disc.title} trail={trail} onHome={goHome} />
         <SpinUpBar key={disc.disc_id} />
@@ -219,6 +237,7 @@ export function DiscBrowser({
             onSelectDiagram={onSelectDiagram}
             onSelectDungeon={onSelectDungeon}
             bookmarks={bookmarks}
+            visited={visited}
           />
           <div className="disc-main">
             {main ?? (
@@ -269,6 +288,7 @@ export function DiscBrowser({
         onPickDisc={handleOpen}
         onQuickJump={onQuickJump}
         onOpenReadMe={onOpenReadMe}
+        onOpenDictionary={onOpenDictionary}
         onReplaySplash={onReplaySplash}
         onBurnNew={onBurnNew}
         onMountImage={onMountImage}

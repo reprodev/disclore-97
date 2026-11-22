@@ -1,8 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import { isMuted, playPageFlip, subscribeMuted } from '../audio/audio';
 import { isSpeechAvailable, speak, stopSpeaking } from '../audio/speech';
 import type { Diagram, MediaItem, Section } from '../model/manifest';
 import { linkSegments } from '../model/crossLinks';
+import { normalizeQuery, splitByQuery } from '../model/findInText';
 import { relatedSections } from '../model/topics';
 import { BevelButton } from './BevelButton';
 import { CiteDialog } from './CiteDialog';
@@ -27,6 +29,8 @@ export interface ArticleViewerProps {
   onToggleBookmark?: () => void;
   /** Pictures of the open disc. When non-empty, the Media Frame and Multimedia Reel replace the plate. */
   media?: MediaItem[];
+  /** Called with a single word the reader double-clicked in the text. Opens the Dictionary. */
+  onLookUpWord?: (word: string) => void;
 }
 
 export function ArticleViewer({
@@ -39,6 +43,7 @@ export function ArticleViewer({
   bookmarked = false,
   onToggleBookmark,
   media,
+  onLookUpWord,
 }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [citeOpen, setCiteOpen] = useState(false);
@@ -48,6 +53,11 @@ export function ArticleViewer({
   /** Reading speed: normal, or brisk. */
   const [rate, setRate] = useState<1 | 1.2>(1);
   const [muted, setMuted] = useState(isMuted);
+  /** Find in Article bar: open flag, the query (kept across articles), and the current match. */
+  const [findOpen, setFindOpen] = useState(false);
+  const [findQuery, setFindQuery] = useState('');
+  const [findIndex, setFindIndex] = useState(0);
+  const findInputRef = useRef<HTMLInputElement | null>(null);
   const section = sections.find((s) => s.section_id === sectionId);
   const found = section !== undefined;
 
@@ -69,6 +79,23 @@ export function ArticleViewer({
     const el = ref.current?.querySelector<HTMLElement>('[data-speaking="true"]');
     el?.scrollIntoView?.({ block: 'nearest' });
   }, [speakingAt]);
+
+  // Each article starts at its first match.
+  useEffect(() => {
+    setFindIndex(0);
+  }, [sectionId]);
+
+  // Focus the search box when the bar opens.
+  useEffect(() => {
+    if (findOpen) findInputRef.current?.focus();
+  }, [findOpen]);
+
+  // Keep the current match in view.
+  const hitKey = findOpen ? [findQuery, findIndex, sectionId].join('|') : '';
+  useEffect(() => {
+    if (hitKey === '') return;
+    ref.current?.querySelector<HTMLElement>('.article-hit--current')?.scrollIntoView?.({ block: 'nearest' });
+  }, [hitKey]);
 
   // Mute stops speech itself (see speech.ts). This only keeps the button in step.
   useEffect(() => subscribeMuted(setMuted), []);
@@ -97,6 +124,55 @@ export function ArticleViewer({
   const linkTargets = sections.filter((s) => s.section_id !== sectionId);
   const reel = media ?? [];
   const speechReady = isSpeechAvailable();
+
+  /** Paragraphs split into plain text and cross-link pieces. Matches are counted piece by piece. */
+  const paragraphSegments = section.paragraphs.map((p) => (onSelectSection ? linkSegments(p, linkTargets) : [{ text: p }]));
+  const needle = findOpen ? normalizeQuery(findQuery) : '';
+  const totalHits =
+    needle === ''
+      ? 0
+      : paragraphSegments.reduce(
+          (sum, segs) => sum + segs.reduce((s, seg) => s + splitByQuery(seg.text, needle).filter((x) => x.hit).length, 0),
+          0,
+        );
+  const currentHit = totalHits === 0 ? 0 : Math.min(findIndex, totalHits - 1);
+  let hitCounter = 0;
+  /** Text pieces for one segment, with the matches wrapped in <mark>. Numbers matches in render order. */
+  const renderPieces = (text: string) =>
+    needle === ''
+      ? text
+      : splitByQuery(text, needle).map((piece, k) => {
+          if (!piece.hit) return <Fragment key={k}>{piece.text}</Fragment>;
+          const n = hitCounter++;
+          return (
+            <mark key={k} className={n === currentHit ? 'article-hit article-hit--current' : 'article-hit'}>
+              {piece.text}
+            </mark>
+          );
+        });
+
+  const stepHit = (d: number) => {
+    if (totalHits > 0) setFindIndex((currentHit + d + totalHits) % totalHits);
+  };
+  const closeFind = () => setFindOpen(false);
+  const onFindKey = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closeFind();
+    } else if (e.key === 'Enter' && e.target === findInputRef.current) {
+      e.preventDefault();
+      stepHit(e.shiftKey ? -1 : 1);
+    }
+  };
+
+  /** A double-click on one word of the text opens the Dictionary for it. */
+  const onParagraphDoubleClick = (e: MouseEvent<HTMLElement>) => {
+    if (!onLookUpWord) return;
+    if (e.target instanceof Element && e.target.closest('button')) return;
+    const picked = window.getSelection?.()?.toString().trim() ?? '';
+    if (/^\p{L}[\p{L}'’-]{0,39}$/u.test(picked)) onLookUpWord(picked);
+  };
 
   /** Narrates the title and paragraphs from item rom (0 is the title). Progress counts the whole list. */
   const startSpeech = (from: number, speed: number) => {
@@ -156,6 +232,9 @@ export function ArticleViewer({
         >
           {progress ? `Stop (${progress.current}/${progress.total})` : 'Read Aloud'}
         </BevelButton>
+        <BevelButton className="article-tools__toggle" aria-pressed={findOpen} onClick={() => setFindOpen((o) => !o)}>
+          Find in Article
+        </BevelButton>
         <BevelButton
           className="article-tools__rate"
           disabled={!speechReady}
@@ -165,6 +244,36 @@ export function ArticleViewer({
           {rate === 1 ? '1x' : '1.2x'}
         </BevelButton>
       </div>
+      {findOpen ? (
+        <div className="article-find" role="search" aria-label="Find in article" onKeyDown={onFindKey}>
+          <label htmlFor="article-find-input">Find:</label>
+          <input
+            id="article-find-input"
+            ref={findInputRef}
+            className="article-find__input"
+            type="text"
+            autoComplete="off"
+            aria-label="Find in article"
+            value={findQuery}
+            onChange={(e) => {
+              setFindQuery(e.target.value);
+              setFindIndex(0);
+            }}
+          />
+          <BevelButton aria-label="Previous match" disabled={totalHits < 2} onClick={() => stepHit(-1)}>
+            &lt; Prev
+          </BevelButton>
+          <BevelButton aria-label="Next match" disabled={totalHits < 2} onClick={() => stepHit(1)}>
+            Next &gt;
+          </BevelButton>
+          <span className="article-find__count" aria-live="polite">
+            {needle === '' ? '' : totalHits === 0 ? 'No matches' : `${currentHit + 1} of ${totalHits}`}
+          </span>
+          <BevelButton aria-label="Close find" onClick={closeFind}>
+            Close
+          </BevelButton>
+        </div>
+      ) : null}
       <aside className="article-aside">
         {reel.length > 0 ? (
           <MediaReel
@@ -200,8 +309,9 @@ export function ArticleViewer({
             .join(' ')}
           data-speaking={progress?.current === i + 2 ? 'true' : undefined}
           aria-current={progress?.current === i + 2 ? 'true' : undefined}
+          onDoubleClick={onParagraphDoubleClick}
         >
-          {(onSelectSection ? linkSegments(p, linkTargets) : [{ text: p }]).map((seg, j) =>
+          {paragraphSegments[i]!.map((seg, j) =>
             seg.sectionId !== undefined ? (
               <button
                 key={j}
@@ -209,10 +319,10 @@ export function ArticleViewer({
                 className="article-xlink"
                 onClick={() => onSelectSection?.(seg.sectionId!)}
               >
-                {seg.text}
+                {renderPieces(seg.text)}
               </button>
             ) : (
-              <Fragment key={j}>{seg.text}</Fragment>
+              <Fragment key={j}>{renderPieces(seg.text)}</Fragment>
             ),
           )}
         </p>

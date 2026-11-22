@@ -134,7 +134,7 @@ describe('Explore History timeline', () => {
     await openDisc(user);
     const bar = screen.getByRole('toolbar', { name: 'Navigation' });
     const labels = within(bar).getAllByRole('button').map((b) => b.textContent);
-    expect(labels.slice(-3)).toEqual(['Diagram', 'Timeline', 'KeepMaze']);
+    expect(labels.slice(-5)).toEqual(['Diagram', 'Timeline', 'KeepMaze', 'Gallery', 'Dictionary']);
     expect((within(bar).getByRole('button', { name: 'Timeline' }) as HTMLButtonElement).disabled).toBe(false);
   });
 

@@ -42,22 +42,24 @@ Any disc that did not ship in the repository (burned, loaded from `localStorage`
 ## 4. SSRF and safe media
 
 - **Page fetching.** `/api/extract` may only fetch addresses that pass `checkTarget` in `src/extract/ssrf.ts`: `http` or `https` only, no credentials, ports 80 and 443 only, no localhost or internal names, no private, loopback, link-local, or reserved IP ranges. Every redirect is checked again, with a hop limit.
+- **Word lookup.** `/api/define` may only call the free Dictionary API. The host is fixed in code and built from parts. The caller supplies one word, checked against a strict letters-only pattern.
 - **Topic lookup.** `/api/topic` may only call the English Wikipedia API. The host is fixed in code. The caller supplies search text only, and it travels as a query parameter.
 - **Pictures.** Every picture address goes through `safeMediaUrl` in `src/model/media.ts`. It allows public `https` addresses only. It rejects `http`, `javascript:`, `data:`, `blob:`, private hosts, credentials, odd ports, whitespace, and `.svg` or `.svgz` files. No more than 8 pictures per disc, and captions must be plain text.
 - **Defence in depth.** The extractor, the adapters, the compiler, and `validateManifest` each check media again. Do not remove a check because another layer has one.
 - **Rendering.** Pictures load with `referrerPolicy="no-referrer"` and fall back to an SVG plate on error. Never use `dangerouslySetInnerHTML` or `innerHTML`.
 - **Absolute URLs in `src/`.** Only GitHub addresses may appear as literals. Build any other address from parts, or keep it in `functions/`.
 
-## 5. The two API routes stay in sync
+## 5. The API routes stay in sync
 
-`/api/extract` and `/api/topic` exist in two places that must behave the same:
+`/api/extract`, `/api/topic` and `/api/define` exist in two places that must behave the same:
 
 | Route | Production | Dev server |
 | --- | --- | --- |
 | `/api/extract` | `functions/api/extract.ts` | the `disclore-dev-extract-api` plugin in `vite.config.ts` |
 | `/api/topic` | `functions/api/topic.ts` | the same plugin |
+| `/api/define` | `functions/api/define.ts` | the same plugin |
 
-Both call one handler in `src/extract/` (`handleExtract` or `handleTopic`). So:
+Both call one handler in `src/extract/` (`handleExtract`, `handleTopic` or `handleDefine`). So:
 
 - Put logic in the handler, never in the function file or the plugin. They only adapt a request and a response.
 - When you add or change a route, change all three places in the same commit: the handler, `functions/api/`, and `vite.config.ts`.

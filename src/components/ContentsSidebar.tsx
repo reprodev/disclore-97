@@ -15,6 +15,8 @@ export interface ContentsSidebarProps {
   onSelectDungeon: (dungeonId: string) => void;
   /** Bookmarked section ids. A Bookmarks list shows when there is at least one. */
   bookmarks?: readonly string[];
+  /** Section ids already opened. When given, read entries get a checkmark and the list shows an "X / Y read" note. */
+  visited?: readonly string[];
 }
 
 /** Persistent contents tree with a live "Find in Disc..." filter over sections. */
@@ -25,6 +27,7 @@ export function ContentsSidebar({
   onSelectDiagram,
   onSelectDungeon,
   bookmarks = [],
+  visited,
 }: ContentsSidebarProps) {
   const [query, setQuery] = useState('');
   const inputId = useId();
@@ -39,6 +42,8 @@ export function ContentsSidebar({
     .map((id) => disc.sections.find((s) => s.section_id === id))
     .filter((s): s is NonNullable<typeof s> => s !== undefined);
 
+  const readIds = new Set(visited ?? []);
+  const readCount = disc.sections.filter((s) => readIds.has(s.section_id)).length;
   const entryClass = (active: boolean) => (active ? 'disc-entry disc-entry--active' : 'disc-entry');
 
   return (
@@ -77,10 +82,20 @@ export function ContentsSidebar({
               >
                 <PixelIcon name="book" />
                 <span>{s.title}</span>
+                {visited && readIds.has(s.section_id) ? (
+                  <span className="contents-visited" aria-hidden="true" data-visited="true">
+                    {'\u2713'}
+                  </span>
+                ) : null}
               </BevelButton>
             </li>
           ))}
         </ul>
+        {visited ? (
+          <p className="disc-progress">
+            {readCount} / {disc.sections.length} read
+          </p>
+        ) : null}
         {filtering && shown.length === 0 ? <p className="disc-find__empty">No sections match.</p> : null}
       </section>
 

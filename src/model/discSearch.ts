@@ -130,3 +130,76 @@ export function pickRandomSection(discs: readonly DiscManifest[], rng: () => num
   const i = Math.min(all.length - 1, Math.max(0, Math.floor(Number.isFinite(r) ? r * all.length : 0)));
   return all[i]!;
 }
+
+export interface Mention extends SectionRef {
+  kind: 'title' | 'fact' | 'sentence';
+  text: string;
+}
+
+const MAX_MENTIONS = 16;
+const MAX_SENTENCES_PER_SECTION = 3;
+const MAX_MENTION_CHARS = 220;
+
+const isWordChar = (ch: string | undefined): boolean => ch !== undefined && /[\p{L}\p{N}]/u.test(ch);
+
+/** True when `needle` (lowercase) occurs in `text` as a whole word, ignoring case. */
+export function hasWord(text: string, needle: string): boolean {
+  if (needle === '') return false;
+  const lower = text.toLowerCase();
+  let from = 0;
+  for (;;) {
+    const at = lower.indexOf(needle, from);
+    if (at === -1) return false;
+    if (!isWordChar(lower[at - 1]) && !isWordChar(lower[at + needle.length])) return true;
+    from = at + 1;
+  }
+}
+
+function clip(s: string): string {
+  const t = s.trim();
+  return t.length > MAX_MENTION_CHARS ? `${t.slice(0, MAX_MENTION_CHARS - 3).trimEnd()}...` : t;
+}
+
+/**
+ * Where `word` appears across the mounted discs, as whole-word, case-insensitive matches in
+ * section titles, Quick Facts, and body sentences. Titles come first, then facts, then sentences.
+ * Sentences that repeat a fact are dropped, and each section adds at most a few sentences.
+ */
+export function findMentions(discs: readonly DiscManifest[], word: string, limit = MAX_MENTIONS): Mention[] {
+  const needle = word.trim().toLowerCase();
+  if (needle.length < 2) return [];
+  const titles: Mention[] = [];
+  const facts: Mention[] = [];
+  const sentences: Mention[] = [];
+  for (const disc of discs) {
+    for (const section of disc.sections) {
+      const ref: SectionRef = {
+        discId: disc.disc_id,
+        discTitle: disc.title,
+        sectionId: section.section_id,
+        sectionTitle: section.title,
+      };
+      if (hasWord(section.title, needle)) titles.push({ ...ref, kind: 'title', text: section.title });
+      const seen = new Set<string>();
+      for (const f of section.facts ?? []) {
+        const t = f.trim();
+        if (t !== '' && hasWord(t, needle)) {
+          seen.add(t);
+          facts.push({ ...ref, kind: 'fact', text: clip(t) });
+        }
+      }
+      let taken = 0;
+      for (const p of section.paragraphs) {
+        for (const s of p.split(/(?<=[.!?])\s+/)) {
+          const t = s.trim();
+          if (taken >= MAX_SENTENCES_PER_SECTION) break;
+          if (t === '' || seen.has(t) || !hasWord(t, needle)) continue;
+          seen.add(t);
+          taken++;
+          sentences.push({ ...ref, kind: 'sentence', text: clip(t) });
+        }
+      }
+    }
+  }
+  return [...titles, ...facts, ...sentences].slice(0, Math.max(0, limit));
+}

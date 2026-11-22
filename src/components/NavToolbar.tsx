@@ -17,6 +17,10 @@ export interface NavToolbarProps {
   onTimeline?: () => void;
   /** Omit when the disc has no dungeons: the button is disabled. */
   onKeepMaze?: () => void;
+  /** Opens the Media Gallery contact sheet. */
+  onGallery?: () => void;
+  /** Opens the Dictionary dialog. */
+  onDictionary?: () => void;
 }
 
 function Tool({
@@ -49,6 +53,8 @@ export function NavToolbar({
   onDiagram,
   onTimeline,
   onKeepMaze,
+  onGallery,
+  onDictionary,
 }: NavToolbarProps) {
   return (
     <div className="nav-toolbar" role="toolbar" aria-label="Navigation">
@@ -61,6 +67,9 @@ export function NavToolbar({
       <Tool icon="diagram" label="Diagram" disabled={!onDiagram} onClick={onDiagram} />
       <Tool icon="notepad" label="Timeline" disabled={!onTimeline} onClick={onTimeline} />
       <Tool icon="torch" label="KeepMaze" disabled={!onKeepMaze} onClick={onKeepMaze} />
+      <span className="nav-toolbar__sep" aria-hidden="true" />
+      <Tool icon="cd" label="Gallery" disabled={!onGallery} onClick={onGallery} />
+      <Tool icon="book" label="Dictionary" disabled={!onDictionary} onClick={onDictionary} />
     </div>
   );
 }

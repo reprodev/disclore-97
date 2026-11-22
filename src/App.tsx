@@ -5,6 +5,8 @@ import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
 import { BootSplash } from './components/BootSplash';
 import { DesktopIcons } from './components/DesktopIcons';
+import { DictionaryDialog } from './components/DictionaryDialog';
+import { MediaGallery } from './components/MediaGallery';
 import { DiscBrowser } from './components/DiscBrowser';
 import { ErrorList } from './components/ErrorList';
 import { MessageDialog } from './components/MessageDialog';
@@ -18,6 +20,7 @@ import { prebakedDiscs } from './discs';
 import { loadDisc } from './discs/loader';
 import { loadBookmarks, saveBookmarks, toggleBookmark } from './library/bookmarks';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
+import { loadVisited, markVisited, saveVisited } from './library/visited';
 import {
   MAX_IMAGE_BYTES,
   discImageFileName,
@@ -99,6 +102,11 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   // Bookmarks share the library's storage: the browser's localStorage unless a test or embedder supplies one.
   const [bookmarkStorage] = useState(() => storage ?? (sources === undefined ? getBrowserStorage() : undefined));
   const [marks, setMarks] = useState<string[]>([]);
+  /** Sections of the open disc that have been opened, saved under disclore97.visited.<disc_id>. */
+  const [visited, setVisited] = useState<readonly string[]>([]);
+  const visitedRef = useRef<readonly string[]>([]);
+  /** The Dictionary dialog: null when closed, otherwise the word it opened with ('' for none). */
+  const [dictionary, setDictionary] = useState<{ word: string } | null>(null);
   const [burnOpen, setBurnOpen] = useState(false);
   /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
   const [burnSample, setBurnSample] = useState<string | null>(null);
@@ -141,6 +149,24 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
   useEffect(() => {
     setMarks(disc ? loadBookmarks(bookmarkStorage, disc.disc_id, new Set(disc.sections.map((s) => s.section_id))) : []);
   }, [marksDiscId]);
+
+  // Load the open disc's visited sections when the disc changes. This must run before the mark effect below.
+  useEffect(() => {
+    const list = disc ? loadVisited(bookmarkStorage, disc.disc_id, new Set(disc.sections.map((s) => s.section_id))) : [];
+    visitedRef.current = list;
+    setVisited(list);
+  }, [marksDiscId]);
+
+  // Opening a section marks it read.
+  const openSectionId = nav.view?.kind === 'section' ? nav.view.section_id : null;
+  useEffect(() => {
+    if (!disc || openSectionId === null) return;
+    const next = markVisited(visitedRef.current, openSectionId);
+    if (next === visitedRef.current) return;
+    visitedRef.current = next;
+    setVisited(next);
+    saveVisited(bookmarkStorage, disc.disc_id, next);
+  }, [marksDiscId, openSectionId]);
 
   const toggleMark = (sectionId: string) => {
     if (!disc) return;
@@ -303,9 +329,12 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onShowInDiagram={showInDiagram}
           bookmarked={marks.includes(v.section_id)}
           onToggleBookmark={() => toggleMark(v.section_id)}
+          onLookUpWord={(word) => setDictionary({ word })}
           {...(disc.media ? { media: disc.media } : {})}
         />
       );
+    } else if (v.kind === 'gallery') {
+      main = <MediaGallery disc={disc} onOpenSection={goSection} />;
     } else if (v.kind === 'timeline') {
       main = <TimelineView disc={disc} onSelectSection={goSection} />;
     } else if (v.kind === 'diagram') {
@@ -356,7 +385,10 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
           onSelectDiagram={(diagram_id) => visit({ kind: 'diagram', diagram_id })}
           onSelectDungeon={(dungeon_id) => visit({ kind: 'keepmaze', dungeon_id })}
           onSelectTimeline={() => visit({ kind: 'timeline' })}
+          onSelectGallery={() => visit({ kind: 'gallery' })}
+          onOpenDictionary={(word) => setDictionary({ word: word ?? '' })}
           bookmarks={marks}
+          visited={visited}
           view={nav.view}
           main={main}
           canBack={canGoBack(history)}
@@ -424,6 +456,15 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage }: AppProps
             onClose={closeReadMe}
             onMinimize={() => setReadMeMinimized(true)}
             minimized={readMeMinimized}
+          />
+        ) : null}
+        {dictionary ? (
+          <DictionaryDialog
+            discs={discs}
+            initialWord={dictionary.word}
+            onClose={() => setDictionary(null)}
+            onOpenSection={openSectionIn}
+            {...(fetchImpl ? { fetch: fetchImpl } : {})}
           />
         ) : null}
         {burnOpen ? (
