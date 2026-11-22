@@ -6,7 +6,7 @@ import type { DiscManifest } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import { discMeta } from './ExpansionPackList';
 import { PixelIcon } from './PixelIcon';
-import type { IconName } from './PixelIcon';
+import { emblemFor } from './discEmblems';
 import '../styles/home.css';
 
 export type PackFilter = 'all' | 'builtin' | 'burned';
@@ -33,10 +33,6 @@ export const SAMPLE_BURNS: readonly { label: string; topic: string }[] = [
   { label: 'Burn Sample: CD-ROM', topic: 'CD-ROM' },
 ];
 
-const EMBLEMS: Record<string, IconName> = {
-  castles: 'castle',
-  'retro-dialup': 'computer',
-};
 
 const TABS: readonly PackFilter[] = ['all', 'builtin', 'burned'];
 
@@ -128,7 +124,7 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
                 <li key={disc.disc_id} className="pack-tile" data-origin={origin}>
                   <BevelButton className="pack-tile__open" onClick={() => onPick(disc.disc_id)}>
                     <span className="pack-card__emblem">
-                      <PixelIcon name={EMBLEMS[disc.disc_id] ?? 'cd'} size={32} />
+                      <PixelIcon name={emblemFor(disc.disc_id)} size={32} />
                     </span>
                     <span className="disc-text">
                       <span className="disc-title">{disc.title}</span>

@@ -79,14 +79,14 @@
   align-items: baseline;
   gap: 8px;
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-display, var(--font-serif));
   line-height: 1;
 }
 
 .home-hero__word {
   font-size: 34px;
-  font-weight: normal;
-  letter-spacing: 0.05em;
+  font-weight: var(--display-weight, normal);
+  letter-spacing: var(--display-tracking, 0.05em);
   text-transform: uppercase;
   color: var(--color-ink);
 }
@@ -145,7 +145,7 @@
 .home__side {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
@@ -566,16 +566,16 @@
 }
 
 .home .home__cards {
-  gap: 4px;
+  gap: 3px;
 }
 
 .home .home__note {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
 }
 
 .home-info {
   flex: 0 0 auto;
-  padding: 6px 8px;
+  padding: 4px 8px;
 }
 
 .home-info__title {
@@ -870,10 +870,10 @@
 .home .bevel-button.home-card {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
-  padding: 4px 8px;
+  padding: 1px 8px;
   text-align: left;
   color: var(--color-ink);
   background: transparent;
@@ -955,4 +955,51 @@
 
 .pinpointer__burn[data-active="true"] .pinpointer__title {
   color: var(--color-title-text);
+}
+
+/* ---- Edition artwork slots: the same four places as the classic marks ---- */
+.home-mark--slot1 {
+  top: 0;
+  right: 4px;
+  width: 190px;
+  height: 142px;
+}
+
+.home-mark--slot2 {
+  top: 118px;
+  right: 14px;
+  width: 128px;
+  height: 128px;
+}
+
+.home-mark--slot3 {
+  top: 238px;
+  right: 150px;
+  width: 124px;
+  height: 83px;
+}
+
+.home-mark--slot4 {
+  top: 330px;
+  right: 12px;
+  width: 116px;
+  height: 87px;
+}
+
+/* ---- Tighter right column: a two-column Utilities grid fits without a scrollbar ---- */
+.home .home__cards--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.home .home__cards--grid .home-card__text {
+  min-width: 0;
+}
+
+.home .home__cards--grid .home-card__title,
+.home .home__cards--grid .home-card__desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

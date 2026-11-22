@@ -1,3 +1,4 @@
+import type { Theme } from '../model/editions';
 import '../styles/splash.css';
 
 const C = {
@@ -17,6 +18,8 @@ const C = {
   stoneDark: 'var(--color-stone-dark)',
   forest: 'var(--color-forest)',
   forestDark: 'var(--color-forest-dark)',
+  forestLight: 'var(--color-forest-light)',
+  crimsonDark: 'var(--color-crimson-dark)',
   surface: 'var(--color-surface)',
   shadow: 'var(--color-bevel-shadow)',
   paper: 'var(--color-paper)',
@@ -40,10 +43,11 @@ function merlons(xs: number[], y: number, w: number, fill: string) {
  * CD-ROM inside compass and orbit rings, a castle keep silhouette on the left,
  * and a CRT terminal on the right. Flat token colors only.
  */
-export function HeroArt() {
+function ClassicHero() {
   return (
     <svg
       className="boot-hero__art"
+      data-edition="classic"
       viewBox="0 0 200 80"
       role="img"
       aria-label="A glowing CD-ROM disc in orbit rings between a castle keep and a CRT terminal"
@@ -229,17 +233,6 @@ function RingsMark() {
   );
 }
 
-/** Low-opacity engraved backdrop for the Home window. Decorative only. */
-export function EngravedWatermarks() {
-  return (
-    <div className="home-marks" aria-hidden="true">
-      <PlanetMark />
-      <RingsMark />
-      <BookMark />
-      <ArchMark />
-    </div>
-  );
-}
 const BLOCKS = 20;
 
 export interface InitBarProps {
@@ -280,5 +273,357 @@ export function InitBar({ durationSec, step, message }: InitBarProps) {
         {message}
       </p>
     </>
+  );
+}
+
+// ---- Haunted Edition and Winter Solstice artwork ---------------------------------------------
+// Same rules as the classic art: flat token colors, stepped shapes, no gradients, no images.
+
+const HAUNT_STARS: [number, number][] = [
+  [8, 8], [22, 16], [40, 6], [60, 12], [96, 5], [132, 8], [186, 8], [192, 24], [12, 32], [76, 20], [118, 22],
+];
+
+/** A haunted keep against a low amber crescent moon, with bats and a flickering lantern. */
+function HauntedHero() {
+  return (
+    <svg
+      className="boot-hero__art"
+      data-edition="haunted"
+      viewBox="0 0 200 80"
+      role="img"
+      aria-label="A haunted keep under an amber crescent moon, with bats and a flickering lantern"
+      shapeRendering="crispEdges"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <rect x={0} y={0} width={200} height={80} fill={C.night} />
+      {HAUNT_STARS.map(([x, y]) => (
+        <rect key={`s${x}-${y}`} x={x} y={y} width={1} height={1} fill={C.star} />
+      ))}
+
+      {/* Crescent moon with a stepped flat halo */}
+      <circle cx={152} cy={22} r={19} fill={C.nightLight} />
+      <circle cx={152} cy={22} r={16} fill={C.goldDark} />
+      <path d="M156 8A14 14 0 1 0 156 36A11 11 0 1 1 156 8Z" fill={C.starGold} />
+
+      {/* Bats */}
+      {[
+        [118, 14],
+        [176, 40],
+        [30, 18],
+      ].map(([x, y]) => (
+        <polygon key={`b${x}`} points={`${x! - 5},${y! - 2} ${x! - 2},${y!} ${x},${y! - 2} ${x! + 2},${y!} ${x! + 5},${y! - 2} ${x! + 3},${y! + 2} ${x},${y! + 1} ${x! - 3},${y! + 2}`} fill={C.ink} />
+      ))}
+
+      {/* Hill and ground */}
+      <polygon points="0,66 34,58 70,64 130,60 200,66 200,80 0,80" fill={C.ink} />
+      <rect x={0} y={72} width={200} height={8} fill={C.forestDark} />
+
+      {/* The keep: two pointed towers, a tall center tower, and a crimson pennant */}
+      <rect x={70} y={34} width={46} height={32} fill={C.ink} />
+      {merlons([70, 76, 82, 100, 106, 112], 31, 4, C.ink)}
+      <rect x={62} y={24} width={14} height={42} fill={C.ink} />
+      <polygon points="62,24 69,8 76,24" fill={C.ink} />
+      <rect x={110} y={24} width={14} height={42} fill={C.ink} />
+      <polygon points="110,24 117,8 124,24" fill={C.ink} />
+      <rect x={84} y={16} width={18} height={50} fill={C.ink} />
+      <polygon points="84,16 93,0 102,16" fill={C.ink} />
+      <rect x={93} y={0} width={1} height={6} fill={C.paper} />
+      <polygon points="94,1 102,3 94,5" fill={C.crimson} />
+      <rect className="hero-torch" x={90} y={26} width={4} height={6} fill={C.gold} />
+      <rect className="hero-torch hero-torch--b" x={67} y={32} width={3} height={5} fill={C.gold} />
+      <rect className="hero-torch" x={115} y={32} width={3} height={5} fill={C.gold} />
+      <rect className="hero-torch hero-torch--b" x={78} y={46} width={3} height={5} fill={C.gold} />
+      <rect className="hero-torch" x={105} y={46} width={3} height={5} fill={C.gold} />
+      <rect x={89} y={54} width={8} height={12} fill={C.crimsonDark} />
+      <polygon points="89,54 93,50 97,54" fill={C.crimsonDark} />
+
+      {/* Lantern on a post */}
+      <rect x={21} y={44} width={2} height={28} fill={C.ink} />
+      <rect x={14} y={42} width={8} height={2} fill={C.ink} />
+      <rect x={15} y={36} width={1} height={6} fill={C.ink} />
+      <rect x={12} y={28} width={10} height={9} fill={C.stoneDark} />
+      <rect className="hero-torch" x={14} y={30} width={6} height={5} fill={C.starGold} />
+      <polygon points="11,28 17,23 23,28" fill={C.ink} />
+
+      {/* Gold frame line */}
+      <rect x={0} y={0} width={200} height={1} fill={C.goldDark} />
+      <rect x={0} y={79} width={200} height={1} fill={C.goldDark} />
+    </svg>
+  );
+}
+
+const SOLSTICE_STARS: [number, number][] = [
+  [6, 6], [18, 30], [34, 8], [52, 4], [70, 26], [88, 6], [104, 28], [120, 4], [136, 24], [150, 6], [168, 10], [184, 4], [194, 26], [60, 34],
+];
+/** Step heights of the aurora band, one value per 10-unit column. */
+const AURORA_WAVE = [0, 2, 4, 6, 7, 6, 4, 2, 0, -2, -3, -2, 0, 2, 4, 6, 7, 6, 4, 2];
+
+/** Evergreen pines under a starry solstice sky, a stepped aurora band, and a lit lighthouse. */
+function SolsticeHero() {
+  const pine = (x: number, base: number, h: number, key: string) => (
+    <g key={key}>
+      <rect x={x - 1} y={base - 3} width={2} height={4} fill={C.ink} />
+      <polygon points={`${x - h * 0.45},${base - 2} ${x},${base - h * 0.55} ${x + h * 0.45},${base - 2}`} fill={C.forestDark} />
+      <polygon points={`${x - h * 0.34},${base - h * 0.32} ${x},${base - h * 0.8} ${x + h * 0.34},${base - h * 0.32}`} fill={C.forest} />
+      <polygon points={`${x - h * 0.22},${base - h * 0.6} ${x},${base - h} ${x + h * 0.22},${base - h * 0.6}`} fill={C.forestDark} />
+      <polygon points={`${x - 2},${base - h * 0.88} ${x},${base - h} ${x + 2},${base - h * 0.88}`} fill={C.paper} />
+    </g>
+  );
+  return (
+    <svg
+      className="boot-hero__art"
+      data-edition="solstice"
+      viewBox="0 0 200 80"
+      role="img"
+      aria-label="Evergreen pines and a lit lighthouse under a starry solstice sky with an aurora band"
+      shapeRendering="crispEdges"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <rect x={0} y={0} width={200} height={80} fill={C.night} />
+      {SOLSTICE_STARS.map(([x, y]) => (
+        <rect key={`s${x}-${y}`} x={x} y={y} width={1} height={1} fill={C.star} />
+      ))}
+      <rect x={96} y={10} width={2} height={2} fill={C.starGold} />
+      <rect x={160} y={30} width={2} height={2} fill={C.starGold} />
+
+      {/* Aurora: three flat stepped bands, one rect per column */}
+      {AURORA_WAVE.map((w, i) => (
+        <g key={`a${i}`}>
+          <rect x={i * 10} y={12 + w} width={10} height={14} fill={C.nightLight} />
+          <rect x={i * 10} y={14 + w} width={10} height={6} fill={C.forestLight} />
+          <rect x={i * 10} y={20 + w} width={10} height={4} fill={C.sky} />
+          <rect x={i * 10} y={24 + w} width={10} height={2} fill={C.starGold} />
+        </g>
+      ))}
+
+      {/* Snowy ground and hills */}
+      <polygon points="0,64 40,58 90,63 140,60 200,64 200,80 0,80" fill={C.paper} />
+      <rect x={0} y={72} width={200} height={8} fill={C.stoneLight} />
+
+      {/* Pines */}
+      {pine(14, 70, 30, 'p1')}
+      {pine(34, 72, 24, 'p2')}
+      {pine(54, 70, 34, 'p3')}
+      {pine(78, 72, 22, 'p4')}
+
+      {/* A small keep with a lit window */}
+      <rect x={104} y={50} width={26} height={22} fill={C.stoneDark} />
+      {merlons([104, 110, 116, 122, 127], 47, 3, C.stoneDark)}
+      <rect className="hero-torch" x={114} y={56} width={4} height={6} fill={C.gold} />
+      <rect x={113} y={64} width={6} height={8} fill={C.ink} />
+
+      {/* Lighthouse on a rock, with a stepped beam */}
+      <polygon points="150,72 158,62 190,62 198,72" fill={C.stoneDark} />
+      <polygon points="166,62 182,62 179,28 169,28" fill={C.paper} />
+      <polygon points="167,54 181,54 180,48 168,48" fill={C.crimson} />
+      <polygon points="169,40 179,40 178,34 170,34" fill={C.crimson} />
+      <rect x={167} y={26} width={14} height={3} fill={C.goldDark} />
+      <rect className="hero-torch" x={169} y={19} width={10} height={7} fill={C.starGold} />
+      <polygon points="167,19 174,11 181,19" fill={C.crimson} />
+      <polygon className="hero-torch hero-torch--b" points="168,21 130,15 130,27 168,24" fill={C.starGold} />
+
+      {/* Gold frame line */}
+      <rect x={0} y={0} width={200} height={1} fill={C.goldDark} />
+      <rect x={0} y={79} width={200} height={1} fill={C.goldDark} />
+    </svg>
+  );
+}
+
+export interface HeroArtProps {
+  /** The edition on show. Defaults to Classic '97. */
+  edition?: Theme;
+}
+
+/**
+ * The wide title-card illustration. Classic '97 draws the castle, CD-ROM, and CRT. The Haunted
+ * Edition draws a haunted keep under a crescent moon, and Winter Solstice draws pines, an aurora,
+ * and a lighthouse.
+ */
+export function HeroArt({ edition = 'classic' }: HeroArtProps) {
+  if (edition === 'haunted') return <HauntedHero />;
+  if (edition === 'solstice') return <SolsticeHero />;
+  return <ClassicHero />;
+}
+
+// ---- Edition watermarks ----------------------------------------------------------------------
+
+/** Rounds to one decimal so the point lists stay short. */
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+/** A gothic lantern on a hook: pointed cap, glass panes with a flame, and a footed base. */
+function LanternMark({ slot }: { slot: number }) {
+  return (
+    <svg className={`home-mark home-mark--lantern home-mark--slot${slot}`} viewBox="0 0 120 120" focusable="false" {...MARK_PROPS}>
+      <circle cx={60} cy={9} r={6} />
+      <line x1={60} y1={15} x2={60} y2={24} />
+      <polygon points="44,34 60,22 76,34" fill={W.tint} />
+      <rect x={41} y={34} width={38} height={5} fill={W.tint} />
+      <path d="M46 39L43 92H77L74 39" fill={W.tint} />
+      <rect x={50} y={44} width={20} height={44} />
+      <line x1={60} y1={44} x2={60} y2={88} />
+      <line x1={50} y1={62} x2={70} y2={62} />
+      <line x1={50} y1={76} x2={70} y2={76} />
+      <polygon points="60,50 54,68 60,78 66,68" fill={W.tint} />
+      <rect x={39} y={92} width={42} height={6} fill={W.tint} />
+      <path d="M43 98L40 108M77 98L80 108M60 98V110" />
+    </svg>
+  );
+}
+
+/** A crescent moon with a few stars. */
+function MoonMark({ slot }: { slot: number }) {
+  return (
+    <svg className={`home-mark home-mark--moon home-mark--slot${slot}`} viewBox="0 0 120 90" focusable="false" {...MARK_PROPS}>
+      {[
+        [14, 14], [28, 64], [100, 20], [108, 70], [92, 46],
+      ].map(([x, y]) => (
+        <path key={`${x}-${y}`} d={`M${x! - 2.5} ${y}H${x! + 2.5}M${x} ${y! - 2.5}V${y! + 2.5}`} />
+      ))}
+      <path d="M72 8A38 38 0 1 0 72 82A30 30 0 1 1 72 8Z" fill={W.tint} />
+      <path d="M66 22A24 24 0 0 0 66 68" strokeDasharray="2 3" />
+    </svg>
+  );
+}
+
+/** A bat with spread wings, doubling as a gargoyle silhouette on a ledge. */
+function BatMark({ slot }: { slot: number }) {
+  return (
+    <svg className={`home-mark home-mark--bat home-mark--slot${slot}`} viewBox="0 0 120 90" focusable="false" {...MARK_PROPS}>
+      <path d="M54 40Q42 16 6 24Q16 32 14 44Q24 38 28 52Q40 44 54 54Z" fill={W.tint} />
+      <path d="M66 40Q78 16 114 24Q104 32 106 44Q96 38 92 52Q80 44 66 54Z" fill={W.tint} />
+      <ellipse cx={60} cy={50} rx={8} ry={15} fill={W.tint} />
+      <circle cx={60} cy={30} r={8} fill={W.tint} />
+      <polygon points="53,26 51,14 58,22" fill={W.tint} />
+      <polygon points="67,26 69,14 62,22" fill={W.tint} />
+      <circle cx={57} cy={30} r={1.2} />
+      <circle cx={63} cy={30} r={1.2} />
+      <path d="M57 35L58.5 38L60 35L61.5 38L63 35" />
+      <path d="M56 64L60 76L64 64" />
+      <line x1={20} y1={84} x2={100} y2={84} />
+    </svg>
+  );
+}
+
+/** A closed tome with a banded spine, corner guards, and a clasp. */
+function TomeMark({ slot }: { slot: number }) {
+  return (
+    <svg className={`home-mark home-mark--tome home-mark--slot${slot}`} viewBox="0 0 120 80" focusable="false" {...MARK_PROPS}>
+      <rect x={14} y={10} width={92} height={58} fill={W.tint} />
+      <rect x={14} y={10} width={12} height={58} />
+      {[18, 32, 46, 60].map((y) => (
+        <line key={y} x1={14} y1={y} x2={26} y2={y} />
+      ))}
+      <rect x={32} y={16} width={68} height={46} />
+      <polygon points="66,24 82,39 66,54 50,39" />
+      <circle cx={66} cy={39} r={5} />
+      {[
+        [32, 16, 1, 1], [100, 16, -1, 1], [32, 62, 1, -1], [100, 62, -1, -1],
+      ].map(([x, y, dx, dy]) => (
+        <path key={`${x}-${y}`} d={`M${x} ${y! + dy! * 8}V${y}H${x! + dx! * 8}`} />
+      ))}
+      <rect x={104} y={32} width={8} height={14} fill={W.tint} />
+      <line x1={14} y1={72} x2={106} y2={72} />
+    </svg>
+  );
+}
+
+/** An eight-point compass star in a ring, with tick marks. */
+function CompassMark({ slot }: { slot: number }) {
+  const pts = Array.from({ length: 16 }, (_, i) => {
+    const angle = ((i * 22.5 - 90) * Math.PI) / 180;
+    const r = i % 2 === 1 ? 11 : i % 4 === 0 ? 40 : 27;
+    return `${r1(60 + r * Math.cos(angle))},${r1(45 + r * Math.sin(angle))}`;
+  }).join(' ');
+  return (
+    <svg className={`home-mark home-mark--compass home-mark--slot${slot}`} viewBox="0 0 120 90" focusable="false" {...MARK_PROPS}>
+      <circle cx={60} cy={45} r={43} strokeDasharray="2 3" />
+      <polygon points={pts} fill={W.tint} />
+      <circle cx={60} cy={45} r={7} />
+      <line x1={60} y1={45} x2={60} y2={5} />
+      <line x1={60} y1={45} x2={100} y2={45} />
+      <line x1={60} y1={45} x2={60} y2={85} />
+      <line x1={60} y1={45} x2={20} y2={45} />
+    </svg>
+  );
+}
+
+/** A six-armed snowflake crystal with branching arms. */
+function SnowflakeMark({ slot }: { slot: number }) {
+  return (
+    <svg className={`home-mark home-mark--snowflake home-mark--slot${slot}`} viewBox="0 0 120 120" focusable="false" {...MARK_PROPS}>
+      {[0, 1, 2, 3, 4, 5].map((k) => (
+        <g key={k} transform={`rotate(${k * 60} 60 60)`}>
+          <line x1={60} y1={60} x2={60} y2={10} />
+          <line x1={60} y1={22} x2={51} y2={13} />
+          <line x1={60} y1={22} x2={69} y2={13} />
+          <line x1={60} y1={36} x2={52} y2={28} />
+          <line x1={60} y1={36} x2={68} y2={28} />
+          <polygon points="60,6 63,10 60,14 57,10" fill={W.tint} />
+        </g>
+      ))}
+      <polygon points="60,50 69,55 69,65 60,70 51,65 51,55" fill={W.tint} />
+    </svg>
+  );
+}
+
+/** A row of evergreen pines on a snowy line. */
+function PineMark({ slot }: { slot: number }) {
+  const tree = (x: number, h: number) => {
+    const base = 68;
+    return (
+      <g key={x}>
+        <rect x={x - 2} y={base - 4} width={4} height={8} fill={W.tint} />
+        <polygon points={`${x - h * 0.42},${base - 3} ${x},${base - h * 0.55} ${x + h * 0.42},${base - 3}`} fill={W.tint} />
+        <polygon points={`${x - h * 0.3},${base - h * 0.36} ${x},${base - h * 0.82} ${x + h * 0.3},${base - h * 0.36}`} fill={W.tint} />
+        <polygon points={`${x - h * 0.18},${base - h * 0.66} ${x},${base - h} ${x + h * 0.18},${base - h * 0.66}`} fill={W.tint} />
+      </g>
+    );
+  };
+  return (
+    <svg className={`home-mark home-mark--pine home-mark--slot${slot}`} viewBox="0 0 120 80" focusable="false" {...MARK_PROPS}>
+      {tree(24, 56)}
+      {tree(60, 66)}
+      {tree(96, 50)}
+      <line x1={6} y1={72} x2={114} y2={72} />
+    </svg>
+  );
+}
+
+export interface EngravedWatermarksProps {
+  /** The edition on show. Defaults to Classic '97. */
+  edition?: Theme;
+}
+
+/**
+ * Low-opacity engraved backdrop for the Home window. Decorative only. Classic '97 has a planet, orbiting
+ * CD rings, an open book, and an arch and keep. The Haunted Edition has a crescent moon, a gothic lantern,
+ * a tome, and a bat. Winter Solstice has a compass star, a snowflake, evergreens, and a lantern.
+ */
+export function EngravedWatermarks({ edition = 'classic' }: EngravedWatermarksProps) {
+  return (
+    <div className="home-marks" aria-hidden="true" data-edition={edition}>
+      {edition === 'haunted' ? (
+        <>
+          <MoonMark slot={1} />
+          <LanternMark slot={2} />
+          <TomeMark slot={3} />
+          <BatMark slot={4} />
+        </>
+      ) : edition === 'solstice' ? (
+        <>
+          <CompassMark slot={1} />
+          <SnowflakeMark slot={2} />
+          <PineMark slot={3} />
+          <LanternMark slot={4} />
+        </>
+      ) : (
+        <>
+          <PlanetMark />
+          <RingsMark />
+          <BookMark />
+          <ArchMark />
+        </>
+      )}
+    </div>
   );
 }

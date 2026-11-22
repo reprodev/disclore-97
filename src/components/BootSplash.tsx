@@ -75,7 +75,7 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS, edition = 'clas
       <div className="boot-card" role="region" aria-label="DiscLore '97 boot splash">
         <div className="boot-card__frame">
           <div className="boot-hero">
-            <HeroArt />
+            <HeroArt edition={edition} />
           </div>
 
           <div className="boot-titleblock">

@@ -65,7 +65,7 @@ function Card({
   onClick?: () => void;
 }) {
   return (
-    <BevelButton className="home-card" disabled={disabled || !onClick} onClick={() => onClick?.()}>
+    <BevelButton className="home-card" title={text} disabled={disabled || !onClick} onClick={() => onClick?.()}>
       <PixelIcon name={icon} size={24} />
       <span className="home-card__text">
         <span className="home-card__title">{title}</span>
@@ -147,10 +147,10 @@ export function HomeLauncher({
       onMinimize={onMinimize}
     >
       <div className="home">
-        <EngravedWatermarks />
+        <EngravedWatermarks edition={theme} />
         <header className="home-hero">
           <div className="home-hero__emblem">
-            <HeroArt />
+            <HeroArt edition={theme} />
           </div>
           <div className="home-hero__text">
             <p className="home-hero__eyebrow">{edition.eyebrow}</p>
@@ -234,7 +234,7 @@ export function HomeLauncher({
             </Group>
 
             <Group legend="Utilities" className="home-group--editorial">
-              <div className="home__cards">
+              <div className="home__cards home__cards--grid">
                 <Card
                   icon="cd"
                   title="Burn New CD-R Disc..."

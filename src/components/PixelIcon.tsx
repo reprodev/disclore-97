@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home' | 'castle' | 'computer' | 'notepad';
+export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home' | 'castle' | 'computer' | 'notepad' | 'lantern' | 'floppy';
 
 /** Palette letters used in the pixel maps below. Every color is a shared token. */
 const PALETTE: Record<string, string> = {
@@ -127,6 +127,36 @@ const MAPS: Record<IconName, string[]> = {
     '...kwgggwwwwk...',
     '...kwwwwwwwwk...',
     '...kkkkkkkkkk...',
+  ]),
+  // A hanging gothic lantern with a lit flame: the Halloween disc.
+  lantern: centered([
+    '.....kk.....',
+    '....k..k....',
+    '...kkkkkk...',
+    '..kYYYYYYk..',
+    '..kyFFFFyk..',
+    '..kyFffFyk..',
+    '..kyFffFyk..',
+    '..kyFffFyk..',
+    '..kyfffFyk..',
+    '..kyyyyyyk..',
+    '..kYYYYYYk..',
+    '...kkkkkk...',
+  ]),
+  // A 3.5-inch floppy disk with a metal shutter and a label: the Digital Resurrection disc.
+  floppy: centered([
+    'kkkkkkkkkkkkk',
+    'kbbLLLLLkbbbk',
+    'kbbLkkkLkbbbk',
+    'kbbLLLLLkbbbk',
+    'kbbbbbbbbbbbk',
+    'kbwwwwwwwwwbk',
+    'kbwggggggwwbk',
+    'kbwwwwwwwwwbk',
+    'kbwggggwwwwbk',
+    'kbwwwwwwwwwbk',
+    'kbbbbbbbbbbbk',
+    'kkkkkkkkkkkkk',
   ]),
   back: centered(BACK_ARROW),
   forward: centered(BACK_ARROW.map((r) => [...r].reverse().join(''))),

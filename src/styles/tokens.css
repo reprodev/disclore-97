@@ -73,6 +73,11 @@
   --color-flame-hot: #FFE000;
 
   --font-serif: Georgia, "Times New Roman", serif;
+
+  /* Display face and masthead styling. Editions override these (system fonts only). */
+  --font-display: Georgia, "Times New Roman", serif;
+  --display-tracking: 0.05em;
+  --display-weight: normal;
   --font-ui: "MS Sans Serif", Tahoma, sans-serif;
 
   --bevel-w: 2px;
@@ -128,6 +133,11 @@
   --color-dungeon-stone: #3A3650;
   --color-flame: #FF7A00;
   --color-flame-hot: #FFD21F;
+
+  /* Dramatic antique serif, tight and bold on the masthead */
+  --font-display: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --display-tracking: 0.01em;
+  --display-weight: bold;
 }
 
 
@@ -182,6 +192,11 @@
   --color-dungeon-stone: #3B4A42;
   --color-flame: #F08A24;
   --color-flame-hot: #FFD966;
+
+  /* Crisp, airy serif with open letter-spacing on the masthead */
+  --font-display: Cambria, "Book Antiqua", Georgia, serif;
+  --display-tracking: 0.16em;
+  --display-weight: normal;
 }
 
 * {

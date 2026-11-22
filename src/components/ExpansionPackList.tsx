@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { DiscManifest } from '../model/manifest';
 import { BevelButton } from './BevelButton';
 import { PixelIcon } from './PixelIcon';
-import type { IconName } from './PixelIcon';
+import { emblemFor } from './discEmblems';
 import '../styles/browser.css';
 
 export interface ExpansionPackListProps {
@@ -16,10 +16,6 @@ export interface ExpansionPackListProps {
   renderExtra?: (disc: DiscManifest) => ReactNode;
 }
 
-const EMBLEMS: Record<string, IconName> = {
-  castles: 'castle',
-  'retro-dialup': 'computer',
-};
 
 const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
@@ -59,7 +55,7 @@ export function ExpansionPackList({
             >
               {card ? (
                 <span className="pack-card__emblem">
-                  <PixelIcon name={EMBLEMS[disc.disc_id] ?? 'cd'} size={32} />
+                  <PixelIcon name={emblemFor(disc.disc_id)} size={32} />
                 </span>
               ) : (
                 <PixelIcon name="cd" size={32} />

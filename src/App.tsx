@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FetchLike } from './adapters/types';
-import { ambienceKindFor, playBurnComplete, playSpinUp, setAmbienceKind } from './audio/audio';
+import { ambienceKindFor, playBurnComplete, playEditionSwitch, playSpinUp, setAmbienceKind, setAudioEdition } from './audio/audio';
 import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
 import { BootSplash } from './components/BootSplash';
@@ -213,9 +213,14 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   const [theme, setTheme] = useState<Theme>(() => loadTheme(bookmarkStorage));
   useEffect(() => {
     applyTheme(document.documentElement, theme);
-    return () => applyTheme(document.documentElement, 'classic');
+    setAudioEdition(theme);
+    return () => {
+      applyTheme(document.documentElement, 'classic');
+      setAudioEdition('classic');
+    };
   }, [theme]);
   const setEdition = (next: Theme) => {
+    if (next !== theme) playEditionSwitch(next);
     setTheme(next);
     saveTheme(bookmarkStorage, next);
   };

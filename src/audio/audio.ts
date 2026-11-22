@@ -7,6 +7,8 @@
  * is Off by default, silent whenever Sound is muted, and stopped on unmount.
  */
 
+import type { Theme } from '../model/editions';
+
 type Factory = () => AudioContext;
 
 const MASTER_LEVEL = 0.25;
@@ -99,6 +101,9 @@ function track(n: AudioScheduledSourceNode): void {
   };
 }
 
+/** The edition that colors the chime and the ambience. Classic '97 is the original sound. */
+let edition: Theme = 'classic';
+
 /** Soft attack, a gentle decay to about half level, then a smooth release. */
 function envelope(c: AudioContext, t0: number, dur: number, peak: number): GainNode {
   const g = c.createGain();
@@ -147,6 +152,18 @@ function chord(
 function warmChord(c: AudioContext, freqs: readonly number[], t0: number, dur: number, peak: number): void {
   chord(c, 'triangle', freqs, t0, dur, peak);
   chord(c, 'sine', freqs.map((f) => f * 2), t0, dur, peak * 0.3);
+}
+
+/** A struck bell: a sine with an inharmonic overtone and a long, soft decay. */
+function bell(c: AudioContext, f: number, t0: number, dur: number, peak: number): void {
+  tone(c, 'sine', f, f, t0, dur, peak);
+  tone(c, 'sine', f * 2.76, f * 2.76, t0, dur * 0.6, peak * 0.3);
+}
+
+/** A crystalline tone: two pure sines an octave apart, short and bright. */
+function crystal(c: AudioContext, f: number, t0: number, dur: number, peak: number): void {
+  tone(c, 'sine', f, f, t0, dur, peak);
+  tone(c, 'sine', f * 2, f * 2, t0, dur * 0.6, peak * 0.25);
 }
 
 function noise(
@@ -238,13 +255,52 @@ export function playDoorUnlock(): void {
   });
 }
 
-/** Disc-ready chime: a rising C major arpeggio that settles on a held chord. */
+/** Disc-ready chime: a rising C major arpeggio that settles on a held chord. The edition changes its character. */
 export function playChime(): void {
   play((c, t) => {
+    if (edition === 'haunted') {
+      // C minor, with an eerie low bell underneath.
+      warmChord(c, [523.25], t, 0.16, 0.3);
+      warmChord(c, [622.25], t + 0.1, 0.16, 0.3);
+      warmChord(c, [783.99], t + 0.2, 0.16, 0.3);
+      warmChord(c, [523.25, 622.25, 783.99, 1046.5], t + 0.3, 0.7, 0.32);
+      bell(c, 130.81, t + 0.05, 1.4, 0.2);
+      noise(c, 'lowpass', 320, t, 0.9, 0.06);
+      return;
+    }
+    if (edition === 'solstice') {
+      // Crisp, crystalline fifths.
+      crystal(c, 783.99, t, 0.5, 0.26);
+      crystal(c, 1174.66, t + 0.1, 0.5, 0.26);
+      crystal(c, 1567.98, t + 0.2, 0.7, 0.24);
+      crystal(c, 2349.32, t + 0.3, 0.9, 0.18);
+      return;
+    }
     warmChord(c, [523.25], t, 0.16, 0.32);
     warmChord(c, [659.25], t + 0.1, 0.16, 0.32);
     warmChord(c, [783.99], t + 0.2, 0.16, 0.32);
     warmChord(c, [523.25, 659.25, 783.99, 1046.5], t + 0.3, 0.7, 0.35);
+  });
+}
+
+/**
+ * Played when the edition changes. Classic '97 is a warm major triad, the Haunted Edition a minor bell
+ * chime, and Winter Solstice a crystalline fifth.
+ */
+export function playEditionSwitch(next: Theme): void {
+  play((c, t) => {
+    if (next === 'haunted') {
+      bell(c, 220, t, 1.3, 0.26);
+      bell(c, 261.63, t + 0.14, 1.2, 0.24);
+      bell(c, 329.63, t + 0.28, 1.4, 0.22);
+      bell(c, 110, t, 1.6, 0.18);
+    } else if (next === 'solstice') {
+      crystal(c, 1046.5, t, 0.9, 0.28);
+      crystal(c, 1567.98, t, 1.0, 0.24);
+      crystal(c, 2093, t + 0.12, 0.8, 0.14);
+    } else {
+      warmChord(c, [523.25, 659.25, 783.99], t, 0.7, 0.36);
+    }
   });
 }
 
@@ -355,6 +411,21 @@ function ambienceLfo(c: AudioContext, target: AudioParam, rate: number, depth: n
   ambienceNodes.push(lfo);
 }
 
+/** The edition's own layer, added over any soundscape: an eerie low bell and wind, or crisp crystalline fifths. */
+function editionLayer(c: AudioContext, bus: GainNode): void {
+  if (edition === 'haunted') {
+    ambienceDrone(c, bus, 'sine', 73.42, 0.16);
+    ambienceDrone(c, bus, 'sine', 73.42 * 2.76, 0.03);
+    const wind = ambienceNoise(c, bus, 'bandpass', 380, 0.2);
+    ambienceLfo(c, wind.filter.frequency, 0.07, 160);
+  } else if (edition === 'solstice') {
+    const fifth = ambienceDrone(c, bus, 'sine', 523.25, 0.04);
+    ambienceLfo(c, fifth.gain, 0.12, 0.015);
+    ambienceDrone(c, bus, 'sine', 783.99, 0.03);
+    ambienceNoise(c, bus, 'highpass', 5000, 0.02);
+  }
+}
+
 function buildAmbience(c: AudioContext, kind: AmbienceKind): void {
   const bus = c.createGain();
   const now = c.currentTime;
@@ -385,6 +456,7 @@ function buildAmbience(c: AudioContext, kind: AmbienceKind): void {
     ambienceDrone(c, bus, 'triangle', 220, 0.04);
     ambienceNoise(c, bus, 'lowpass', 220, 0.12);
   }
+  editionLayer(c, bus);
 }
 
 /** Stops the ambience voices. `immediate` cuts them now, otherwise they fade out first. */
@@ -461,6 +533,17 @@ export function startAmbience(kind: AmbienceKind): void {
   ambienceKind = kind;
   syncAmbience();
   if (changed) notifyAmbience();
+}
+
+/** Sets the edition that colors the chime and the ambience. Rebuilds the ambience while it is on. */
+export function setAudioEdition(next: Theme): void {
+  if (next === edition) return;
+  edition = next;
+  if (ambienceOn) syncAmbience();
+}
+
+export function getAudioEdition(): Theme {
+  return edition;
 }
 
 /** Switches the soundscape (for example when another disc opens). Rebuilds it only while it is on. */

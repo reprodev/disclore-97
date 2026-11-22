@@ -671,7 +671,9 @@ describe('Edition tokens', () => {
   it('Winter Solstice overrides only existing tokens, and the same set as Haunted', () => {
     for (const name of solstice.keys()) expect(classic.has(name), name).toBe(true);
     expect([...solstice.keys()].sort()).toEqual([...haunted.keys()].sort());
-    for (const [name, value] of solstice) expect(value, name).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    for (const [name, value] of solstice) {
+      if (name.startsWith('--color-')) expect(value, name).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    }
   });
 
   it('Winter Solstice differs from Classic in its main tokens: evergreen, frost-ivory, hearth gold', () => {
