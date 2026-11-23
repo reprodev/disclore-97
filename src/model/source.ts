@@ -1,7 +1,6 @@
 import type { MediaItem } from './manifest';
 
-/** Where a disc's content came from. stitched is a disc combined from 2 to 4 other sources (see stitch.ts). */
-export type SourceKind = 'github' | 'webpage' | 'markdown' | 'topic' | 'stitched';
+export type SourceKind = 'github' | 'webpage' | 'markdown' | 'topic';
 
 export interface SourceMetadata {
   kind: SourceKind;

@@ -391,8 +391,6 @@ const SCENES: Record<SourceKind, Scene> = {
   webpage: webpageScene,
   markdown: markdownScene,
   topic: topicScene,
-  // A stitched disc is a set of related articles from several sources: the concept chart fits it.
-  stitched: topicScene,
 };
 
 /**

@@ -238,7 +238,16 @@ The Notebook began as one pad per disc. This pass turned it into a small study t
 - **No more chunk-size warning.** The production bundle had grown past Vite's 500 kB warning. `build.rollupOptions.output.manualChunks` in `vite.config.ts` now splits React and React DOM into a `react-vendor` chunk and the four built-in discs (pure data) into a `discs` chunk, which leaves every chunk well under the limit. Vitest does not bundle, so this changes nothing for the tests.
 - **A finding from the compliance reviewer.** The custom agent from section 13 flagged the monospace font stack written out by hand in four stylesheets. The design system asks for fonts to be defined once, so `:root` in `tokens.css` now has a `--font-mono` token, and every one of those rules uses `var(--font-mono)`.
 
-## 24. Verification today
+## 24. Why we prototyped and reverted the Multi-Source Stitcher
+
+We built a Multi-Source CD-R Stitcher (commit `c3b02fa`): a Burn dialog mode that combined 2 to 4 sources, in any mix of Wikipedia topics, GitHub repositories, web pages, and Markdown, into one cross-linked disc. It worked as engineered. A property test showed that every stitched disc passed `loadDisc`, was BFS-solvable, and kept each source's text in its own articles. We tried it, then reverted it on purpose (the revert restores the tree exactly to `717bef5`). The lesson was about the product, not a bug.
+
+- **The even split punished rich sources.** `compileDisc` spreads a source's paragraphs evenly across its section headings, in order. To keep each source's text inside its own articles, every article had to hold the same number of paragraphs, so the thinnest source set the pace. Stitching a 40-paragraph Wikipedia article with a two-paragraph README gave one paragraph per article, and most of the encyclopedia text was merged or dropped. The only real fix was to change how the compiler splits paragraphs, which would have changed every existing disc and broken the guarantee that the same source always compiles to the same disc.
+- **The Diagram had nothing to draw.** Each source kind has its own diagram scene: a repository blueprint, a site map, a Markdown outline, or a topic concept chart. A mix of a repository and an article fits none of them, so a stitched disc fell back to a generic concept chart whose pins joined unrelated subjects.
+- **KeepMaze asked about two subjects at once.** Trivia is built from all of a disc's articles, so one dungeon mixed questions about a code repository with questions about lighthouses. That broke the feel of a themed quest, and the Flashcards deck had the same problem.
+- **One source, one cohesive disc.** A 1997 CD-ROM was about one subject, and that is what makes the encyclopedia, the Diagram, KeepMaze, and the Flashcards feel authentic here, especially for the Resurrection category. Cross-source discovery does not need a mixed disc: the Pinpointer already searches every mounted disc, and the Dictionary finds a word on all of them. So we keep **1 source = 1 cohesive CD-ROM**, and let search connect the discs.
+
+## 25. Verification today
 
 The count in section 5 is where the project stood after the first spec. It has grown since then. Run `npm test` for the current numbers. Alongside the property and unit tests, `tests/static.test.ts` and `tests/dynamic-static.test.ts` run on every change, and they decide what may appear in `src/`: for example, no absolute URL other than GitHub's. `npm run build` and `npm run lint` are the other two gates.
 ## Appendix A: Architecture at a glance

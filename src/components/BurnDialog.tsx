@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { burn, burnFallback, burnStitchedDisc } from '../adapters/burn';
+import { burn, burnFallback } from '../adapters/burn';
 import type { BurnResult } from '../adapters/burn';
 import { ERROR_MESSAGES } from '../adapters/errors';
 import type { BurnError, FetchLike } from '../adapters/types';
 import type { DiscManifest } from '../model/manifest';
 import { parseInput } from '../model/sourceInput';
-import { MAX_STITCH, MIN_STITCH } from '../model/stitch';
 import { BevelButton } from './BevelButton';
 import { BurnProgress } from './BurnProgress';
 import { PresetList } from './PresetList';
@@ -29,16 +28,6 @@ export interface BurnDialogProps {
 }
 
 const OFFLINE_NOTICE = 'URL sources need a connection.';
-
-export type BurnMode = 'single' | 'stitch';
-
-/** The one-click stitch preset: a GitHub repository and a Wikipedia topic on one disc. */
-export const STITCH_PRESET = {
-  label: 'Mix: octocat/Hello-World + Lighthouse',
-  rows: ['https://github.com/octocat/Hello-World', 'Lighthouse'],
-} as const;
-
-const ROW_HINT = 'A topic, a GitHub or web page address, or Markdown';
 
 const defaultOnline = (): boolean => typeof navigator === 'undefined' || navigator.onLine !== false;
 
@@ -71,14 +60,6 @@ export function BurnDialog({
   const [text, setText] = useState(initialText);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<BurnError | null>(null);
-  const [mode, setMode] = useState<BurnMode>('single');
-  const [discTitle, setDiscTitle] = useState('');
-  const [rows, setRows] = useState<string[]>(() => Array.from({ length: MIN_STITCH }, () => ''));
-  const rowRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
-  const filledRows = rows.filter((r) => r.trim() !== '');
-  // The error focus runs after an await, so it reads the mode through a ref.
-  const modeRef = useRef<BurnMode>(mode);
-  modeRef.current = mode;
 
   const cancel = useCallback(() => {
     controllerRef.current?.abort();
@@ -121,7 +102,7 @@ export function BurnDialog({
     }
     setError(result.error);
     // The textarea is re-enabled on the next render, so focus after it commits.
-    setTimeout(() => (modeRef.current === 'stitch' ? rowRefs.current[0] : inputRef.current)?.focus(), 0);
+    setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const burnText = (input: string) => {
@@ -151,52 +132,6 @@ export function BurnDialog({
     void run((signal) => burnFallback(topic, { signal }));
   };
 
-  const switchMode = (next: BurnMode) => {
-    if (busy || next === mode) return;
-    setMode(next);
-    setError(null);
-  };
-
-  const setRow = (i: number, value: string) => {
-    setRows((rs) => rs.map((r, j) => (j === i ? value : r)));
-    setError(null);
-  };
-
-  const addRow = () => {
-    if (rows.length >= MAX_STITCH) return;
-    setRows((rs) => [...rs, '']);
-    setError(null);
-    setTimeout(() => rowRefs.current[rows.length]?.focus(), 0);
-  };
-
-  const removeRow = (i: number) => {
-    if (rows.length <= MIN_STITCH) return;
-    setRows((rs) => rs.filter((_, j) => j !== i));
-    setError(null);
-  };
-
-  const onStitchPreset = () => {
-    setRows([...STITCH_PRESET.rows]);
-    setError(null);
-    rowRefs.current[0]?.focus();
-  };
-
-  const onStitch = () => {
-    if (busy || filledRows.length < MIN_STITCH) return;
-    if (offline) {
-      const needsNetwork = filledRows.some((r) => {
-        const parsed = parseInput(r);
-        return parsed.ok && (parsed.kind === 'github' || parsed.kind === 'webpage');
-      });
-      if (needsNetwork) {
-        setError({ code: 'network', message: OFFLINE_NOTICE });
-        return;
-      }
-    }
-    const title = discTitle.trim() === '' ? undefined : discTitle;
-    void run((signal) => burnStitchedDisc(rows, title, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal }));
-  };
-
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
     setError(null);
@@ -211,102 +146,23 @@ export function BurnDialog({
   const isOfflineNotice = error?.message === OFFLINE_NOTICE;
   const fallbackTopic = !isOfflineNotice && error?.fallbackTopic ? error.fallbackTopic : undefined;
   const offlineTopic = isOfflineNotice ? fallbackTopicFor(text) : fallbackTopic;
-  // A stitched burn names the source that failed in its message, so Stitch mode shows the message itself.
-  const message = error
-    ? isOfflineNotice
-      ? OFFLINE_NOTICE
-      : mode === 'stitch'
-        ? error.message
-        : ERROR_MESSAGES[error.code]
-    : '';
-  const stitching = mode === 'stitch';
+  const message = error ? (isOfflineNotice ? OFFLINE_NOTICE : ERROR_MESSAGES[error.code]) : '';
 
   return (
     <div ref={layerRef} className="modal-layer">
       <Window title="Burn New CD-R Disc..." className="burn-dialog" modal onClose={cancel}>
         <div className="burn-dialog__body">
-          <fieldset className="burn-mode" disabled={busy}>
-            <legend className="burn-mode__legend">Burn mode</legend>
-            <label className="burn-mode__option">
-              <input type="radio" name="burn-mode" checked={!stitching} onChange={() => switchMode('single')} />
-              Single Source
-            </label>
-            <label className="burn-mode__option">
-              <input type="radio" name="burn-mode" checked={stitching} onChange={() => switchMode('stitch')} />
-              Stitch CD-R (2-4 Sources)
-            </label>
-          </fieldset>
-          {stitching ? (
-            <div className="burn-stitch" role="group" aria-label="Stitch sources">
-              <label htmlFor="burn-stitch-title" className="burn-stitch__label">
-                Disc Title (optional):
-              </label>
-              <input
-                id="burn-stitch-title"
-                className="burn-stitch__title"
-                type="text"
-                maxLength={80}
-                placeholder="Leave blank to name it after its sources"
-                value={discTitle}
-                disabled={busy}
-                onChange={(e) => setDiscTitle(e.target.value)}
-              />
-              <ol className="burn-stitch__rows">
-                {rows.map((row, i) => (
-                  <li key={i} className="burn-stitch__row">
-                    <label htmlFor={`burn-stitch-${i}`} className="burn-stitch__label">
-                      Source {i + 1}:
-                    </label>
-                    <textarea
-                      id={`burn-stitch-${i}`}
-                      ref={(el) => {
-                        rowRefs.current[i] = el;
-                      }}
-                      className="burn-input burn-stitch__input"
-                      rows={2}
-                      placeholder={ROW_HINT}
-                      value={row}
-                      disabled={busy}
-                      onChange={(e) => setRow(i, e.target.value)}
-                    />
-                    <BevelButton
-                      className="burn-stitch__remove"
-                      aria-label={`Remove Source ${i + 1}`}
-                      disabled={busy || rows.length <= MIN_STITCH}
-                      onClick={() => removeRow(i)}
-                    >
-                      Remove
-                    </BevelButton>
-                  </li>
-                ))}
-              </ol>
-              <div className="burn-stitch__tools">
-                <BevelButton disabled={busy || rows.length >= MAX_STITCH} onClick={addRow}>
-                  + Add Source
-                </BevelButton>
-                <BevelButton disabled={busy} onClick={onStitchPreset}>
-                  {STITCH_PRESET.label}
-                </BevelButton>
-                <span className="burn-stitch__count">
-                  {rows.length} of {MAX_STITCH} sources
-                </span>
-              </div>
-            </div>
-          ) : (
-            <>
-              <label htmlFor="burn-input">Paste a GitHub address, a web page address, some Markdown, or a topic:</label>
-              <textarea
-                id="burn-input"
-                ref={inputRef}
-                className="burn-input"
-                rows={5}
-                value={text}
-                disabled={busy}
-                onChange={onChange}
-              />
-              <PresetList onSelect={onPreset} disabled={busy} />
-            </>
-          )}
+          <label htmlFor="burn-input">Paste a GitHub address, a web page address, some Markdown, or a topic:</label>
+          <textarea
+            id="burn-input"
+            ref={inputRef}
+            className="burn-input"
+            rows={5}
+            value={text}
+            disabled={busy}
+            onChange={onChange}
+          />
+          <PresetList onSelect={onPreset} disabled={busy} />
           {offline && !error ? <p role="status">{OFFLINE_NOTICE}</p> : null}
           {busy ? <BurnProgress /> : null}
           <div role="alert" className="burn-error" hidden={!error}>
@@ -322,7 +178,7 @@ export function BurnDialog({
                     ))}
                   </ul>
                 ) : null}
-                {offlineTopic && !stitching ? (
+                {offlineTopic ? (
                   <BevelButton disabled={busy} onClick={() => onBurnOffline(offlineTopic)}>
                     {`Burn offline from "${offlineTopic}"`}
                   </BevelButton>
@@ -331,15 +187,9 @@ export function BurnDialog({
             ) : null}
           </div>
           <div className="burn-dialog__buttons">
-            {stitching ? (
-              <BevelButton disabled={busy || filledRows.length < MIN_STITCH} onClick={onStitch}>
-                Stitch &amp; Burn
-              </BevelButton>
-            ) : (
-              <BevelButton disabled={busy || text.trim() === ''} onClick={onBurn}>
-                Burn
-              </BevelButton>
-            )}
+            <BevelButton disabled={busy || text.trim() === ''} onClick={onBurn}>
+              Burn
+            </BevelButton>
             <BevelButton onClick={cancel}>Cancel</BevelButton>
           </div>
         </div>

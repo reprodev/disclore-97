@@ -1003,10 +1003,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* A stitched CD-R: several sources on one disc, so a forest badge with a doubled edge. */
-.pack-badge.pack-badge--stitched {
-  color: var(--color-paper);
-  background: var(--color-forest);
-  border-color: var(--color-forest-dark);
-  border-style: double;
-}

@@ -50,7 +50,6 @@ export const KIND_LABELS: Record<SourceKind, string> = {
   webpage: 'Web page',
   markdown: 'Markdown text',
   topic: 'Topic',
-  stitched: 'Stitched CD-R',
 };
 
 /** Plate keys defined by Plate.tsx, three per source kind. */
@@ -59,7 +58,6 @@ const PLATES_BY_KIND: Record<SourceKind, readonly string[]> = {
   webpage: ['browser', 'bbs', 'modem'],
   markdown: ['book', 'disc', 'phone'],
   topic: ['book', 'computer', 'browser'],
-  stitched: ['disc', 'book', 'browser', 'terminal'],
 };
 
 function firstSentence(text: string): string {
@@ -69,7 +67,7 @@ function firstSentence(text: string): string {
 
 function kindOf(source: ExtractedSource): SourceKind {
   const k = source.metadata?.kind;
-  return k === 'github' || k === 'webpage' || k === 'markdown' || k === 'topic' || k === 'stitched' ? k : 'topic';
+  return k === 'github' || k === 'webpage' || k === 'markdown' || k === 'topic' ? k : 'topic';
 }
 
 function listOf(v: unknown): string[] {

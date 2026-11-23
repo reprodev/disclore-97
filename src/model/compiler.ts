@@ -29,7 +29,7 @@ const TITLE_MAX = 120;
 const HEADING_MAX = 120;
 const SOURCE_LABEL_MAX = 300;
 
-const KINDS: readonly SourceKind[] = ['github', 'webpage', 'markdown', 'topic', 'stitched'];
+const KINDS: readonly SourceKind[] = ['github', 'webpage', 'markdown', 'topic'];
 
 function stringItems(v: unknown, limit: number): string[] {
   if (!Array.isArray(v)) return [];
@@ -116,8 +116,6 @@ function canonical(s: ExtractedSource): string {
 
 function identityOf(s: ExtractedSource): string {
   const src = s.metadata.source;
-  // A stitched disc is named by its title and every input, so a new title or a new mix is a new disc.
-  if (s.metadata.kind === 'stitched') return `${s.title} | ${src}`;
   try {
     const url = new URL(src);
     if (s.metadata.kind === 'github') {
