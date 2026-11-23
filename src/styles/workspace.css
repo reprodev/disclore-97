@@ -1,11 +1,17 @@
 /* Open-disc workspace: toolbar, breadcrumb, contents sidebar + main pane, status bar. */
 
+/*
+ * Scroll lock: the disc window, its content box, and the workspace never scroll, so the title bar,
+ * menu bar, toolbar, breadcrumb, and status bar cannot scroll out of view. Only the sidebar and the
+ * main pane (or an article's body inside it) scroll.
+ */
 .disc-window {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
   max-width: 1120px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .disc-window .window-content {
@@ -108,17 +114,25 @@
 }
 
 /* Sidebar + main pane */
+/*
+ * The workspace never scrolls as a whole. The sidebar and the main pane each scroll on their own,
+ * inside a height the window fixes, so the chrome above and below them stays in view.
+ */
 .disc-workspace {
   flex: 1 1 auto;
   display: flex;
   gap: 4px;
   padding: 2px;
   min-height: 0;
+  overflow: hidden;
 }
 
+/* The contents sidebar: a 12-section burned disc scrolls here without stretching the window. */
 .disc-workspace .disc-tree {
   flex: 0 0 236px;
-  overflow: auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 4px;
   background: var(--color-surface);
   border: var(--bevel-w) solid;
@@ -128,6 +142,7 @@
 .disc-main {
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
   overflow: auto;
   background: var(--color-surface);
   border: var(--bevel-w) solid;

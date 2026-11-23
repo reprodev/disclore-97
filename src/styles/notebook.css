@@ -54,19 +54,16 @@
   color: var(--color-forest);
 }
 
-/* The "+ Note" button beside a Quick Fact. */
-.article-callout__add {
-  min-width: 0;
-  margin-left: 4px;
-  padding: 0 4px;
-  font-size: 11px;
-}
 
+/* The "Added to Notebook." note under the Quick Facts takes no room until it has something to say. */
 .article-callout__added {
-  margin: 4px 0 0;
-  min-height: 1em;
+  margin: 0;
   font-size: 11px;
   color: var(--color-forest);
+}
+
+.article-callout__added:not(:empty) {
+  margin-top: 3px;
 }
 
 /* Disc selector and Pin to Desktop, above the pad. */

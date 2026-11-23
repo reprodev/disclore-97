@@ -13,6 +13,7 @@ DISCS
 - Home also has a Did You Know? box and Surprise Me!. If you have not burned any discs yet, the Burned CD-Rs tab offers three sample burns. In Classic '97 they are Halloween, Gothic fiction, and CD-ROM, and each edition has its own three.
 - Open a disc from the desktop, the Start menu, or the Select a CD-ROM window. Pick a topic in the Contents list, or type in Find in Disc.
 - Use Back, Forward and Home on the toolbar to move around.
+- The disc window itself never scrolls: its title bar, menus, toolbar, address line, and status bar always stay where they are. When a disc has more topics than fit, only the Contents list scrolls. When an article is long, only the article text scrolls, and its title and the row of article tools stay at the top. Short articles fit on one screen with no scroll bar.
 
 BURN NEW CD-R DISC
 Compile your own disc from:
@@ -27,7 +28,7 @@ DISC IMAGES
 - File > Mount Disc Image (.json)..., or the Mount Disc Image card on the Home window, opens a saved file. It runs the same safety checks as a burned disc. If the file is not valid JSON, is not a disc, or holds anything unsafe (for example a picture that is not a public secure image address), a message box says why and nothing is mounted. A valid disc opens and is added to the library.
 
 READING
-- Chronology strip: dated entries for the article, laid out along a timeline.
+- Chronology strip: dated entries for the article, laid out along a timeline. In a short article it follows the text straight away, beside the picture, with no empty gap.
 - Explore History: the Timeline button on the toolbar gathers every dated event from every article on the open disc into one strip, oldest first, in columns by century. Each event shows the article it came from. Click an event to open that article, and use Back to return to the timeline. The button is dimmed when no article on the disc has dated events.
 - Cross-links: when an article mentions the title of another article on the same disc, the words are a link. Each article is linked once per paragraph, and Back and Forward work as usual.
 - Bookmark: the Bookmark button in the article tools marks the article. Bookmarks are kept on this computer for each disc, and a Bookmarks list appears in the contents sidebar for one-click jumping. Press Bookmarked to remove one.

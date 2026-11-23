@@ -63,6 +63,8 @@ export function ArticleViewer({
   const [findQuery, setFindQuery] = useState('');
   const [findIndex, setFindIndex] = useState(0);
   const findInputRef = useRef<HTMLInputElement | null>(null);
+  /** The article body under the pinned header: the only part of an article that scrolls. */
+  const bodyRef = useRef<HTMLDivElement | null>(null);
   /** The fact just added to the Notebook, shown briefly as confirmation. */
   const [noteAdded, setNoteAdded] = useState(false);
   /** The quote just added with + Quote, shown briefly. */
@@ -73,7 +75,9 @@ export function ArticleViewer({
   const found = section !== undefined;
 
   useEffect(() => {
+    // The body is the scroller; the article itself is reset too, in case a narrow layout scrolls it.
     if (ref.current) ref.current.scrollTop = 0;
+    if (bodyRef.current) bodyRef.current.scrollTop = 0;
     if (found) playPageFlip();
   }, [sectionId, found]);
 
@@ -267,202 +271,207 @@ export function ArticleViewer({
 
   return (
     <article ref={ref} className="article-viewer">
-      <h1 className={progress?.current === 1 ? 'article-title article-title--speaking' : 'article-title'} data-speaking={progress?.current === 1 ? 'true' : undefined}>
-        {section.title}
-      </h1>
-      <div className="article-tools" role="group" aria-label="Article tools">
-        {diagramLink ? (
-          <BevelButton onClick={() => onShowInDiagram?.(diagramLink.diagram_id, sectionId)}>
-            Show in Diagram
-          </BevelButton>
-        ) : null}
-        {canCite ? <BevelButton onClick={() => setCiteOpen(true)}>Cite / Print Preview</BevelButton> : null}
-        {onToggleBookmark ? (
-          <BevelButton className="article-tools__toggle" aria-pressed={bookmarked} onClick={onToggleBookmark}>
-            {bookmarked ? 'Bookmarked' : 'Bookmark'}
-          </BevelButton>
-        ) : null}
-        <BevelButton
-          className="article-tools__toggle"
-          aria-pressed={speaking}
-          disabled={!speechReady || (muted && !speaking)}
-          title={
-            !speechReady
-              ? 'Narration is not available in this browser'
-              : muted
-                ? 'Sound is muted'
-                : 'Read this article aloud'
-          }
-          onClick={toggleSpeech}
-        >
-          {progress ? `Stop (${progress.current}/${progress.total})` : 'Read Aloud'}
-        </BevelButton>
-        <BevelButton className="article-tools__toggle" aria-pressed={findOpen} onClick={() => setFindOpen((o) => !o)}>
-          Find in Article
-        </BevelButton>
-        {onAddNote ? (
+      {/* Pinned header: the title, the tool row, and the Find bar stay put while the body scrolls. */}
+      <header className="article-header">
+        <h1 className={progress?.current === 1 ? 'article-title article-title--speaking' : 'article-title'} data-speaking={progress?.current === 1 ? 'true' : undefined}>
+          {section.title}
+        </h1>
+        <div className="article-tools" role="group" aria-label="Article tools">
+          {diagramLink ? (
+            <BevelButton onClick={() => onShowInDiagram?.(diagramLink.diagram_id, sectionId)}>
+              Show in Diagram
+            </BevelButton>
+          ) : null}
+          {canCite ? <BevelButton onClick={() => setCiteOpen(true)}>Cite / Print Preview</BevelButton> : null}
+          {onToggleBookmark ? (
+            <BevelButton className="article-tools__toggle" aria-pressed={bookmarked} onClick={onToggleBookmark}>
+              {bookmarked ? 'Bookmarked' : 'Bookmark'}
+            </BevelButton>
+          ) : null}
           <BevelButton
-            className="article-tools__quote"
-            title="Add the selected text to the Notebook, or the first sentence when nothing is selected"
-            onPointerDown={() => {
-              pendingQuote.current = readSelection();
-            }}
-            onClick={addQuote}
+            className="article-tools__toggle"
+            aria-pressed={speaking}
+            disabled={!speechReady || (muted && !speaking)}
+            title={
+              !speechReady
+                ? 'Narration is not available in this browser'
+                : muted
+                  ? 'Sound is muted'
+                  : 'Read this article aloud'
+            }
+            onClick={toggleSpeech}
           >
-            + Quote
+            {progress ? `Stop (${progress.current}/${progress.total})` : 'Read Aloud'}
           </BevelButton>
-        ) : null}
-        {onAddNote ? (
-          <span className="article-tools__added" aria-live="polite">
-            {quoteAdded ? 'Quote added to Notebook.' : ''}
-          </span>
-        ) : null}
-        <BevelButton
-          className="article-tools__rate"
-          disabled={!speechReady}
-          title={`Reading speed: ${rate === 1 ? 'normal' : 'brisk'}. Click to change.`}
-          onClick={toggleRate}
-        >
-          {rate === 1 ? '1x' : '1.2x'}
-        </BevelButton>
-      </div>
-      {findOpen ? (
-        <div className="article-find" role="search" aria-label="Find in article" onKeyDown={onFindKey}>
-          <label htmlFor="article-find-input">Find:</label>
-          <input
-            id="article-find-input"
-            ref={findInputRef}
-            className="article-find__input"
-            type="text"
-            autoComplete="off"
-            aria-label="Find in article"
-            value={findQuery}
-            onChange={(e) => {
-              setFindQuery(e.target.value);
-              setFindIndex(0);
-            }}
-          />
-          <BevelButton aria-label="Previous match" disabled={totalHits < 2} onClick={() => stepHit(-1)}>
-            &lt; Prev
+          <BevelButton className="article-tools__toggle" aria-pressed={findOpen} onClick={() => setFindOpen((o) => !o)}>
+            Find in Article
           </BevelButton>
-          <BevelButton aria-label="Next match" disabled={totalHits < 2} onClick={() => stepHit(1)}>
-            Next &gt;
-          </BevelButton>
-          <span className="article-find__count" aria-live="polite">
-            {needle === '' ? '' : totalHits === 0 ? 'No matches' : `${currentHit + 1} of ${totalHits}`}
-          </span>
-          <BevelButton aria-label="Close find" onClick={closeFind}>
-            Close
+          {onAddNote ? (
+            <BevelButton
+              className="article-tools__quote"
+              title="Add the selected text to the Notebook, or the first sentence when nothing is selected"
+              onPointerDown={() => {
+                pendingQuote.current = readSelection();
+              }}
+              onClick={addQuote}
+            >
+              + Quote
+            </BevelButton>
+          ) : null}
+          {onAddNote ? (
+            <span className="article-tools__added" aria-live="polite">
+              {quoteAdded ? 'Quote added to Notebook.' : ''}
+            </span>
+          ) : null}
+          <BevelButton
+            className="article-tools__rate"
+            disabled={!speechReady}
+            title={`Reading speed: ${rate === 1 ? 'normal' : 'brisk'}. Click to change.`}
+            onClick={toggleRate}
+          >
+            {rate === 1 ? '1x' : '1.2x'}
           </BevelButton>
         </div>
-      ) : null}
-      <aside className="article-aside">
-        {reel.length > 0 ? (
-          <MediaReel
-            media={reel}
-            title={discTitle ?? section.title}
-            fallback={(caption) => <Plate kind={section.plate} caption={caption} />}
-          />
-        ) : (
-          <Plate kind={section.plate} caption={`Plate: ${section.title}`} />
-        )}
-        {facts.length > 0 ? (
-          <div className="article-callout">
-            <section aria-label="Quick Facts">
-              <h2 className="article-callout__title">Quick Facts</h2>
-              <ul className="article-callout__list">
-                {facts.map((f, i) => (
-                  <li key={i}>
-                    {f}
-                    {onAddNote ? (
-                      <BevelButton
-                        className="article-callout__add"
-                        aria-label={`Add to Notebook: ${f}`}
-                        onClick={() => {
-                          onAddNote(section.title, f);
-                          setNoteAdded(true);
-                        }}
-                      >
-                        + Note
-                      </BevelButton>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-              {onAddNote ? (
-                <p className="article-callout__added" aria-live="polite">
-                  {noteAdded ? 'Added to Notebook.' : ''}
-                </p>
-              ) : null}
-            </section>
+        {findOpen ? (
+          <div className="article-find" role="search" aria-label="Find in article" onKeyDown={onFindKey}>
+            <label htmlFor="article-find-input">Find:</label>
+            <input
+              id="article-find-input"
+              ref={findInputRef}
+              className="article-find__input"
+              type="text"
+              autoComplete="off"
+              aria-label="Find in article"
+              value={findQuery}
+              onChange={(e) => {
+                setFindQuery(e.target.value);
+                setFindIndex(0);
+              }}
+            />
+            <BevelButton aria-label="Previous match" disabled={totalHits < 2} onClick={() => stepHit(-1)}>
+              &lt; Prev
+            </BevelButton>
+            <BevelButton aria-label="Next match" disabled={totalHits < 2} onClick={() => stepHit(1)}>
+              Next &gt;
+            </BevelButton>
+            <span className="article-find__count" aria-live="polite">
+              {needle === '' ? '' : totalHits === 0 ? 'No matches' : `${currentHit + 1} of ${totalHits}`}
+            </span>
+            <BevelButton aria-label="Close find" onClick={closeFind}>
+              Close
+            </BevelButton>
           </div>
         ) : null}
-      </aside>
-      {section.paragraphs.map((p, i) => (
-        <p
-          key={i}
-          className={[
-            'article-paragraph',
-            i === 0 ? 'article-paragraph--lead' : '',
-            progress?.current === i + 2 ? 'article-paragraph--speaking' : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          data-speaking={progress?.current === i + 2 ? 'true' : undefined}
-          aria-current={progress?.current === i + 2 ? 'true' : undefined}
-          onDoubleClick={onParagraphDoubleClick}
-        >
-          {paragraphSegments[i]!.map((seg, j) =>
-            seg.sectionId !== undefined ? (
-              <button
-                key={j}
-                type="button"
-                className="article-xlink"
-                onClick={() => onSelectSection?.(seg.sectionId!)}
-              >
-                {renderPieces(seg.text)}
-              </button>
-            ) : (
-              <Fragment key={j}>{renderPieces(seg.text)}</Fragment>
-            ),
+      </header>
+      <div ref={bodyRef} className="article-body">
+        <aside className="article-aside">
+          {reel.length > 0 ? (
+            <MediaReel
+              media={reel}
+              title={discTitle ?? section.title}
+              fallback={(caption) => <Plate kind={section.plate} caption={caption} />}
+            />
+          ) : (
+            <Plate kind={section.plate} caption={`Plate: ${section.title}`} />
           )}
-        </p>
-      ))}
-      {timeline.length > 0 ? (
-        <section className="article-chrono" aria-label="Chronology">
-          <h2 className="article-chrono__title">Chronology</h2>
-          <ol className="article-chrono__strip">
-            {timeline.map((t, i) => (
-              <li key={i} className="article-chrono__stop">
-                <span className="article-chrono__when">{t.when}</span>
-                <span className="article-chrono__tick" aria-hidden="true" />
-                <span className="article-chrono__event">{t.event}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
-      {onSelectSection && related.length > 0 ? (
-        <nav className="article-seealso" aria-label="See Also">
-          <h2 className="article-seealso__title">See Also</h2>
-          <ul className="article-seealso__list">
-            {related.map((r) => (
-              <li key={r.section_id}>
-                <a
-                  href={`#${r.section_id}`}
-                  className="article-seealso__link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onSelectSection(r.section_id);
-                  }}
+          {facts.length > 0 ? (
+            <div className="article-callout">
+              <section aria-label="Quick Facts">
+                <h2 className="article-callout__title">Quick Facts</h2>
+                <ul className="article-callout__list">
+                  {facts.map((f, i) => (
+                    <li key={i}>
+                      {f}
+                      {onAddNote ? (
+                        <BevelButton
+                          className="article-callout__add"
+                          aria-label={`Add to Notebook: ${f}`}
+                          onClick={() => {
+                            onAddNote(section.title, f);
+                            setNoteAdded(true);
+                          }}
+                        >
+                          + Note
+                        </BevelButton>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+                {onAddNote ? (
+                  <p className="article-callout__added" aria-live="polite">
+                    {noteAdded ? 'Added to Notebook.' : ''}
+                  </p>
+                ) : null}
+              </section>
+            </div>
+          ) : null}
+        </aside>
+        {section.paragraphs.map((p, i) => (
+          <p
+            key={i}
+            className={[
+              'article-paragraph',
+              i === 0 ? 'article-paragraph--lead' : '',
+              progress?.current === i + 2 ? 'article-paragraph--speaking' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            data-speaking={progress?.current === i + 2 ? 'true' : undefined}
+            aria-current={progress?.current === i + 2 ? 'true' : undefined}
+            onDoubleClick={onParagraphDoubleClick}
+          >
+            {paragraphSegments[i]!.map((seg, j) =>
+              seg.sectionId !== undefined ? (
+                <button
+                  key={j}
+                  type="button"
+                  className="article-xlink"
+                  onClick={() => onSelectSection?.(seg.sectionId!)}
                 >
-                  {r.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      ) : null}
+                  {renderPieces(seg.text)}
+                </button>
+              ) : (
+                <Fragment key={j}>{renderPieces(seg.text)}</Fragment>
+              ),
+            )}
+          </p>
+        ))}
+        {timeline.length > 0 ? (
+          <section className="article-chrono" aria-label="Chronology">
+            <h2 className="article-chrono__title">Chronology</h2>
+            <ol className="article-chrono__strip">
+              {timeline.map((t, i) => (
+                <li key={i} className="article-chrono__stop">
+                  <span className="article-chrono__when">{t.when}</span>
+                  <span className="article-chrono__tick" aria-hidden="true" />
+                  <span className="article-chrono__event">{t.event}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
+        {onSelectSection && related.length > 0 ? (
+          <nav className="article-seealso" aria-label="See Also">
+            <h2 className="article-seealso__title">See Also</h2>
+            <ul className="article-seealso__list">
+              {related.map((r) => (
+                <li key={r.section_id}>
+                  <a
+                    href={`#${r.section_id}`}
+                    className="article-seealso__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSelectSection(r.section_id);
+                    }}
+                  >
+                    {r.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : null}
+      </div>
       {citeOpen && discTitle !== undefined ? (
         <CiteDialog section={section} discTitle={discTitle} onClose={() => setCiteOpen(false)} />
       ) : null}
