@@ -11,6 +11,7 @@ const KIND_LABELS: Record<SourceKind, string> = {
   webpage: 'Web page',
   markdown: 'Markdown text',
   topic: 'Topic',
+  stitched: 'Stitched CD-R',
 };
 
 function expectedParagraph(source: ExtractedSource): string {

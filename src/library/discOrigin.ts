@@ -1,7 +1,7 @@
 import type { DiscManifest } from '../model/manifest';
 
 /** Where a disc came from, for the tag on its Home card. */
-export type DiscOrigin = 'Built-In' | 'Wikipedia' | 'GitHub' | 'Web' | 'Markdown' | 'Outline' | 'Disc Image';
+export type DiscOrigin = 'Built-In' | 'Wikipedia' | 'GitHub' | 'Web' | 'Markdown' | 'Outline' | 'Stitched' | 'Disc Image';
 
 const OFFLINE_OUTLINE = /offline study outline/i;
 
@@ -16,6 +16,7 @@ export function discOrigin(disc: DiscManifest, builtIn: boolean): DiscOrigin {
   if (id.startsWith('github-')) return 'GitHub';
   if (id.startsWith('webpage-')) return 'Web';
   if (id.startsWith('markdown-')) return 'Markdown';
+  if (id.startsWith('stitched-')) return 'Stitched';
   if (id.startsWith('topic-')) {
     const outline = disc.sections.some((s) => s.paragraphs.some((p) => OFFLINE_OUTLINE.test(p)));
     return outline ? 'Outline' : 'Wikipedia';
@@ -38,6 +39,8 @@ export function originClassName(origin: DiscOrigin): string {
       return 'pack-badge--markdown';
     case 'Outline':
       return 'pack-badge--outline';
+    case 'Stitched':
+      return 'pack-badge--stitched';
     case 'Disc Image':
       return 'pack-badge--image';
   }
