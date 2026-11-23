@@ -1,20 +1,19 @@
 # DiscLore '97
 
-A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Browse the disc, click around illustrated scenes, flip through pictures, have articles read aloud, and try to survive a trivia dungeon. You can also **burn your own disc** from a GitHub repository, a web page, a Wikipedia topic, or Markdown.
+**Live demo: [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com)** · Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97)
 
-## Live Demo & Judge's Quick-Start
+Studying a subject on the web usually means a dozen tabs, sidebars, pop-ups, and autoplaying video, and nothing you can take with you when you close them. DiscLore '97 turns a subject into a focused, self-contained study disc in the style of a 1997 Encarta CD-ROM. The source can be a Wikipedia topic, a GitHub repository, a web page, or your own Markdown. A disc holds one subject: short articles with Quick Facts and a chronology, an illustrated diagram, flashcards, a guided tour that can read itself aloud, and KeepMaze, a trivia dungeon that quizzes you on what you just read. Discs are compiled in the browser, checked by the same validator as the built-in ones, kept on your machine, and portable as a single `.json` disc image.
 
-**Live demo: [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com)** (Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions). Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97).
+### Try It in 30 Seconds
 
-It is built for a desktop browser window of 1280 x 720 or larger. Sound starts after your first click, as browsers require. The **Sound** button in the taskbar mutes everything.
+Use a desktop browser window of 1280 x 720 or larger. Sound starts after your first click, and the **Sound** button in the taskbar mutes everything.
 
-A five-minute tour:
+1. **Pinpointer → burn a Wikipedia topic.** On the Home window, type a subject that is not on the shelf, such as `Lighthouse`, into the Pinpointer. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The article is compiled into a disc and opens with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.reprodev.com/?topic=Lighthouse).
+2. **KeepMaze.** Press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers, and the room changes as you move: a gate, a passage, a library, a tower, and a hall. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.reprodev.com/?disc=castles&view=keepmaze).
+3. **Take a Tour or Flashcards.** Press **Tour**, then **Play Show**, to have the disc narrated stop by stop. Or press **Flashcards** and flip cards with **Space**. Shortcuts: [`?disc=castles&view=tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour), [`?disc=halloween&view=flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards).
+4. **Switch Editions.** Use **Start > Edition Switcher** to move between **Classic '97**, **Haunted Edition**, and **Christmas Edition**. The colours, artwork, lettering, and chime all change.
 
-1. **Pinpointer → Burn CD-R.** On the Home window, type a subject that is not on the shelf, for example `Lighthouse`, into the Pinpointer search. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The app reads the English Wikipedia article, compiles it into a disc in your browser, checks it, and opens it, with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.reprodev.com/?topic=Lighthouse).
-2. **KeepMaze.** On any disc, press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers. Watch the room change as you move between the five room kinds (gate, passage, library, tower, and hall), and keep an eye on your three torches and the "P" score medallion. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.reprodev.com/?disc=castles&view=keepmaze).
-3. **Take a Tour.** Press **Tour**, then **Play Show**. With sound on, each stop is read aloud and the tour moves on by itself. Shortcut: [`?disc=castles&view=tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour).
-4. **Flashcards.** Press **Flashcards**, flip a card with **Space**, then mark it **Got It** or **Need Review**. Shortcut: [`?disc=halloween&view=flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards).
-5. **The three Editions.** Switch between **Classic '97**, **Haunted Edition**, and **Christmas Edition** with **Start > Edition Switcher**, **View > Edition**, or the **Edition** card on the Home window. Each edition changes the colours, the artwork, the lettering, and the chime.
+The live site is Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions, with no keys or accounts.
 
 ## Features
 
@@ -113,6 +112,12 @@ The project was built with [Kiro](https://kiro.dev) using Spec-Driven Developmen
 4. `tasks.md`: an ordered, dependency-aware implementation plan, executed task by task.
 
 The specs live in `.kiro/specs/`: `disclore-97-core` (the app and the built-in discs) and `dynamic-disc-compiler` (Burn New CD-R Disc). The later multimedia, palette, and Wikipedia work was done as follow-up changes. See [docs/BUILD-STORY.md](docs/BUILD-STORY.md) for the whole story.
+
+### Lessons & surprises
+
+- **The reviewer agent caught what the regex tests could not.** The static tests ban hex values outside `tokens.css`, rounded corners, gradients, and blurred shadows, but a font stack typed out by hand breaks none of those patterns. The read-only `compliance-reviewer` agent reads a diff against the steering files rather than matching regexes. It flagged the same monospace stack repeated in four stylesheets, against the rule that fonts are defined once. It became a `--font-mono` token in `tokens.css`.
+- **A feature that worked, reverted on purpose.** A Multi-Source Stitcher burned 2 to 4 sources into one cross-linked disc, and every stitched disc passed `loadDisc` and the BFS solver. In use it diluted rich sources to the thinnest one's paragraph split. The diagram had no single scene to draw, and one KeepMaze dungeon asked about two unrelated subjects. It was reverted in full to keep one source per cohesive disc. Search across discs (Pinpointer, Dictionary) connects subjects instead.
+- **A blank screen that would not reproduce.** A report of a bare teal desktop after the boot splash could not be reproduced in headless Edge. The structural cause was that the app had no error boundary, so any render error unmounted everything. `AppErrorBoundary` now turns a crash into a Win95 message box with a restart. The next report showed the real error, `Cannot read properties of undefined (reading 'forEach')`, from a `PixelIcon` map lookup coming back empty. That fits a dev server holding stale modules across an icon-name change. `PixelIcon` now falls back to the CD-ROM icon for any unknown name, the other `.forEach` paths were guarded, and `tests/components/icon-hardening.test.tsx` renders the bad cases.
 
 ### Kiro hooks
 
