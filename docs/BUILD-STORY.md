@@ -313,7 +313,7 @@ The steering file asked from the start for a Cloudflare Pages deployment that st
   - **Ignore rules.** `.gitignore` already excludes `node_modules`, `dist`, `.env`, `.env.*`, `.wrangler`, and `*.tsbuildinfo`, so the local `.wrangler` state and the build output never leave the machine.
 
   The README's deployment section records the same results for anyone reviewing the repository.
-- **A Quick-Start for judges.** The README now opens with the live link and a five-minute tour: Pinpointer to Burn CD-R, KeepMaze, Take a Tour, Flashcards, and the three Editions, each with a deep link (`?topic=Lighthouse`, `?disc=castles&view=keepmaze`, and so on). The in-app ReadMe has the same tour in plain words. The in-app copy writes the addresses without a scheme, because the static tests allow no absolute URL in `src/` other than GitHub's.
+- **A quick start for judges.** The README now opens with the live link, a short paragraph on the problem the app solves, and a four-step "Try It in 30 Seconds": Pinpointer to a Wikipedia burn, KeepMaze, Take a Tour or Flashcards, and the three Editions, with deep links such as `?topic=Lighthouse` and `?disc=castles&view=keepmaze`. Its "How it was built" section gained three "Lessons & surprises": the reviewer agent's `--font-mono` finding, the reverted Stitcher, and the error boundary and `PixelIcon` hardening. The in-app ReadMe has the same tour in plain words. The in-app copy writes the addresses without a scheme, because the static tests allow no absolute URL in `src/` other than GitHub's.
 
 ## 31. Verification today
 
