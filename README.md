@@ -2,6 +2,20 @@
 
 A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Browse the disc, click around illustrated scenes, flip through pictures, have articles read aloud, and try to survive a trivia dungeon. You can also **burn your own disc** from a GitHub repository, a web page, a Wikipedia topic, or Markdown.
 
+## Live Demo & Judge's Quick-Start
+
+**Live demo: [https://disclore-97.pages.dev](https://disclore-97.pages.dev)** (Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions). Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97).
+
+It is built for a desktop browser window of 1280 x 720 or larger. Sound starts after your first click, as browsers require. The **Sound** button in the taskbar mutes everything.
+
+A five-minute tour:
+
+1. **Pinpointer → Burn CD-R.** On the Home window, type a subject that is not on the shelf, for example `Lighthouse`, into the Pinpointer search. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The app reads the English Wikipedia article, compiles it into a disc in your browser, checks it, and opens it, with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.pages.dev/?topic=Lighthouse).
+2. **KeepMaze.** On any disc, press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers. Watch the room change as you move between the five room kinds (gate, passage, library, tower, and hall), and keep an eye on your three torches and the "P" score medallion. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.pages.dev/?disc=castles&view=keepmaze).
+3. **Take a Tour.** Press **Tour**, then **Play Show**. With sound on, each stop is read aloud and the tour moves on by itself. Shortcut: [`?disc=castles&view=tour`](https://disclore-97.pages.dev/?disc=castles&view=tour).
+4. **Flashcards.** Press **Flashcards**, flip a card with **Space**, then mark it **Got It** or **Need Review**. Shortcut: [`?disc=halloween&view=flashcards`](https://disclore-97.pages.dev/?disc=halloween&view=flashcards).
+5. **The three Editions.** Switch between **Classic '97**, **Haunted Edition**, and **Christmas Edition** with **Start > Edition Switcher**, **View > Edition**, or the **Edition** card on the Home window. Each edition changes the colours, the artwork, the lettering, and the chime.
+
 ## Features
 
 - **Win95-style CD-ROM encyclopedia.** Windows 95 chrome, article browsing, and original disc content on the four built-in discs.
@@ -231,12 +245,33 @@ npx wrangler pages dev dist
 
 ## Deploying to Cloudflare Pages
 
-The app is a static site plus optional Pages Functions. Use these settings:
+The app is a static site plus optional Pages Functions, live at [https://disclore-97.pages.dev](https://disclore-97.pages.dev). Use these settings:
 
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
 
 Cloudflare Pages picks up `functions/api/extract.ts`, `functions/api/topic.ts` and `functions/api/define.ts` automatically. No API keys or environment variables are needed.
+
+### wrangler.toml
+
+The repository root holds a minimal, secret-free `wrangler.toml` with three keys and nothing else:
+
+```toml
+name = "disclore-97"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-19"
+```
+
+It has no `account_id`, `zone_id`, routes, `vars`, bindings, or secrets. Because it sets `pages_build_output_dir`, Pages treats it as the [source of truth](https://developers.cloudflare.com/pages/functions/wrangler-configuration/#source-of-truth) for the project's configuration. The matching dashboard fields become read-only. Any setting the app ever needs must be added to this file. Secrets, if any are ever needed, belong in the dashboard or `wrangler secret`, never in the repository.
+
+### Privacy audit of the public repository
+
+The public repository [reprodev/disclore-97](https://github.com/reprodev/disclore-97) was audited across every tracked file and the full history of every ref. At the time of the audit it held 87 commits, 280 paths ever committed, and 52,559 added lines.
+
+- **Credentials and keys.** No API keys, tokens, private keys, passwords, `account_id`, or `zone_id` were found in any tracked file or in any line ever added. The check covered the common token formats (AWS, GitHub, Slack, Google, OpenAI-style, PEM private keys, and `key = "..."` assignments).
+- **Local files.** No `.env`, `.dev.vars`, key, or credential file was ever committed. `.gitignore` excludes `node_modules`, `dist`, `.env`, `.env.*`, `.wrangler`, and `*.tsbuildinfo`. One build cache, `tsconfig.tsbuildinfo`, was committed early and later untracked. It holds only relative paths.
+- **Personal data.** No local user paths (such as a home-directory path) appear in the files or the history. The only email addresses are `example.com` and `example.org` test fixtures. Every commit uses the GitHub `users.noreply.github.com` address, so no personal email is exposed.
+- **Content.** The built-in discs are original text and art. Wikipedia text and Commons pictures are only fetched at run time into a visitor's own browser, and never committed (see the next section).
 
 ## Attribution and Content Licensing
 
