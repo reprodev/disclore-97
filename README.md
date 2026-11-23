@@ -4,16 +4,16 @@ A fictional 1997 Windows 95 CD-ROM encyclopedia, rebuilt as a static web app. Br
 
 ## Live Demo & Judge's Quick-Start
 
-**Live demo: [https://disclore-97.pages.dev](https://disclore-97.pages.dev)** (Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions). Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97).
+**Live demo: [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com)** (Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions). Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97).
 
 It is built for a desktop browser window of 1280 x 720 or larger. Sound starts after your first click, as browsers require. The **Sound** button in the taskbar mutes everything.
 
 A five-minute tour:
 
-1. **Pinpointer → Burn CD-R.** On the Home window, type a subject that is not on the shelf, for example `Lighthouse`, into the Pinpointer search. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The app reads the English Wikipedia article, compiles it into a disc in your browser, checks it, and opens it, with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.pages.dev/?topic=Lighthouse).
-2. **KeepMaze.** On any disc, press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers. Watch the room change as you move between the five room kinds (gate, passage, library, tower, and hall), and keep an eye on your three torches and the "P" score medallion. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.pages.dev/?disc=castles&view=keepmaze).
-3. **Take a Tour.** Press **Tour**, then **Play Show**. With sound on, each stop is read aloud and the tour moves on by itself. Shortcut: [`?disc=castles&view=tour`](https://disclore-97.pages.dev/?disc=castles&view=tour).
-4. **Flashcards.** Press **Flashcards**, flip a card with **Space**, then mark it **Got It** or **Need Review**. Shortcut: [`?disc=halloween&view=flashcards`](https://disclore-97.pages.dev/?disc=halloween&view=flashcards).
+1. **Pinpointer → Burn CD-R.** On the Home window, type a subject that is not on the shelf, for example `Lighthouse`, into the Pinpointer search. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The app reads the English Wikipedia article, compiles it into a disc in your browser, checks it, and opens it, with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.reprodev.com/?topic=Lighthouse).
+2. **KeepMaze.** On any disc, press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers. Watch the room change as you move between the five room kinds (gate, passage, library, tower, and hall), and keep an eye on your three torches and the "P" score medallion. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.reprodev.com/?disc=castles&view=keepmaze).
+3. **Take a Tour.** Press **Tour**, then **Play Show**. With sound on, each stop is read aloud and the tour moves on by itself. Shortcut: [`?disc=castles&view=tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour).
+4. **Flashcards.** Press **Flashcards**, flip a card with **Space**, then mark it **Got It** or **Need Review**. Shortcut: [`?disc=halloween&view=flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards).
 5. **The three Editions.** Switch between **Classic '97**, **Haunted Edition**, and **Christmas Edition** with **Start > Edition Switcher**, **View > Edition**, or the **Edition** card on the Home window. Each edition changes the colours, the artwork, the lettering, and the chime.
 
 ## Features
@@ -245,7 +245,7 @@ npx wrangler pages dev dist
 
 ## Deploying to Cloudflare Pages
 
-The app is a static site plus optional Pages Functions, live at [https://disclore-97.pages.dev](https://disclore-97.pages.dev). Use these settings:
+The app is a static site plus optional Pages Functions, live at the custom domain [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com). The Cloudflare Pages project `disclore-97` also answers at its default `disclore-97.pages.dev` address. The source is pushed to the public GitHub repository [reprodev/disclore-97](https://github.com/reprodev/disclore-97). Use these settings:
 
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`

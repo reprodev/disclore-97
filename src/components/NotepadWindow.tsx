@@ -7,7 +7,7 @@ export const README_TEXT = `DiscLore '97 - ReadMe
 DiscLore '97 is a make-believe 1997 CD-ROM encyclopedia. The four built-in discs are completely original, and the app is an unaffiliated tribute to the multimedia reference discs of the 1990s.
 
 QUICK START
-You can find DiscLore '97 on the web at disclore-97.pages.dev, and its source code on GitHub at github.com/reprodev/disclore-97. For a five-minute look around:
+You can find DiscLore '97 on the web at disclore-97.reprodev.com, and its source code on GitHub at github.com/reprodev/disclore-97. For a five-minute look around:
 - Type a subject into the Pinpointer on the Home window, for example Lighthouse, and pick the last row, Burn CD-R for your words (Wikipedia)... A new disc is made from the encyclopedia article and opens by itself.
 - Press KeepMaze on any disc, then Start, and answer the door questions. The castle changes as you walk: a gate, a passage, a library, a tower, and a hall.
 - Press Tour, then Play Show, to have a disc read to you one stop at a time.
