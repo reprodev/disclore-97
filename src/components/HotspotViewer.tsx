@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { playPageFlip } from '../audio/audio';
 import { SHAPE_ANIMS } from '../model/manifest';
@@ -69,60 +70,101 @@ function renderShape(shape: Shape, i: number) {
  * Renders a diagram as SVG in a 0..100 coordinate space. Each hotspot is a
  * focusable button placed at (x, y) in that space, wrapped in a Tooltip.
  * Tooltip renders HTML, so hotspots sit in an overlay positioned by percent
- * rather than inside the shapes SVG.
+ * rather than inside the shapes SVG. Below the diagram, a numbered Callout Key
+ * lists every pin; hovering or focusing either side highlights the other.
  */
 export function HotspotViewer({ diagram, onNavigate, sections, highlightSectionId }: HotspotViewerProps) {
+  // The pin (by index) being previewed from either side: its numbered pin or its Callout Key entry.
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const activate = (sectionId: string) => {
     playPageFlip();
     onNavigate(sectionId);
   };
+  const preview = (i: number) => () => setPreviewIndex(i);
+  const unpreview = (i: number) => () => setPreviewIndex((p) => (p === i ? null : p));
+  const titleFor = (sectionId: string, label: string) =>
+    sections?.find((s) => s.section_id === sectionId)?.title ?? label;
 
   return (
-    <div className="hotspot-viewer">
-      <svg
-        className="hotspot-shapes"
-        viewBox="0 0 100 100"
-        role="img"
-        aria-label={diagram.title}
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {diagram.shapes.map(renderShape)}
-      </svg>
-      {diagram.hotspots.map((h, i) => {
-        const onKeyDown = (e: KeyboardEvent<SVGGElement>) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            activate(h.section_id);
-          }
-        };
-        return (
-          <div key={`${h.section_id}-${i}`} className="hotspot-anchor" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
-            <Tooltip text={h.label} card={previewCard(sections, h.section_id)} alignEnd={h.x > 60}>
-              <svg className="hotspot-marker" viewBox="-8 -8 16 16" aria-hidden={false}>
-                <g
-                  role="button"
-                  tabIndex={0}
-                  aria-label={h.label}
-                  className={
-                    highlightSectionId && h.section_id === highlightSectionId
-                      ? 'hotspot-button hotspot-button--active'
-                      : 'hotspot-button'
-                  }
-                  data-x={h.x}
-                  data-y={h.y}
-                  onClick={() => activate(h.section_id)}
-                  onKeyDown={onKeyDown}
-                >
-                  <rect x={-7} y={-7} width={14} height={14} />
-                  <text x={0} y={1} textAnchor="middle" dominantBaseline="central" aria-hidden="true">
-                    {i + 1}
-                  </text>
-                </g>
-              </svg>
-            </Tooltip>
+    <div className="hotspot-figure">
+      <div className="hotspot-viewer">
+        <svg
+          className="hotspot-shapes"
+          viewBox="0 0 100 100"
+          role="img"
+          aria-label={diagram.title}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {diagram.shapes.map(renderShape)}
+        </svg>
+        {diagram.hotspots.map((h, i) => {
+          const onKeyDown = (e: KeyboardEvent<SVGGElement>) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              activate(h.section_id);
+            }
+          };
+          return (
+            <div key={`${h.section_id}-${i}`} className="hotspot-anchor" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
+              <Tooltip text={h.label} card={previewCard(sections, h.section_id)} alignEnd={h.x > 60}>
+                <svg className="hotspot-marker" viewBox="-8 -8 16 16" aria-hidden={false}>
+                  <g
+                    role="button"
+                    tabIndex={0}
+                    aria-label={h.label}
+                    className={[
+                      'hotspot-button',
+                      highlightSectionId && h.section_id === highlightSectionId ? 'hotspot-button--active' : '',
+                      previewIndex === i ? 'hotspot-button--preview' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    data-x={h.x}
+                    data-y={h.y}
+                    data-preview={previewIndex === i ? 'true' : 'false'}
+                    onClick={() => activate(h.section_id)}
+                    onKeyDown={onKeyDown}
+                    onPointerEnter={preview(i)}
+                    onPointerLeave={unpreview(i)}
+                    onFocus={preview(i)}
+                    onBlur={unpreview(i)}
+                  >
+                    <rect x={-7} y={-7} width={14} height={14} />
+                    <text x={0} y={1} textAnchor="middle" dominantBaseline="central" aria-hidden="true">
+                      {i + 1}
+                    </text>
+                  </g>
+                </svg>
+              </Tooltip>
+            </div>
+          );
+        })}
+      </div>
+      {diagram.hotspots.length > 0 ? (
+        <div className="callout-key">
+          <div className="callout-key__caption" aria-hidden="true">
+            Callout Key
           </div>
-        );
-      })}
+          <ol className="callout-key__list" aria-label="Callout Key">
+            {diagram.hotspots.map((h, i) => (
+              <li key={`${h.section_id}-${i}`}>
+                <button
+                  type="button"
+                  className="callout-key__item"
+                  data-preview={previewIndex === i ? 'true' : 'false'}
+                  onClick={() => activate(h.section_id)}
+                  onPointerEnter={preview(i)}
+                  onPointerLeave={unpreview(i)}
+                  onFocus={preview(i)}
+                  onBlur={unpreview(i)}
+                >
+                  <span className="callout-key__num">[{i + 1}]</span> {titleFor(h.section_id, h.label)}
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
     </div>
   );
 }

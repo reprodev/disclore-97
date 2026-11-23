@@ -191,6 +191,37 @@
   background: var(--color-gold-light);
 }
 
+/* Disc seek: the LED flashes hot amber in hard steps, then settles on the steady mounted gold. */
+@keyframes taskbar-led-seek {
+  0%,
+  24% {
+    background: var(--color-flame-hot);
+  }
+  25%,
+  49% {
+    background: var(--color-gold-light);
+  }
+  50%,
+  74% {
+    background: var(--color-flame-hot);
+  }
+  75%,
+  100% {
+    background: var(--color-gold-light);
+  }
+}
+
+.taskbar__drive[data-seek="true"] .taskbar__led {
+  background: var(--color-flame-hot);
+  animation: taskbar-led-seek 0.7s steps(1, end) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taskbar__drive[data-seek="true"] .taskbar__led {
+    animation: none;
+  }
+}
+
 .taskbar__clock {
   min-width: 36px;
   text-align: right;

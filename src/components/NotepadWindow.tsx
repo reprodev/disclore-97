@@ -60,7 +60,18 @@ PICTURES
 - A picture that cannot be loaded is replaced by an illustration plate.
 
 DIAGRAMS
-Click the numbered pins on a diagram to jump to articles. Point at a pin, or tab to it, to see a small preview card with the article's title and its first Quick Fact before you click. Burned discs get a diagram that matches their source: a blueprint for a GitHub repository, a site map for a web page, an outline for Markdown, and a concept chart for a topic.
+Click the numbered pins on a diagram to jump to articles. Point at a pin, or tab to it, to see a small preview card with the article's title and its first Quick Fact before you click.
+
+Under every diagram is a Callout Key, an ivory list of every pin by number, for example [1] The Moat. Click an entry to open that article, just like clicking its pin. Point at an entry, or tab to it, and its pin lights up on the diagram. Point at a pin and its entry lights up in the key.
+
+Burned discs get an illustrated scene that matches their source:
+- A topic gets an atlas plate: a celestial globe with a ring and latitude lines, a compass rose, a double border, and twinkling stars.
+- A web page gets a 1997 browser window, with a title bar and its three buttons, an address bar, a status bar, and linked pages around a globe. A small light glints in the status bar.
+- A GitHub repository gets a computer workstation: an old monitor showing the project plan, a server rack with blinking lights, and circuit lines.
+- Markdown gets an open leather-bound book with ruled pages, a bookmark ribbon, and a desk lamp that flickers.
+
+DRIVE D:
+The small light beside Drive D: in the taskbar is gold while a disc is in the drive. When a disc opens, finishes burning, or moves to another article or page, the light flashes amber for a moment, like a real CD-ROM drive reading, then goes back to gold. It does not flash if your system asks for reduced motion.
 
 KEEPMAZE
 KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached.
@@ -74,7 +85,7 @@ All sound effects are generated live, and no audio files are used: soft chords f
 
 The Ambience button in the taskbar is Off until you press it. When it is On, it plays a quiet background atmosphere that suits the open disc: wind and a hearth for castles, a CRT hum for code and web discs, and a soft study tone for the rest. Use the Sound button to mute everything, including Ambience and Read Aloud.
 
-A few pictures move a little: a blinking cursor on the computer screens, flickering torch windows, and a glint on the CD. They stand still if your system asks for reduced motion.
+A few pictures move a little: a blinking cursor on the computer screens, flickering torch windows, a glint on the CD, and the twinkling stars, blinking rack lights, and flickering lamp in burned-disc diagrams. They stand still if your system asks for reduced motion.
 
 ATTRIBUTION AND LICENSING
 - Built-in discs: original text, artwork and sound, made for this project.

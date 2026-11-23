@@ -34,7 +34,12 @@ export interface TaskbarProps {
   driveActive?: boolean;
   /** What the Start menu items do. An item with no action is dimmed. */
   startActions?: StartMenuActions;
+  /** Bumped on every disc seek (open, burn, navigation). Each new value flashes the Drive D: LED briefly. */
+  activityKey?: number;
 }
+
+/** How long the Drive D: LED flashes after a seek, in milliseconds. */
+export const SEEK_PULSE_MS = 700;
 
 /** Local time as HH:MM, 24-hour. */
 export function formatClock(d: Date): string {
@@ -72,8 +77,17 @@ export function Taskbar({
   onToggleReadMe,
   driveActive = false,
   startActions,
+  activityKey = 0,
 }: TaskbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  // The LED flashes while the latest activity key has not yet been settled by its timer.
+  const [settledKey, setSettledKey] = useState(activityKey);
+  const seeking = activityKey !== settledKey;
+  useEffect(() => {
+    if (activityKey === settledKey) return;
+    const id = window.setTimeout(() => setSettledKey(activityKey), SEEK_PULSE_MS);
+    return () => window.clearTimeout(id);
+  }, [activityKey, settledKey]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<HTMLButtonElement | null>(null);
 
@@ -172,9 +186,11 @@ export function Taskbar({
           aria-label={driveActive ? 'Drive D: (CD-ROM), disc loaded' : 'Drive D: (CD-ROM), empty'}
           title="Drive D: (CD-ROM)"
           data-active={driveActive ? 'true' : 'false'}
+          data-seek={seeking ? 'true' : 'false'}
         >
           <PixelIcon name="cd" size={16} />
-          <span className="taskbar__led" aria-hidden="true" />
+          {/* Keyed by the activity so each new seek restarts the flash from its first step. */}
+          <span key={seeking ? activityKey : 'steady'} className="taskbar__led" aria-hidden="true" />
         </span>
         <AmbienceToggle />
         <MuteToggle />

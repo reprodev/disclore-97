@@ -134,7 +134,7 @@
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
 }
 
-.disc-main .hotspot-viewer {
+.disc-main .hotspot-figure {
   max-width: 560px;
   margin: 0 auto;
 }

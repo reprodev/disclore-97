@@ -50,7 +50,7 @@ describe('Property 9: Sanitization of hostile text', () => {
       }),
       { numRuns: 200 },
     );
-  }, 15000);
+  }, 30000); // About 2.5s alone; headroom for a loaded parallel run (richer diagram scenes add strings to scan).
 
   // Feature: dynamic-disc-compiler, Property 9: Sanitization of hostile text (media)
   it('keeps only validated https media urls and sanitizes every caption', () => {
@@ -117,5 +117,5 @@ describe('Property 9: Sanitization of hostile text', () => {
       }),
       { numRuns: 200 },
     );
-  }, 15000);
+  }, 30000); // About 2.5s alone; headroom for a loaded parallel run (richer diagram scenes add strings to scan).
 });

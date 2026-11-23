@@ -1,4 +1,4 @@
-import type { Diagram, Hotspot, Section, Shape } from '../manifest';
+import type { Diagram, Hotspot, Section, Shape, ShapeAnim } from '../manifest';
 import type { SourceKind } from '../source';
 import { truncate } from './text';
 
@@ -56,7 +56,7 @@ export function hotspotSectionIndex(i: number, n: number): number {
 
 // ---- Shape helpers. Optional paint fields are omitted, never undefined. ----
 
-function rect(x: number, y: number, width: number, height: number, fill?: Tok, stroke?: Tok): Shape {
+function rect(x: number, y: number, width: number, height: number, fill?: Tok, stroke?: Tok, anim?: ShapeAnim): Shape {
   return {
     kind: 'rect',
     x,
@@ -65,16 +65,85 @@ function rect(x: number, y: number, width: number, height: number, fill?: Tok, s
     height,
     fill: fill ? tok(fill) : 'none',
     stroke: stroke ? tok(stroke) : 'none',
+    ...(anim ? { anim } : {}),
   };
 }
 
-function circle(cx: number, cy: number, r: number, fill?: Tok, stroke?: Tok): Shape {
-  return { kind: 'circle', cx, cy, r, fill: fill ? tok(fill) : 'none', stroke: stroke ? tok(stroke) : 'none' };
+function circle(cx: number, cy: number, r: number, fill?: Tok, stroke?: Tok, anim?: ShapeAnim): Shape {
+  return {
+    kind: 'circle',
+    cx,
+    cy,
+    r,
+    fill: fill ? tok(fill) : 'none',
+    stroke: stroke ? tok(stroke) : 'none',
+    ...(anim ? { anim } : {}),
+  };
 }
 
-function line(x1: number, y1: number, x2: number, y2: number, stroke: Tok): Shape {
-  return { kind: 'line', x1, y1, x2, y2, stroke: tok(stroke) };
+function line(x1: number, y1: number, x2: number, y2: number, stroke: Tok, anim?: ShapeAnim): Shape {
+  return { kind: 'line', x1, y1, x2, y2, stroke: tok(stroke), ...(anim ? { anim } : {}) };
 }
+
+/** Rounds to one decimal place, so computed points stay short and identical on every run. */
+const r1 = (n: number): number => Math.round(n * 10) / 10;
+
+function polygon(points: readonly (readonly [number, number])[], fill?: Tok, stroke?: Tok, anim?: ShapeAnim): Shape {
+  return {
+    kind: 'polygon',
+    points: points.map(([x, y]) => [r1(x), r1(y)] as [number, number]),
+    fill: fill ? tok(fill) : 'none',
+    stroke: stroke ? tok(stroke) : 'none',
+    ...(anim ? { anim } : {}),
+  };
+}
+
+/** An open polyline. The manifest has no polyline shape, so it is drawn as joined line segments. */
+function polyline(points: readonly (readonly [number, number])[], stroke: Tok, anim?: ShapeAnim): Shape[] {
+  const out: Shape[] = [];
+  for (let i = 1; i < points.length; i++) {
+    const [x1, y1] = points[i - 1]!;
+    const [x2, y2] = points[i]!;
+    out.push(line(r1(x1), r1(y1), r1(x2), r1(y2), stroke, anim));
+  }
+  return out;
+}
+
+/** Points on an ellipse centred on (cx, cy), tilted by `tilt` radians, from angle a0 to a1 in `steps` steps. */
+function ellipsePoints(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  tilt: number,
+  a0: number,
+  a1: number,
+  steps: number,
+): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    const a = a0 + ((a1 - a0) * i) / steps;
+    const x = rx * Math.cos(a);
+    const y = ry * Math.sin(a);
+    pts.push([cx + x * Math.cos(tilt) - y * Math.sin(tilt), cy + x * Math.sin(tilt) + y * Math.cos(tilt)]);
+  }
+  return pts;
+}
+
+/** A star with `points` tips, alternating outer and inner radius. The first tip points up, turned by `turn` radians. */
+function star(cx: number, cy: number, outer: number, inner: number, points: number, turn = 0): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = -Math.PI / 2 + turn + (i * Math.PI) / points;
+    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  return pts;
+}
+
+/** A four-point twinkle. */
+const twinkle = (cx: number, cy: number, r: number, anim?: ShapeAnim): Shape =>
+  polygon(star(cx, cy, r, r / 3, 4), 'gold-light', undefined, anim);
 
 interface Pt {
   cx: number;
@@ -91,13 +160,13 @@ interface Scene {
   backdrop: () => Shape[];
   links: (a: Pt, b: Pt) => Shape[];
   card: (p: Pt, i: number) => Shape[];
-  /** Drawn after the cards (frames, title blocks) so they sit on top. */
+  /** Drawn after the cards (frames, hubs, accents) so they sit on top. Kept clear of the pins. */
   overlay: () => Shape[];
 }
 
 const mid = (a: number, b: number): number => Math.round((a + b) / 2);
 
-// ---- github: repository architecture blueprint (module boxes + connectors) ----
+// ---- github: a retro CRT workstation showing the repository blueprint, beside a server rack ----
 
 const GITHUB_STRIPS: readonly Tok[] = ['gold', 'forest-light', 'crimson-light', 'sky', 'gold-light', 'stone-light'];
 
@@ -123,16 +192,34 @@ const githubScene: Scene = {
     [5, 7],
   ],
   backdrop() {
-    const s: Shape[] = [rect(0, 0, 100, 100, 'sky-deep')];
-    for (let x = 10; x <= 90; x += 10) s.push(line(x, 16, x, 89, 'sky'));
-    for (let y = 26; y <= 86; y += 10) s.push(line(3, y, 97, y, 'sky'));
-    // Header band with a repository glyph, footer band for the title block.
-    s.push(rect(0, 0, 100, 14, 'ink'), rect(0, 14, 100, 2, 'gold'));
-    s.push(rect(4, 4, 6, 6, 'gold', 'gold-dark'), rect(12, 4, 6, 6, 'parchment', 'gold-dark'));
-    s.push(rect(22, 5, 34, 2, 'parchment'), rect(22, 9, 22, 2, 'stone-light'));
-    s.push(rect(0, 90, 100, 10, 'ink'));
-    // Dimension line down the left edge.
-    s.push(line(5, 22, 5, 84, 'gold-light'), line(3, 22, 7, 22, 'gold-light'), line(3, 84, 7, 84, 'gold-light'));
+    // The monitor: a beige bezel round a dark blueprint screen.
+    const s: Shape[] = [rect(0, 0, 100, 100, 'stone-light'), rect(2, 2, 96, 86, 'ink'), rect(3, 3, 94, 84, 'sky-deep')];
+    for (let x = 13; x <= 83; x += 10) s.push(line(x, 16, x, 86, 'sky'));
+    for (let y = 26; y <= 86; y += 10) s.push(line(4, y, 86, y, 'sky'));
+    // A DOS-style prompt along the top of the screen, with a blinking cursor.
+    s.push(rect(3, 3, 94, 11, 'ink'), rect(3, 14, 94, 1, 'gold'));
+    s.push(rect(6, 6, 8, 2, 'forest-light'), rect(16, 6, 24, 2, 'parchment'), rect(16, 10, 16, 2, 'stone-light'));
+    s.push(rect(42, 6, 3, 2, 'forest-light', undefined, 'blink'));
+    // Circuit traces down the left margin, with gold vias.
+    s.push(...polyline([[5, 18], [5, 34], [8, 37], [8, 54], [5, 57], [5, 84]], 'gold-dark'));
+    s.push(...polyline([[9, 20], [9, 28], [11, 30], [11, 70], [9, 72], [9, 84]], 'gold-dark'));
+    for (const [x, y] of [[5, 18], [8, 37], [5, 57], [9, 28], [11, 70], [5, 84], [9, 84]] as const) {
+      s.push(circle(x, y, 1, 'gold', 'gold-dark'));
+    }
+    // A server rack at the right edge: four units, each with a status light.
+    s.push(rect(89, 17, 7, 68, 'ink', 'stone-light'));
+    for (let u = 0; u < 4; u++) {
+      const y = 20 + u * 16;
+      s.push(rect(90, y, 5, 13, 'sky-deep', 'stone-light'));
+      s.push(line(90.5, y + 4, 94.5, y + 4, 'stone-light'), line(90.5, y + 7, 94.5, y + 7, 'stone-light'));
+      const led: Tok = u % 3 === 0 ? 'forest-light' : u % 3 === 1 ? 'gold-light' : 'crimson-light';
+      s.push(rect(91, y + 10, 2, 2, led, undefined, u % 2 === 0 ? 'blink' : undefined));
+    }
+    // The stand and the keyboard below the screen.
+    s.push(rect(36, 88, 28, 3, 'parchment-dark', 'ink'));
+    s.push(rect(6, 92, 88, 7, 'parchment', 'ink'));
+    for (let k = 0; k < 10; k++) s.push(rect(9 + k * 8, 93.5, 6, 1.5, 'stone-light', 'ink'));
+    s.push(rect(22, 96, 56, 1.5, 'stone-light', 'ink'));
     return s;
   },
   links(a, b) {
@@ -159,20 +246,12 @@ const githubScene: Scene = {
     ];
   },
   overlay() {
-    return [
-      rect(58, 91, 40, 8, 'parchment', 'gold'),
-      line(70, 91, 70, 99, 'gold-dark'),
-      line(84, 91, 84, 99, 'gold-dark'),
-      rect(60, 93, 8, 4, 'gold'),
-      rect(72, 93, 10, 2, 'ink'),
-      rect(86, 93, 10, 4, 'sky'),
-      rect(3, 92, 6, 6, 'gold', 'gold-dark'),
-      rect(12, 94, 30, 2, 'sky'),
-    ];
+    // The power light on the bezel, blinking like a busy drive.
+    return [rect(88, 89, 4, 1.5, 'ink'), circle(94, 89.8, 1.2, 'forest-light', 'ink', 'blink')];
   },
 };
 
-// ---- webpage: hypertext browser frame with a linked-page node map ----
+// ---- webpage: a 1997 browser window with a hypertext page map ----
 
 const webpageScene: Scene = {
   title: (t) => `Site Map of ${t}`,
@@ -201,27 +280,46 @@ const webpageScene: Scene = {
   backdrop() {
     return [
       rect(0, 0, 100, 100, 'stone-light'),
-      // Window frame and title bar.
+      // Window frame and title bar, with a page glyph and the title text.
       rect(2, 2, 96, 96, 'stone-light', 'ink'),
       rect(3, 3, 94, 7, 'sky-deep'),
-      rect(5, 5, 24, 3, 'parchment'),
+      polygon([[5, 4], [8, 4], [9, 5], [9, 9], [5, 9]], 'parchment', 'ink'),
+      rect(11, 5, 22, 3, 'parchment'),
+      // Minimize, maximize, and close, each with its glyph.
       rect(76, 4, 5, 5, 'stone-light', 'ink'),
+      line(77, 7.5, 80, 7.5, 'ink'),
       rect(82, 4, 5, 5, 'stone-light', 'ink'),
+      rect(83, 5, 3, 3, undefined, 'ink'),
       rect(88, 4, 5, 5, 'crimson-light', 'ink'),
-      // Toolbar with navigation buttons and an address field.
+      line(89, 5, 92, 8, 'ink'),
+      line(92, 5, 89, 8, 'ink'),
+      // Toolbar: back and forward, the address bar, and the spinning globe.
       rect(3, 11, 94, 8, 'stone-light', 'parchment-dark'),
       rect(5, 12, 5, 6, 'parchment', 'ink'),
+      polygon([[9, 13], [6, 15], [9, 17]], 'sky-deep'),
       rect(11, 12, 5, 6, 'parchment', 'ink'),
+      polygon([[12, 13], [15, 15], [12, 17]], 'sky-deep'),
       rect(18, 12, 62, 6, 'parchment', 'ink'),
-      rect(20, 14, 26, 2, 'sky-deep'),
+      rect(19, 13.5, 4, 3, 'gold'),
+      rect(25, 14, 26, 2, 'sky-deep'),
       rect(82, 12, 13, 6, 'gold-light', 'ink'),
-      // Page area and scroll bar.
+      circle(88.5, 15, 2.6, 'sky', 'ink'),
+      line(85.9, 15, 91.1, 15, 'ink'),
+      ...polyline(ellipsePoints(88.5, 15, 1.2, 2.6, 0, -Math.PI / 2, Math.PI / 2, 6), 'ink'),
+      ...polyline(ellipsePoints(88.5, 15, 1.2, 2.6, 0, Math.PI / 2, (3 * Math.PI) / 2, 6), 'ink'),
+      // Page area, a faint hypertext globe in the corner, and the scroll bar.
       rect(4, 21, 87, 69, 'parchment', 'ink'),
+      circle(84, 82, 6, undefined, 'parchment-dark'),
+      line(78, 82, 90, 82, 'parchment-dark'),
+      ...polyline(ellipsePoints(84, 82, 3, 6, 0, -Math.PI / 2, Math.PI / 2, 6), 'parchment-dark'),
       rect(92, 21, 5, 69, 'stone-light', 'ink'),
-      rect(92, 26, 5, 18, 'gold', 'ink'),
-      // Status bar with a load meter.
+      rect(92, 21, 5, 4, 'parchment', 'ink'),
+      rect(92, 86, 5, 4, 'parchment', 'ink'),
+      rect(92, 28, 5, 16, 'gold', 'ink'),
+      // Status bar: the load meter.
       rect(3, 92, 94, 6, 'stone-light', 'parchment-dark'),
       rect(5, 94, 34, 2, 'forest-light'),
+      rect(42, 94, 40, 2, 'parchment-dark'),
     ];
   },
   links(a, b) {
@@ -233,17 +331,20 @@ const webpageScene: Scene = {
     return [
       rect(x, y, CARD_W, CARD_H, CARD_FILLS[i % CARD_FILLS.length], 'ink'),
       rect(x, y, CARD_W, 3, 'sky-deep', 'ink'),
+      // A folded page corner.
+      polygon([[x + CARD_W - 4, y + CARD_H], [x + CARD_W, y + CARD_H - 4], [x + CARD_W, y + CARD_H]], 'parchment-dark', 'ink'),
       line(x + 2, cy + 3, x + 11, cy + 3, 'sky-deep'),
-      line(x + 2, cy + 5, x + 16, cy + 5, 'ink'),
+      line(x + 2, cy + 5, x + 14, cy + 5, 'ink'),
       circle(cx, cy, 2.5, 'gold', 'gold-dark'),
     ];
   },
   overlay() {
-    return [];
+    // The connection light in the status bar, and a glint on the spinning globe.
+    return [rect(88, 93.5, 6, 3, 'gold-light', 'ink', 'glint'), twinkle(86.5, 13.5, 1.6, 'glint')];
   },
 };
 
-// ---- markdown: encyclopedia outline chart (ruled page, heading tree) ----
+// ---- markdown: an open leather-bound folio under a desk lamp ----
 
 const OUTLINE_FILLS: readonly Tok[] = ['gold-light', 'parchment', 'stone-light'];
 
@@ -273,14 +374,31 @@ const markdownScene: Scene = {
     [3, 7],
   ],
   backdrop() {
-    const s: Shape[] = [rect(0, 0, 100, 100, 'parchment')];
-    // Ruled paper with a margin rule.
-    for (let y = 22; y <= 86; y += 6) s.push(line(5, y, 95, y, 'parchment-dark'));
-    s.push(line(9, 17, 9, 89, 'crimson-light'));
-    // Header band: a heading glyph and two text rules.
-    s.push(rect(0, 0, 100, 14, 'sky-deep'), rect(0, 14, 100, 1, 'gold-dark'));
-    s.push(rect(4, 3, 8, 8, 'gold', 'gold-dark'), rect(16, 5, 30, 2, 'parchment'), rect(16, 9, 20, 2, 'parchment-dark'));
-    s.push(rect(0, 90, 100, 10, 'parchment-dark'));
+    const s: Shape[] = [
+      // The desk, and the leather cover showing round the pages.
+      rect(0, 0, 100, 100, 'wood-light'),
+      rect(0, 0, 100, 13, 'gold-dark'),
+      rect(4, 4, 30, 2, 'parchment'),
+      rect(4, 8, 20, 2, 'parchment-dark'),
+      rect(2, 15, 96, 81, 'crimson-light', 'ink'),
+      rect(3.5, 16.5, 93, 78, undefined, 'gold'),
+      // Two ruled parchment pages that dip into the spine.
+      polygon([[6, 18], [48, 20], [48, 92], [6, 90]], 'parchment', 'ink'),
+      polygon([[52, 20], [94, 18], [94, 90], [52, 92]], 'parchment', 'ink'),
+      rect(48, 18, 4, 75, 'gold-dark', 'ink'),
+      line(50, 19, 50, 92, 'ink'),
+    ];
+    for (let y = 26; y <= 86; y += 6) {
+      s.push(line(8, y, 46, y + 1, 'parchment-dark'));
+      s.push(line(54, y + 1, 92, y, 'parchment-dark'));
+    }
+    s.push(line(12, 19, 12, 89, 'crimson-light'));
+    // The bookmark ribbon, from the head of the spine past the foot of the book, under the cards.
+    s.push(polygon([[53, 15], [57, 15], [57, 98], [55, 95.5], [53, 98]], 'crimson-light', 'ink'));
+    // The desk lamp: a stand, an arm, a gold shade, and a flickering bulb.
+    s.push(rect(82, 10, 12, 2, 'ink'), line(88, 10, 84, 5, 'ink'), line(84, 5, 90, 2, 'ink'));
+    s.push(polygon([[86, 1], [96, 1], [98, 6], [84, 6]], 'gold', 'ink'));
+    s.push(circle(91, 7.5, 1.6, 'gold-light', 'gold-dark', 'flicker'));
     return s;
   },
   links(a, b) {
@@ -299,19 +417,21 @@ const markdownScene: Scene = {
     ];
   },
   overlay() {
-    // Double rule frame, drawn last so it sits over the page edges.
+    // Brass corner guards on the cover.
     return [
-      rect(2, 16, 96, 73, undefined, 'gold-dark'),
-      rect(4, 18, 92, 69, undefined, 'ink'),
-      rect(2, 16, 4, 4, 'gold-dark'),
-      rect(94, 16, 4, 4, 'gold-dark'),
-      rect(2, 85, 4, 4, 'gold-dark'),
-      rect(94, 85, 4, 4, 'gold-dark'),
+      polygon([[2, 15], [8, 15], [2, 21]], 'gold', 'ink'),
+      polygon([[92, 15], [98, 15], [98, 21]], 'gold', 'ink'),
+      polygon([[2, 90], [2, 96], [8, 96]], 'gold', 'ink'),
+      polygon([[98, 90], [98, 96], [92, 96]], 'gold', 'ink'),
     ];
   },
 };
 
-// ---- topic: encyclopedia concept chart (hub, rings, spokes) ----
+// ---- topic: an Encarta atlas plate, a ringed celestial globe in a double cartouche ----
+
+/** Centre of the topic scene's globe, and of its compass rose hub. */
+const HUB = { x: 50, y: 52 } as const;
+const GLOBE_R = 30;
 
 const topicScene: Scene = {
   title: (t) => `Concept Chart of ${t}`,
@@ -336,33 +456,37 @@ const topicScene: Scene = {
     [7, 0],
   ],
   backdrop() {
-    return [
+    const s: Shape[] = [
       rect(0, 0, 100, 100, 'parchment'),
-      // Header band and plate frame.
-      rect(0, 0, 100, 14, 'sky-deep'),
-      rect(0, 14, 100, 1, 'gold-dark'),
-      rect(6, 4, 24, 3, 'parchment'),
-      rect(6, 9, 14, 2, 'parchment-dark'),
-      circle(90, 7, 4, 'gold', 'gold-dark'),
-      rect(0, 90, 100, 10, 'parchment-dark'),
-      // Concentric rings and a crosshair behind the hub.
-      circle(50, 52, 34, undefined, 'parchment-dark'),
-      circle(50, 52, 22, undefined, 'parchment-dark'),
-      line(50, 17, 50, 88, 'parchment-dark'),
-      line(6, 52, 94, 52, 'parchment-dark'),
-      // Scale bar in the footer.
-      line(6, 95, 36, 95, 'ink'),
-      rect(6, 93, 10, 2, 'ink'),
-      rect(16, 93, 10, 2, 'parchment'),
-      rect(26, 93, 10, 2, 'ink'),
-      rect(60, 93, 6, 5, 'wood-light', 'ink'),
-      rect(68, 91, 6, 7, 'forest-light', 'ink'),
-      rect(76, 94, 6, 4, 'gold', 'ink'),
-      rect(84, 92, 6, 6, 'crimson-light', 'ink'),
+      // The cartouche: a title band with scrolled ends.
+      rect(14, 4, 72, 10, 'parchment-dark', 'gold-dark'),
+      polygon([[14, 4], [9, 9], [14, 14]], 'gold-dark'),
+      polygon([[86, 4], [91, 9], [86, 14]], 'gold-dark'),
+      rect(20, 6.5, 40, 2.5, 'ink'),
+      rect(20, 10.5, 24, 1.5, 'gold-dark'),
+      // The far half of the orrery ring, behind the globe.
+      ...polyline(ellipsePoints(HUB.x, HUB.y, 40, 8, -0.32, Math.PI, 2 * Math.PI, 16), 'gold-dark'),
+      circle(HUB.x, HUB.y, GLOBE_R, 'sky', 'sky-deep'),
     ];
+    // Latitude lines (chords of the globe) and longitude arcs.
+    for (const dy of [-20, -10, 0, 10, 20]) {
+      const hw = Math.sqrt(GLOBE_R * GLOBE_R - dy * dy);
+      s.push(line(r1(HUB.x - hw), HUB.y + dy, r1(HUB.x + hw), HUB.y + dy, 'sky-deep'));
+    }
+    for (const rx of [10, 20]) {
+      s.push(...polyline(ellipsePoints(HUB.x, HUB.y, rx, GLOBE_R, 0, -Math.PI / 2, Math.PI / 2, 10), 'sky-deep'));
+      s.push(...polyline(ellipsePoints(HUB.x, HUB.y, rx, GLOBE_R, 0, Math.PI / 2, (3 * Math.PI) / 2, 10), 'sky-deep'));
+    }
+    s.push(line(HUB.x, HUB.y - GLOBE_R, HUB.x, HUB.y + GLOBE_R, 'sky-deep'));
+    // The near half of the ring, over the globe.
+    s.push(...polyline(ellipsePoints(HUB.x, HUB.y, 40, 8, -0.32, 0, Math.PI, 16), 'gold'));
+    // A scale bar and a key strip in the footer.
+    s.push(line(8, 93, 38, 93, 'ink'), rect(8, 91, 10, 2, 'ink'), rect(18, 91, 10, 2, 'parchment'), rect(28, 91, 10, 2, 'ink'));
+    s.push(rect(62, 90, 6, 5, 'wood-light', 'ink'), rect(70, 89, 6, 6, 'forest-light', 'ink'), rect(78, 91, 6, 4, 'gold', 'ink'));
+    return s;
   },
   links(a, b) {
-    // Spokes run from the hub; ring edges between neighbors are drawn as faint chords.
+    // Ring edges between neighbouring nodes, drawn as faint chords.
     return [line(a.cx, a.cy, b.cx, b.cy, 'parchment-dark')];
   },
   card({ cx, cy }, i) {
@@ -378,10 +502,22 @@ const topicScene: Scene = {
   },
   overlay() {
     return [
-      circle(50, 52, 10, 'gold-light', 'gold-dark'),
-      circle(50, 52, 6, 'gold', 'ink'),
-      circle(50, 52, 2, 'ink'),
-      rect(2, 16, 96, 73, undefined, 'wood-light'),
+      // The 8-point compass rose at the hub: short ordinal points under long cardinal ones.
+      polygon(star(HUB.x, HUB.y, 6, 2.4, 4, Math.PI / 4), 'gold', 'ink'),
+      polygon(star(HUB.x, HUB.y, 9, 2, 4), 'gold-light', 'ink'),
+      circle(HUB.x, HUB.y, 1.6, 'ink'),
+      // Glinting stars in the four corners of the plate.
+      twinkle(8, 22, 2.4, 'glint'),
+      twinkle(92, 22, 2.4, 'glint'),
+      twinkle(8, 84, 2, 'glint'),
+      twinkle(92, 84, 2, 'glint'),
+      // The double cartouche border, drawn last so it frames everything.
+      rect(1, 1, 98, 98, undefined, 'gold-dark'),
+      rect(3, 3, 94, 94, undefined, 'ink'),
+      polygon([[1, 1], [6, 1], [1, 6]], 'gold-dark'),
+      polygon([[99, 1], [94, 1], [99, 6]], 'gold-dark'),
+      polygon([[1, 99], [6, 99], [1, 94]], 'gold-dark'),
+      polygon([[99, 99], [94, 99], [99, 94]], 'gold-dark'),
     ];
   },
 };
@@ -393,11 +529,19 @@ const SCENES: Record<SourceKind, Scene> = {
   topic: topicScene,
 };
 
+/** The scene layouts, for tests that check pins stay in bounds and apart. */
+export const SCENE_SLOTS: Readonly<Record<SourceKind, readonly (readonly [number, number])[]>> = {
+  github: githubScene.slots,
+  webpage: webpageScene.slots,
+  markdown: markdownScene.slots,
+  topic: topicScene.slots,
+};
+
 /**
  * Builds the single diagram `diagram-1`. `rng` is the `'diagram'` stream.
- * `kind` picks the scene: a repository blueprint, a browser site map, a markdown
- * outline, or a topic concept chart. Unknown kinds use the topic scene.
- * `sections` must be non-empty.
+ * `kind` picks the scene: a CRT workstation blueprint for a repository, a 1997 browser window for a
+ * web page, an open folio for Markdown, or an atlas plate with a celestial globe for a topic.
+ * Unknown kinds use the topic scene. `sections` must be non-empty.
  */
 export function buildDiagram(
   sections: readonly Section[],
@@ -420,8 +564,8 @@ export function buildDiagram(
   const shapes: Shape[] = [...scene.backdrop()];
 
   if (scene === topicScene) {
-    // Spokes run from the hub at (50, 52) to every node, under the ring chords.
-    for (const p of nodes) shapes.push(line(50, 52, p.cx, p.cy, 'ink'));
+    // Spokes run from the hub to every node, under the ring chords.
+    for (const p of nodes) shapes.push(line(HUB.x, HUB.y, p.cx, p.cy, 'ink'));
   }
   for (const [a, b] of scene.edges) {
     if (a < k && b < k) shapes.push(...scene.links(nodes[a], nodes[b]));

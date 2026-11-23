@@ -101,6 +101,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   const [readMeMinimized, setReadMeMinimized] = useState(false);
   /** Section whose hotspot is highlighted after "Show in Diagram". Cleared by any other navigation. */
   const [diagramFocus, setDiagramFocus] = useState<string | null>(null);
+  /** Bumped on every disc seek (open, burn, mount, navigation): flashes the taskbar's Drive D: LED. */
+  const [seekPulse, setSeekPulse] = useState(0);
+  const seek = () => setSeekPulse((n) => n + 1);
   const { nav, history } = shell;
 
   const openReadMe = () => {
@@ -254,6 +257,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   };
 
   const openDisc = (discId: string) => {
+    seek();
     setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
@@ -332,6 +336,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   };
   /** Visits a view and records it in the history. */
   const visit = (view: View | null) => {
+    seek();
     setDiagramFocus(null);
     setNotFound(null);
     setShell((s) => {
@@ -340,6 +345,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     });
   };
   const move = (step: (h: History) => History) => {
+    seek();
     setDiagramFocus(null);
     setNotFound(null);
     setShell((s) => {
@@ -363,6 +369,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
       );
       return;
     }
+    seek();
     setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
@@ -384,6 +391,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     const target = discs.find((d) => d.disc_id === discId);
     if (!target || !target.sections.some((s) => s.section_id === sectionId)) return;
     const view: View = { kind: 'section', section_id: sectionId };
+    seek();
     setDiagramFocus(null);
     setNotFound(null);
     setMinimized(false);
@@ -657,6 +665,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
         readMeMinimized={readMeMinimized}
         onToggleReadMe={() => setReadMeMinimized((m) => !m)}
         driveActive={disc !== undefined}
+        activityKey={seekPulse}
         startActions={{
           onBurnNew: () => {
             setBurnSample(null);

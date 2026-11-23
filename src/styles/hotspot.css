@@ -64,6 +64,72 @@
   stroke-width: 2.5px;
 }
 
+/* Pin previewed from the Callout Key (or hovered/focused itself): bright gold, dashed crimson frame. */
+.hotspot-button--preview rect {
+  fill: var(--color-gold-light);
+  stroke: var(--color-crimson);
+  stroke-dasharray: 2 1;
+  stroke-width: 2px;
+}
+
+/* Numbered Callout Key: a sunken ivory plate under the diagram, one row per pin. */
+.callout-key {
+  margin-top: 6px;
+  padding: 4px 6px 6px;
+  background: var(--color-tooltip-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-bevel-edge);
+}
+
+.callout-key__caption {
+  margin-bottom: 3px;
+  font-weight: bold;
+}
+
+.callout-key__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.callout-key__item {
+  display: block;
+  width: 100%;
+  padding: 1px 3px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-align: left;
+  color: var(--color-bevel-edge);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.callout-key__item:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: -2px;
+}
+
+.callout-key__item[data-preview="true"] {
+  background: var(--color-title-bg);
+  color: var(--color-title-text);
+}
+
+.callout-key__num {
+  font-weight: bold;
+}
+
 /* Built-in diagram micro-animations (Shape.anim). Flat opacity steps, off for reduced motion. */
 @keyframes shape-blink {
   0%,

@@ -52,6 +52,27 @@ describe('Property 6: Diagram geometry, references, and colors', () => {
           for (const shape of d.shapes) {
             for (const [key, val] of Object.entries(shape)) {
               if (key === 'kind') continue;
+              if (key === 'anim') {
+                // Only the three micro-animations the viewer and the validator know.
+                expect(['blink', 'flicker', 'glint']).toContain(val);
+                continue;
+              }
+              if (key === 'points') {
+                // Polygon corners: at least three finite points, all inside the 0..100 space.
+                expect(Array.isArray(val)).toBe(true);
+                const pts = val as unknown[];
+                expect(pts.length).toBeGreaterThanOrEqual(3);
+                for (const p of pts) {
+                  expect(Array.isArray(p) && p.length === 2).toBe(true);
+                  for (const n of p as unknown[]) {
+                    expect(typeof n).toBe('number');
+                    expect(Number.isFinite(n)).toBe(true);
+                    expect(n as number).toBeGreaterThanOrEqual(0);
+                    expect(n as number).toBeLessThanOrEqual(100);
+                  }
+                }
+                continue;
+              }
               if (key === 'fill' || key === 'stroke') {
                 expect(paintOk(val)).toBe(true);
                 const ref = typeof val === 'string' ? VAR_REF.exec(val) : null;
