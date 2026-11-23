@@ -74,6 +74,9 @@ const T = {
   night: 'var(--color-night)',
   nightLight: 'var(--color-night-light)',
   moss: 'var(--color-forest-dark)',
+  dungeonBg: 'var(--color-dungeon-bg)',
+  plaster: 'var(--color-parchment-dark)',
+  plasterLight: 'var(--color-parchment-tint)',
   forest: 'var(--color-forest)',
   sky: 'var(--color-sky-deep)',
 };
@@ -91,23 +94,39 @@ const FLOOR = 155;
  * with `meet`, so on a pane wider or taller than the scene the bleed shows as more stone, never an
  * empty band, and nothing inside the frame is ever cropped.
  */
-const BLEED_X = 320;
+const BLEED_X = 400;
 const BLEED_Y = 64;
+/** Left edge and full width of the bleed, for anything that spans the whole painted area. */
+const LEFT = -BLEED_X;
+const SPAN = W + 2 * BLEED_X;
 const mod = (a: number, n: number) => ((a % n) + n) % n;
 
-/** Stone-block wall across the whole room. `every` sets how often a block is a lighter dressed stone. */
-function Wall({ every, damp = false }: { every: number; damp?: boolean }) {
-  const out: ReactElement[] = [];
-  for (let row = -BLEED_Y / 16; row < 10; row++) {
-    const y = row * 16;
-    out.push(<rect key={`h${row}`} x={-BLEED_X} y={y + 15} width={W + 2 * BLEED_X} height={1} fill={T.brick} />);
-    for (let x = -BLEED_X + (mod(row, 2) === 0 ? 0 : 16); x < W + BLEED_X; x += 32) {
-      out.push(<rect key={`v${row}-${x}`} x={x} y={y} width={1} height={15} fill={T.brick} />);
+/** What a stone wall is made of: its face, its mortar joints, and its occasional dressed blocks. */
+interface Stone {
+  face: string;
+  mortar: string;
+  dressed: string;
+}
+const GREY_STONE: Stone = { face: T.wall, mortar: T.brick, dressed: T.block };
+const SLATE_STONE: Stone = { face: T.dungeonBg, mortar: T.block, dressed: T.wall };
+const PALE_STONE: Stone = { face: T.brick, mortar: T.wall, dressed: T.arch };
+
+/**
+ * A stone-block wall from `top` to `bottom`, across the whole bleed. `every` sets how often a block is
+ * a dressed stone; `damp` adds moss and drips.
+ */
+function Wall({ stone, every, top = -BLEED_Y, bottom = FLOOR, damp = false }: { stone: Stone; every: number; top?: number; bottom?: number; damp?: boolean }) {
+  const out: ReactElement[] = [<rect key="face" x={LEFT} y={top} width={SPAN} height={bottom - top} fill={stone.face} />];
+  for (let row = 0, y = top; y < bottom; row++, y += 16) {
+    const h = Math.min(15, bottom - y);
+    if (y + 15 < bottom) out.push(<rect key={`h${row}`} x={LEFT} y={y + 15} width={SPAN} height={1} fill={stone.mortar} />);
+    for (let x = LEFT + (row % 2 === 0 ? 0 : 16); x < W + BLEED_X; x += 32) {
+      out.push(<rect key={`v${row}-${x}`} x={x} y={y} width={1} height={h} fill={stone.mortar} />);
       if (mod(row * 3 + x / 16, every) === 0) {
-        out.push(<rect key={`b${row}-${x}`} className="viewport__block" x={x + 1} y={y} width={31} height={15} fill={T.block} />);
+        out.push(<rect key={`b${row}-${x}`} className="viewport__block" x={x + 1} y={y} width={31} height={h} fill={stone.dressed} />);
       }
       // Damp stone: moss at the foot of some blocks, and a drip line.
-      if (damp && mod(row * 5 + x / 16, 7) === 0) {
+      if (damp && mod(row * 5 + x / 16, 7) === 0 && h === 15) {
         out.push(<rect key={`m${row}-${x}`} className="viewport__moss" x={x + 4} y={y + 12} width={12} height={3} fill={T.moss} />);
         out.push(<rect key={`d${row}-${x}`} x={x + 20} y={y + 2} width={1} height={10} fill={T.sky} />);
       }
@@ -116,20 +135,53 @@ function Wall({ every, damp = false }: { every: number; damp?: boolean }) {
   return <g className="viewport__wall">{out}</g>;
 }
 
-function Floor() {
-  const tiles: ReactElement[] = [];
-  for (let i = -BLEED_X / 32; i < (W + BLEED_X) / 32; i++) {
-    tiles.push(<rect key={`t${i}`} x={i * 32 + mod(i, 2) * 6} y={FLOOR + 22} width={1} height={H + BLEED_Y - FLOOR - 22} fill={T.floorDark} />);
+type FloorKind = 'flags' | 'slate' | 'cobbles' | 'boards';
+
+/** The floor, from the floor line down through the bleed, in one of four materials. */
+function Floor({ kind }: { kind: FloorKind }) {
+  const bottom = H + BLEED_Y;
+  const face = kind === 'slate' ? T.block : kind === 'cobbles' ? T.arch : kind === 'boards' ? T.doorDark : T.floor;
+  const line = kind === 'slate' ? T.dungeonBg : kind === 'cobbles' ? T.brick : kind === 'boards' ? T.door : T.floorDark;
+  const marks: ReactElement[] = [];
+  if (kind === 'cobbles') {
+    // Rounded setts in staggered rows.
+    for (let row = 0, y = FLOOR + 6; y < bottom; row++, y += 9) {
+      for (let x = LEFT + (row % 2) * 7; x < W + BLEED_X; x += 14) {
+        marks.push(<rect key={`c${row}-${x}`} x={x + 1} y={y} width={11} height={6} fill={line} />);
+        marks.push(<rect key={`ch${row}-${x}`} x={x + 3} y={y + 1} width={5} height={1} fill={T.floor} />);
+      }
+    }
+  } else if (kind === 'boards') {
+    // Long oak boards running towards the door, with staggered butt joints.
+    for (let y = FLOOR + 8; y < bottom; y += 8) marks.push(<rect key={`bl${y}`} x={LEFT} y={y} width={SPAN} height={1} fill={line} />);
+    for (let row = 0, y = FLOOR + 3; y < bottom; row++, y += 8) {
+      for (let x = LEFT + mod(row * 37, 96); x < W + BLEED_X; x += 96) marks.push(<rect key={`bj${row}-${x}`} x={x} y={y} width={1} height={5} fill={line} />);
+    }
+  } else {
+    for (let i = LEFT / 32; i < (W + BLEED_X) / 32; i++) {
+      marks.push(<rect key={`t${i}`} x={i * 32 + mod(i, 2) * 6} y={FLOOR + 22} width={1} height={bottom - FLOOR - 22} fill={line} />);
+    }
+    marks.push(<rect key="r1" x={LEFT} y={FLOOR + 22} width={SPAN} height={1} fill={line} />);
+    marks.push(<rect key="r2" x={LEFT} y={H + 20} width={SPAN} height={1} fill={line} />);
   }
   return (
-    <g className="viewport__floor">
-      <rect x={-BLEED_X} y={FLOOR} width={W + 2 * BLEED_X} height={H + BLEED_Y - FLOOR} fill={T.floor} />
-      <rect x={-BLEED_X} y={FLOOR} width={W + 2 * BLEED_X} height={3} fill={T.floorDark} />
-      <rect x={-BLEED_X} y={FLOOR + 22} width={W + 2 * BLEED_X} height={1} fill={T.floorDark} />
-      <rect x={-BLEED_X} y={H + 20} width={W + 2 * BLEED_X} height={1} fill={T.floorDark} />
-      {tiles}
+    <g className={`viewport__floor viewport__floor--${kind}`}>
+      <rect x={LEFT} y={FLOOR} width={SPAN} height={bottom - FLOOR} fill={face} />
+      <rect x={LEFT} y={FLOOR} width={SPAN} height={3} fill={line} />
+      {marks}
     </g>
   );
+}
+
+/** Deterministic star field for the open-sky scenes. */
+function stars(count: number, x0: number, x1: number, y0: number, y1: number, cls: string): ReactElement[] {
+  const out: ReactElement[] = [];
+  for (let k = 0; k < count; k++) {
+    const x = x0 + mod(k * 97 + 13, x1 - x0);
+    const y = y0 + mod(k * 53 + 7, y1 - y0);
+    out.push(<rect key={`${cls}${k}`} className={cls} x={x} y={y} width={2} height={2} fill={k % 3 === 0 ? T.parchment : T.goldLight} />);
+  }
+  return out;
 }
 
 /** A wall torch: an oak haft, an iron cup, a flat glow, and a two-tone flame that flickers in CSS steps. */
@@ -225,13 +277,53 @@ function SideDoor({ cx }: { cx: number }) {
   );
 }
 
+/** A heraldic shield on the plaster, for the hall's side walls. */
+function Shield({ cx, field, charge }: { cx: number; field: string; charge: string }) {
+  return (
+    <g className="viewport__shield">
+      <polygon points={pts([[cx - 14, 40], [cx + 14, 40], [cx + 14, 60], [cx, 76], [cx - 14, 60]])} fill={T.goldDark} />
+      <polygon points={pts([[cx - 11, 43], [cx + 11, 43], [cx + 11, 59], [cx, 72], [cx - 11, 59]])} fill={field} />
+      <rect x={cx - 2} y={45} width={4} height={24} fill={charge} />
+      <rect x={cx - 9} y={53} width={18} height={4} fill={charge} />
+    </g>
+  );
+}
+
+/** Warm plaster above a stone wainscot, crossed by half-timber posts, with a wooden chair rail. */
+function HallWalls() {
+  const posts: ReactElement[] = [];
+  for (let x = LEFT + 20; x < W + BLEED_X; x += 120) {
+    posts.push(<rect key={`p${x}`} x={x} y={12} width={6} height={86} fill={T.doorDark} />);
+  }
+  const cracks: ReactElement[] = [];
+  for (let k = 0; k < 18; k++) {
+    const x = LEFT + mod(k * 131 + 40, SPAN);
+    const y = 24 + mod(k * 29, 60);
+    cracks.push(<rect key={`k${k}`} x={x} y={y} width={8} height={1} fill={T.plasterLight} />);
+  }
+  return (
+    <g className="viewport__plaster">
+      <rect x={LEFT} y={-BLEED_Y} width={SPAN} height={BLEED_Y + 100} fill={T.plaster} />
+      {cracks}
+      {posts}
+      <Wall stone={GREY_STONE} every={5} top={100} />
+      <rect className="viewport__chair-rail" x={LEFT} y={96} width={SPAN} height={4} fill={T.door} />
+      <rect x={LEFT} y={99} width={SPAN} height={1} fill={T.doorDark} />
+    </g>
+  );
+}
+
 function HallScene() {
   const fringe: ReactElement[] = [];
   for (let x = 122; x <= 316; x += 8) fringe.push(<rect key={`f${x}`} x={x} y={198} width={2} height={2} fill={T.parchment} />);
   return (
     <>
-      <Wall every={5} />
-      <Floor />
+      <HallWalls />
+      <Floor kind="flags" />
+      <Shield cx={-90} field={T.crimson} charge={T.gold} />
+      <Shield cx={-250} field={T.navy} charge={T.gold} />
+      <Shield cx={530} field={T.navy} charge={T.gold} />
+      <Shield cx={690} field={T.crimson} charge={T.gold} />
       <g className="viewport__rug">
         <polygon points={pts([[150, 165], [290, 165], [320, 198], [120, 198]])} fill={T.crimson} />
         <polygon points={pts([[156, 168], [284, 168], [310, 195], [130, 195]])} fill={T.goldDark} />
@@ -270,7 +362,7 @@ function HallScene() {
 /** The hall's ceiling sits in front of the central arch. */
 function HallFront() {
   const joists: ReactElement[] = [];
-  for (let x = 6 - 28 * 12; x < W + BLEED_X; x += 28) {
+  for (let x = 6 - 28 * 15; x < W + BLEED_X; x += 28) {
     joists.push(<rect key={`j${x}`} x={x} y={12} width={10} height={6} fill={T.door} />);
     joists.push(<rect key={`jd${x}`} x={x} y={16} width={10} height={2} fill={T.doorDark} />);
   }
@@ -334,10 +426,28 @@ function GateScene() {
   }
   const planks: ReactElement[] = [];
   for (let i = 1; i < 8; i++) planks.push(<line key={i} x1={160 + i * 15} y1={160} x2={140 + i * 20} y2={H} stroke={T.doorDark} />);
+  // Crenellated curtain wall against the open night: merlons every 32 units along the wall top.
+  const merlons: ReactElement[] = [];
+  for (let x = LEFT; x < W + BLEED_X; x += 32) merlons.push(<rect key={`m${x}`} x={x} y={26} width={18} height={14} fill={T.wall} />);
+  // The gatehouse rises above the curtain wall, with its own merlons.
+  const towerMerlons: ReactElement[] = [];
+  for (let x = 132; x < 308; x += 26) towerMerlons.push(<rect key={`t${x}`} x={x} y={-14} width={16} height={14} fill={T.wall} />);
   return (
     <>
-      <Wall every={4} />
-      <Floor />
+      <g className="viewport__sky">
+        <rect x={LEFT} y={-BLEED_Y} width={SPAN} height={BLEED_Y + 40} fill={T.sky} />
+        {stars(34, LEFT, W + BLEED_X, -BLEED_Y + 4, 24, 'viewport__sky-star')}
+      </g>
+      <g className="viewport__battlements">
+        {merlons}
+        <rect x={130} y={0} width={180} height={40} fill={T.wall} />
+        {towerMerlons}
+      </g>
+      <Wall stone={GREY_STONE} every={4} top={40} />
+      <rect x={LEFT} y={40} width={SPAN} height={2} fill={T.brick} />
+      <Floor kind="cobbles" />
+      <Portcullis x={-130} w={80} raisedTo={FLOOR - 20} />
+      <Portcullis x={490} w={80} raisedTo={100} />
       <g className="viewport__archway">
         <circle cx={220} cy={75} r={76} fill={T.brick} />
         <rect x={144} y={75} width={152} height={FLOOR - 75} fill={T.brick} />
@@ -388,16 +498,29 @@ function PassageScene() {
   for (let y = 168; y <= 190; y += 8) grate.push(<rect key={`gy${y}`} x={182} y={y} width={78} height={2} fill={T.iron} />);
   const windowBars: ReactElement[] = [];
   for (let x = 46; x <= 94; x += 8) windowBars.push(<rect key={`w${x}`} x={x} y={36} width={2} height={28} fill={T.iron} />);
+  const wingBars: ReactElement[] = [];
+  for (const x0 of [-200, 580]) {
+    wingBars.push(<rect key={`wf${x0}`} x={x0} y={32} width={62} height={34} fill={T.block} />);
+    wingBars.push(<rect key={`wv${x0}`} x={x0 + 4} y={36} width={54} height={28} fill={T.void} />);
+    for (let x = x0 + 6; x <= x0 + 54; x += 8) wingBars.push(<rect key={`wb${x0}-${x}`} x={x} y={36} width={2} height={28} fill={T.iron} />);
+  }
   return (
     <>
-      <Wall every={3} damp />
-      {/* Vault ribs: concentric arcs whose lower halves the floor hides. */}
+      {/* Dark slate dungeon stone, damp with moss and drips. */}
+      <Wall stone={SLATE_STONE} every={3} damp />
+      {/* Vault ribs: concentric arcs whose lower halves the floor hides; the outer ones reach the bleed. */}
       <g className="viewport__vault">
         {[205, 172, 140, 108].map((r) => (
           <circle key={r} cx={220} cy={FLOOR} r={r} fill="none" stroke={T.arch} strokeWidth={4} />
         ))}
+        {[250, 300, 360, 430].map((r) => (
+          <circle key={r} className="viewport__rib" cx={220} cy={FLOOR} r={r} fill="none" stroke={T.wall} strokeWidth={5} />
+        ))}
       </g>
-      <Floor />
+      <Floor kind="slate" />
+      <g className="viewport__grating">{wingBars}</g>
+      <WallChain x={-60} />
+      <WallChain x={500} />
       <g className="viewport__perspective">
         <line x1={155} y1={FLOOR} x2={0} y2={H} stroke={T.floorDark} />
         <line x1={285} y1={FLOOR} x2={W} y2={H} stroke={T.floorDark} />
@@ -456,13 +579,39 @@ function Shelf({ x, w, cubbyRows = 0 }: { x: number; w: number; cubbyRows?: numb
   return <g className="viewport__shelf">{out}</g>;
 }
 
+/** Warm oak panelling: dark stiles and rails framing lighter raised panels, under a gold cornice. */
+function WoodPanels() {
+  const out: ReactElement[] = [<rect key="face" x={LEFT} y={-BLEED_Y} width={SPAN} height={BLEED_Y + FLOOR} fill={T.door} />];
+  const rails = [-BLEED_Y, 8, 70, 120, FLOOR - 6];
+  for (let x = LEFT; x < W + BLEED_X; x += 48) {
+    out.push(<rect key={`s${x}`} x={x} y={-BLEED_Y} width={5} height={BLEED_Y + FLOOR} fill={T.doorDark} />);
+    for (let r = 0; r < rails.length - 1; r++) {
+      const y0 = rails[r]! + 6;
+      const y1 = rails[r + 1]! - 2;
+      if (y1 - y0 > 10) out.push(<rect key={`p${x}-${r}`} className="viewport__panel" x={x + 10} y={y0} width={33} height={y1 - y0} fill="none" stroke={T.doorLight} />);
+    }
+  }
+  for (const y of rails) out.push(<rect key={`r${y}`} x={LEFT} y={y} width={SPAN} height={4} fill={T.doorDark} />);
+  out.push(<rect key="cornice" x={LEFT} y={2} width={SPAN} height={3} fill={T.goldDark} />);
+  return <g className="viewport__panelling">{out}</g>;
+}
+
 function LibraryScene() {
   return (
     <>
-      <Wall every={6} />
-      <Floor />
+      <WoodPanels />
+      <Floor kind="boards" />
+      <g className="viewport__runner">
+        <polygon points={pts([[170, FLOOR], [270, FLOOR], [330, H + BLEED_Y], [110, H + BLEED_Y]])} fill={T.crimson} />
+        <line x1={176} y1={FLOOR} x2={122} y2={H + BLEED_Y} stroke={T.gold} strokeWidth={2} />
+        <line x1={264} y1={FLOOR} x2={318} y2={H + BLEED_Y} stroke={T.gold} strokeWidth={2} />
+      </g>
       <Shelf x={10} w={118} />
       <Shelf x={312} w={118} cubbyRows={2} />
+      <Shelf x={-130} w={118} />
+      <Shelf x={-270} w={118} cubbyRows={1} />
+      <Shelf x={452} w={118} />
+      <Shelf x={592} w={118} cubbyRows={1} />
       <g className="viewport__lectern">
         <rect x={346} y={150} width={8} height={42} fill={T.doorDark} />
         <rect x={332} y={190} width={36} height={6} fill={T.doorDark} />
@@ -477,7 +626,8 @@ function LibraryScene() {
 
 // ---- tower: a gothic lancet window onto a starry night, spiral-stair trim, and a banner ----
 
-const LANCET: readonly Pt[] = [[50, 140], [50, 62], [53, 47], [62, 34], [80, 22], [98, 34], [107, 47], [110, 62], [110, 140]];
+/** A tall pointed gothic window, from the sill nearly up to the vault. */
+const LANCET: readonly Pt[] = [[50, 140], [50, 48], [53, 32], [62, 19], [80, 7], [98, 19], [107, 32], [110, 48], [110, 140]];
 const STARS: readonly Pt[] = [[60, 70], [72, 48], [88, 40], [66, 100], [100, 92], [58, 124], [96, 118], [76, 82]];
 
 function TowerScene() {
@@ -492,8 +642,16 @@ function TowerScene() {
   }
   return (
     <>
-      <Wall every={5} />
-      <Floor />
+      {/* Pale tower stone, lighter than the other rooms, so the night window stands out. */}
+      <Wall stone={PALE_STONE} every={4} />
+      <Floor kind="flags" />
+      {/* A second, plain lancet further along the tower wall. */}
+      <g className="viewport__lancet viewport__lancet--far" transform="translate(-230 0)">
+        <polygon points={pts(frame)} fill={T.arch} />
+        <polygon points={pts(LANCET)} fill={T.night} />
+        {stars(7, 54, 106, 40, 128, 'viewport__far-star')}
+        <rect x={79} y={14} width={2} height={126} fill={T.arch} />
+      </g>
       <g className="viewport__lancet">
         <polygon points={pts(frame)} fill={T.arch} />
         <polygon points={pts(LANCET)} fill={T.night} />
@@ -502,7 +660,7 @@ function TowerScene() {
         ))}
         <circle className="viewport__moon" cx={92} cy={60} r={10} fill={T.goldLight} />
         <circle cx={97} cy={56} r={9} fill={T.night} />
-        <rect x={79} y={26} width={2} height={114} fill={T.arch} />
+        <rect x={79} y={12} width={2} height={128} fill={T.arch} />
         <rect x={50} y={96} width={60} height={2} fill={T.arch} />
         <rect x={42} y={140} width={76} height={6} fill={T.arch} />
         <rect x={50} y={130} width={60} height={10} fill={T.nightLight} />

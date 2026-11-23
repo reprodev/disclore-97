@@ -23,9 +23,8 @@
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  aspect-ratio: 440 / 200;
-  min-height: 200px;
-  max-height: 300px;
+  /* A thin, wide panorama: the console below keeps room for a whole question without scrolling. */
+  height: clamp(130px, 26vh, 175px);
   overflow: hidden;
   background: var(--color-stone-dark);
   border: var(--bevel-w) solid;
@@ -173,11 +172,13 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2px 10px;
+  gap: 1px 8px;
+  max-width: 100%;
   margin: 0;
-  padding: 2px 4px;
+  padding: 1px 2px;
   list-style: none;
-  font-size: 11px;
+  font-size: 10px;
+  white-space: nowrap;
   color: var(--color-console-text);
 }
 
@@ -220,8 +221,11 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 4px;
+  justify-content: center;
+  gap: 3px;
+  min-height: 0;
+  padding: 6px 4px;
+  overflow: hidden;
   background: var(--color-paper);
   color: var(--color-ink);
   border: 2px solid var(--color-gold-dark);
@@ -372,9 +376,9 @@
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   margin: 3px;
-  padding: 6px 8px;
+  padding: 5px 8px;
   border: 1px solid var(--color-crimson);
   outline: 1px solid var(--color-gold);
   outline-offset: 1px;
@@ -514,10 +518,43 @@
   outline: 1px dotted var(--color-bevel-edge);
 }
 
+/* During a question: the room folds into one header row above the Q card. */
+.keepmaze__qheader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-gold);
+}
+
+.keepmaze__qheader-line {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.keepmaze__qheader-line .keepmaze__room {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.keepmaze__qheader-sep {
+  color: var(--color-gold-dark);
+}
+
+.keepmaze__qheader .keepmaze__restart {
+  margin-left: 0;
+}
+
 /* During a question: the illuminated manuscript card in a stepped navy, gold, and burgundy frame. */
 .keepmaze__question--manuscript {
   position: relative;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: var(--color-parchment);
   color: var(--color-ink);
   border: 3px solid var(--color-title-bg);
@@ -547,13 +584,13 @@
   float: left;
   position: relative;
   box-sizing: border-box;
-  width: 40px;
-  height: 44px;
-  margin: 2px 8px 4px 2px;
+  width: 34px;
+  height: 38px;
+  margin: 1px 8px 2px 1px;
   font-family: var(--font-display);
-  font-size: 36px;
+  font-size: 30px;
   font-weight: bold;
-  line-height: 40px;
+  line-height: 34px;
   text-align: center;
   color: var(--color-crimson);
   background: var(--color-gold-light);
@@ -564,7 +601,7 @@
 }
 
 .keepmaze__question--manuscript .keepmaze__prompt {
-  margin: 2px 0 6px;
+  margin: 2px 0 4px;
   font-family: var(--font-serif);
   font-size: 13px;
   font-weight: bold;
@@ -575,13 +612,22 @@
 .keepmaze__question--manuscript .keepmaze__options {
   clear: both;
   align-items: stretch;
+  gap: 3px;
+  margin-top: 4px;
 }
 
+/* Slightly tighter than a standard bevel button, so four strips and Peek Hint fit on screen. */
 .keepmaze__option {
   display: flex;
   align-items: center;
   width: 100%;
+  padding: 2px 8px;
   text-align: left;
+}
+
+.keepmaze__question--manuscript .keepmaze__peek-button {
+  margin-top: 5px;
+  padding: 2px 10px;
 }
 
 .keepmaze__letter {

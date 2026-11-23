@@ -76,14 +76,14 @@ The small light beside Drive D: in the taskbar is gold while a disc is in the dr
 KEEPMAZE
 KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Welcome card shows your goal, and under the mini-map you can see how many rooms you have explored, with a legend that explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached.
 
-KeepMaze fills its whole window, like a 1990s quiz game. The room you are in is drawn as a wide picture across the top. Below it, on the left, are the mini-map, your torches, and your score. On the right is one ivory page that changes as you play: a Welcome page with the Start button, then the room you are in with its exits, and then the question when you try a door.
+KeepMaze fills its whole window, like a 1990s quiz game, and on a 1280 by 720 screen everything fits without scrolling. The room you are in is drawn as a wide, thin picture across the top. Below it, on the left, are the mini-map, your torches, and your score. On the right is one ivory page that changes as you play: a Welcome page with the Start button, then the room you are in with its exits, and then the question when you try a door. While a question is open, the room shrinks to one line at the top of the page (its name, your moves, your wrong answers, and Restart), so the question and all four answers fit. The room and its exits come back once you have answered.
 
-Rooms come in five kinds, so the castle changes as you walk through it:
-- A gate, with a great stone arch, iron portcullises, and drawbridge chains.
-- A passage, with a vaulted stone ceiling, damp mossy walls, iron gratings, and chains on the walls.
-- A library, with tall shelves of coloured books, scroll holes, and a reading stand.
-- A tower, with a pointed window onto a starry night and a crescent moon, a stone stair, and a banner.
-- A hall, with timber beams, a woven rug, a framed portrait, a tapestry, and two side doors.
+Rooms come in five kinds, each with its own walls and floor, so the castle changes as you walk through it:
+- A gate, open to the night sky with stars above the battlements, with a cobbled courtyard, a great stone arch, iron portcullises, and drawbridge chains.
+- A passage, with dark slate walls damp with moss, a slate floor, a vaulted stone ceiling, iron gratings, and chains on the walls.
+- A library, with warm oak panelling, a wooden floor with a red carpet, tall shelves of coloured books, scroll holes, and a reading stand.
+- A tower, with pale stone walls, a tall pointed window onto a starry night and a crescent moon, a stone stair, and a banner.
+- A hall, with warm plaster walls above stone, timber beams, a woven rug, a framed portrait, a tapestry, shields, and two side doors.
 Every room has the main door in the middle and two flickering torches. The padlock on the door shows whether it is locked. A room's kind comes from its name, so the same room always looks the same.
 
 When a door asks its question, the question appears on a parchment page with a gold, burgundy, and navy frame and a large decorated Q in the corner, like an illuminated manuscript. Each answer is a strip that starts with its letter, A. to D. Click the strip to give that answer.

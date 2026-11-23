@@ -322,12 +322,35 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
     </div>
   );
 
+  /**
+   * During a question the room card folds into one row, so the Q card and all four answers fit on
+   * screen: the room name, Moves, Incorrect, and Restart. The exits come back once the door is decided.
+   */
+  const questionHeader = (
+    <div className="keepmaze__qheader">
+      <p className="keepmaze__qheader-line">
+        <span className="keepmaze__room">{room?.name ?? state.roomId}</span>
+        <span className="keepmaze__qheader-sep" aria-hidden="true">
+          {'•'}
+        </span>
+        <span>Moves: {state.moves}</span>
+        <span className="keepmaze__qheader-sep" aria-hidden="true">
+          {'•'}
+        </span>
+        <span>Incorrect: {state.incorrect}</span>
+      </p>
+      <BevelButton className="keepmaze__restart" onClick={restart}>
+        Restart
+      </BevelButton>
+    </div>
+  );
+
   return (
     <div className="keepmaze">
       {stage}
       {consoleStrip(
         <>
-          {roomCard}
+          {pending ? questionHeader : roomCard}
           {!pending && !state.lastWrong && (
             <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
           )}

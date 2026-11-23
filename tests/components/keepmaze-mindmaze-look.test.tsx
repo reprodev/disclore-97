@@ -306,11 +306,10 @@ describe('hero stage and console layout', () => {
     expect(within(hud as HTMLElement).getByText('Rooms explored: 1 of 3')).toBeTruthy();
   });
 
-  it('sizes the stage as a wide panorama and lets the console fill the rest of the pane', () => {
+  it('sizes the stage as a thin, wide panorama and lets the console fill the rest of the pane', () => {
     const stage = rule('.keepmaze__stage');
-    expect(stage).toContain('aspect-ratio: 440 / 200');
-    expect(stage).toContain('min-height: 200px');
-    expect(stage).toContain('max-height: 300px');
+    expect(stage).toContain('height: clamp(130px, 26vh, 175px)');
+    expect(stage).not.toContain('aspect-ratio');
     expect(rule('.keepmaze')).toContain('min-height: 100%');
     expect(rule('.keepmaze')).toContain('background: var(--color-dungeon-bg)');
     expect(rule('.keepmaze__console')).toContain('flex: 1 1 auto');
@@ -343,15 +342,58 @@ describe('hero stage and console layout', () => {
     expect(within(card).getByRole('button', { name: 'Great Hall' })).toBeTruthy();
   });
 
-  it('shows the illuminated Q card in the same panel during a question, with the exits kept as context', async () => {
+  it('folds the room into one header row during a question, so the Q card and every answer fit', async () => {
     const { user, container } = await setup();
     await openDoor(user);
     const p = panel(container);
     expect(p.getAttribute('data-mode')).toBe('question');
     const body = p.querySelector('.keepmaze__panel-body')!;
+    expect(Array.from(body.children).map((el) => el.className.split(' ')[0])).toEqual(['keepmaze__qheader', 'keepmaze__question']);
+    const header = body.querySelector('.keepmaze__qheader') as HTMLElement;
+    const line = header.querySelector('.keepmaze__qheader-line')!;
+    expect(line.textContent).toBe('Gate•Moves: 0•Incorrect: 0');
+    for (const sep of line.querySelectorAll('.keepmaze__qheader-sep')) expect(sep.getAttribute('aria-hidden')).toBe('true');
+    expect(within(header).getByText('Gate')).toBeTruthy();
+    expect(within(header).getByText('Moves: 0')).toBeTruthy();
+    expect(within(header).getByText('Incorrect: 0')).toBeTruthy();
+    expect(within(header).getByRole('button', { name: 'Restart' })).toBeTruthy();
+    // No room paragraph and no exits while the door is being decided.
+    expect(body.querySelector('.keepmaze__room-card')).toBeNull();
+    expect(screen.queryByText('A cold gate.')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Great Hall' })).toBeNull();
     expect(body.querySelector('.keepmaze__question--manuscript .keepmaze__dropcap')).toBeTruthy();
-    const exit = within(body.querySelector('.keepmaze__room-card') as HTMLElement).getByRole('button', { name: 'Great Hall' });
-    expect((exit as HTMLButtonElement).disabled).toBe(true);
+    expect(within(body as HTMLElement).getAllByRole('button').map((b) => b.textContent)).toEqual([
+      'Restart',
+      ...['A.', 'B.', 'C.', 'D.'].map((l, i) => `${l}Q${questionNumber()} ${['wrong A', 'right', 'wrong B', 'wrong C'][i]}`),
+      'Peek Hint',
+    ]);
+  });
+
+  it('brings the full room card and exits back once the door is decided', async () => {
+    const { user, container } = await setup();
+    await openDoor(user);
+    await user.click(screen.getByRole('button', { name: `Q${questionNumber()} wrong A` }));
+    const body = panel(container).querySelector('.keepmaze__panel-body')!;
+    expect(body.querySelector('.keepmaze__qheader')).toBeNull();
+    expect(within(body.querySelector('.keepmaze__room-card') as HTMLElement).getByText('A cold gate.')).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Great Hall' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('tightens the strips and keeps the legend and plaque inside the console', () => {
+    expect(rule('.keepmaze__option')).toContain('padding: 2px 8px');
+    expect(rule('.keepmaze__question--manuscript .keepmaze__options')).toContain('gap: 3px');
+    expect(rule('.keepmaze__question--manuscript .keepmaze__peek-button')).toContain('padding: 2px 10px');
+    const header = rule('.keepmaze__qheader-line');
+    expect(header).toContain('white-space: nowrap');
+    expect(header).toContain('overflow: hidden');
+    const legend = rule('.minimap-legend');
+    expect(legend).toContain('flex-wrap: wrap');
+    expect(legend).toContain('max-width: 100%');
+    expect(legend).toContain('font-size: 10px');
+    const plaque = rule('.keepmaze__trophy');
+    expect(plaque).toContain('overflow: hidden');
+    expect(plaque).toContain('min-height: 0');
+    expect(rule('.keepmaze__map')).toContain('overflow: hidden');
   });
 
   it('uses one ivory manuscript look for every panel: navy caption bar, gold and burgundy trim', () => {
@@ -464,6 +506,55 @@ describe('room scene variants', () => {
     cleanup();
     const tower = svgOf('tower');
     expect(tower.querySelector('.viewport__lancet polygon[fill="var(--color-night)"]')).toBeTruthy();
+  });
+
+  it('gives each variant its own wall, ceiling or sky, and floor material', () => {
+    const fillOf = (el: Element | null) => el?.getAttribute('fill');
+    // Gate: open night sky with stars above crenellated battlements, over a cobbled courtyard.
+    const gate = svgOf('gate');
+    expect(fillOf(gate.querySelector('.viewport__sky rect'))).toBe('var(--color-sky-deep)');
+    expect(gate.querySelectorAll('.viewport__sky-star').length).toBeGreaterThanOrEqual(20);
+    expect(gate.querySelectorAll('.viewport__battlements rect').length).toBeGreaterThanOrEqual(20);
+    expect(gate.querySelector('.viewport__floor--cobbles')).toBeTruthy();
+    cleanup();
+    // Passage: dark slate dungeon stone and a slate floor.
+    const passage = svgOf('passage');
+    expect(fillOf(passage.querySelector('.viewport__wall rect'))).toBe('var(--color-dungeon-bg)');
+    expect(passage.querySelectorAll('.viewport__wall rect[fill="var(--color-dungeon-stone)"]').length).toBeGreaterThan(20);
+    expect(passage.querySelector('.viewport__floor--slate')).toBeTruthy();
+    cleanup();
+    // Library: oak panelling, an oak board floor, and a crimson carpet runner.
+    const library = svgOf('library');
+    expect(fillOf(library.querySelector('.viewport__panelling rect'))).toBe('var(--color-wood)');
+    expect(library.querySelectorAll('.viewport__panelling rect[fill="var(--color-wood-dark)"]').length).toBeGreaterThan(10);
+    expect(library.querySelectorAll('.viewport__panel').length).toBeGreaterThan(20);
+    expect(fillOf(library.querySelector('.viewport__runner polygon'))).toBe('var(--color-crimson)');
+    expect(library.querySelector('.viewport__floor--boards')).toBeTruthy();
+    expect(library.querySelector('.viewport__wall')).toBeNull();
+    cleanup();
+    // Tower: pale stone around a tall lancet onto the night sky.
+    const tower = svgOf('tower');
+    expect(fillOf(tower.querySelector('.viewport__wall rect'))).toBe('var(--color-stone)');
+    const lancet = tower.querySelector('.viewport__lancet:not(.viewport__lancet--far) polygon[fill="var(--color-night)"]')!;
+    const ys = lancet.getAttribute('points')!.split(' ').map((p) => Number(p.split(',')[1]));
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThanOrEqual(130);
+    cleanup();
+    // Hall: warm plaster above a stone wainscot with a chair rail, under the rafters.
+    const hall = svgOf('hall');
+    expect(fillOf(hall.querySelector('.viewport__plaster rect'))).toBe('var(--color-parchment-dark)');
+    expect(hall.querySelector('.viewport__chair-rail')).toBeTruthy();
+    expect(hall.querySelector('.viewport__plaster .viewport__wall')).toBeTruthy();
+    expect(hall.querySelector('.viewport__floor--flags')).toBeTruthy();
+    cleanup();
+
+    // The first, back-most surface of every scene is a different material.
+    const backdrops = ROOM_VARIANTS.map((v) => {
+      const svg = svgOf(v);
+      const first = fillOf(svg.querySelector('.viewport__scene rect'));
+      cleanup();
+      return first;
+    });
+    expect(new Set(backdrops).size).toBe(5);
   });
 
   it('keeps the central door, its padlock cue, and two torches in every variant, in tokens only', () => {
