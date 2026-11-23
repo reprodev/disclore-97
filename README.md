@@ -1,17 +1,40 @@
+<p align="center">
+  <img src="docs/disclore-97-logo.svg" alt="DiscLore '97 — 1997 Multimedia Reference &amp; Study Disc" width="760" />
+</p>
+
+<p align="center">
+  <a href="https://disclore-97.reprodev.com"><img src="https://img.shields.io/badge/Live_Demo-disclore--97.reprodev.com-0B2E59?style=flat-square" alt="Live Demo" /></a>
+  <a href="#how-it-was-built"><img src="https://img.shields.io/badge/Built_with-Kiro_Specs_%26_Hooks-7A1C24?style=flat-square" alt="Built with Kiro" /></a>
+  <a href="#getting-started"><img src="https://img.shields.io/badge/Runtime-React_%2B_TypeScript-000080?style=flat-square" alt="React + TypeScript" /></a>
+  <a href="#deploying-to-cloudflare-pages"><img src="https://img.shields.io/badge/Hosted_on-Cloudflare_Pages-C89B3C?style=flat-square&amp;labelColor=1F1B16" alt="Cloudflare Pages" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-808080?style=flat-square" alt="MIT License" /></a>
+</p>
+
+<p align="center">
+  <a href="#try-it-in-30-seconds">Try It in 30 Seconds</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#how-it-was-built">How It Was Built (Kiro)</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#getting-started">Run Locally</a>
+</p>
+
 # DiscLore '97
 
-**Live demo: [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com)** · Source: [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97)
+> **Live demo:** [https://disclore-97.reprodev.com](https://disclore-97.reprodev.com) · **Source:** [github.com/reprodev/disclore-97](https://github.com/reprodev/disclore-97)
 
-Studying a subject on the web usually means a dozen tabs, sidebars, pop-ups, and autoplaying video, and nothing you can take with you when you close them. DiscLore '97 turns a subject into a focused, self-contained study disc in the style of a 1997 Encarta CD-ROM. The source can be a Wikipedia topic, a GitHub repository, a web page, or your own Markdown. A disc holds one subject: short articles with Quick Facts and a chronology, an illustrated diagram, flashcards, a guided tour that can read itself aloud, and KeepMaze, a trivia dungeon that quizzes you on what you just read. Discs are compiled in the browser, checked by the same validator as the built-in ones, kept on your machine, and portable as a single `.json` disc image.
+Studying a subject on the web usually means a dozen tabs, sidebars, pop-ups, and autoplaying video, and nothing you can take with you when you close them. **DiscLore '97** turns a subject into a focused, self-contained study disc in the style of a 1997 Encarta CD-ROM. The source can be a Wikipedia topic, a GitHub repository, a web page, or your own Markdown. A disc holds one subject: short articles with Quick Facts and a chronology, an illustrated diagram, flashcards, a guided tour that can read itself aloud, and KeepMaze, a trivia dungeon that quizzes you on what you just read. Discs are compiled in the browser, checked by the same validator as the built-in ones, kept on your machine, and portable as a single `.json` disc image.
 
 ### Try It in 30 Seconds
 
 Use a desktop browser window of 1280 x 720 or larger. Sound starts after your first click, and the **Sound** button in the taskbar mutes everything.
 
-1. **Pinpointer → burn a Wikipedia topic.** On the Home window, type a subject that is not on the shelf, such as `Lighthouse`, into the Pinpointer. Pick the last row, **Burn CD-R for "Lighthouse" (Wikipedia)...**. The article is compiled into a disc and opens with its own diagram, trivia, and dungeon. Shortcut: [`?topic=Lighthouse`](https://disclore-97.reprodev.com/?topic=Lighthouse).
-2. **KeepMaze.** Press **KeepMaze** in the toolbar, then **Start**, and pick an exit. Each door asks an illuminated "Q" question with A to D answers, and the room changes as you move: a gate, a passage, a library, a tower, and a hall. Shortcut: [`?disc=castles&view=keepmaze`](https://disclore-97.reprodev.com/?disc=castles&view=keepmaze).
-3. **Take a Tour or Flashcards.** Press **Tour**, then **Play Show**, to have the disc narrated stop by stop. Or press **Flashcards** and flip cards with **Space**. Shortcuts: [`?disc=castles&view=tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour), [`?disc=halloween&view=flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards).
-4. **Switch Editions.** Use **Start > Edition Switcher** to move between **Classic '97**, **Haunted Edition**, and **Christmas Edition**. The colours, artwork, lettering, and chime all change.
+| Step | Action | Direct Jump |
+| --- | --- | --- |
+| **1. Burn a Wikipedia topic** | On Home, type `Lighthouse` into **Pinpointer** and pick **Burn CD-R for "Lighthouse" (Wikipedia)...** to compile a full disc with its own diagram, trivia, and dungeon. | [`?topic=Lighthouse`](https://disclore-97.reprodev.com/?topic=Lighthouse) |
+| **2. Play KeepMaze** | Press **KeepMaze** in the toolbar, click **Start**, and pick an exit. Answer illuminated **Q** questions (`A`–`D`) as rooms shift from gate to passage, library, tower, and hall. | [`?disc=castles&view=keepmaze`](https://disclore-97.reprodev.com/?disc=castles&view=keepmaze) |
+| **3. Tour or Flashcards** | Press **Tour → Play Show** for stop-by-stop narration, or **Flashcards** and flip cards with `Space`. | [`Tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour) · [`Flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards) |
+| **4. Switch Editions** | Open **Start > Edition Switcher** to switch between **Classic '97**, **Haunted Edition**, and **Christmas Edition**—colours, artwork, lettering, and chimes all change. | *Taskbar → Start* |
 
 The live site is Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions, with no keys or accounts. On a phone or a window under 768px wide, the desktop icons fold into a strip along the top, the Home columns and the disc sidebar stack, KeepMaze scrolls inside its pane, and the taskbar keeps **Start** and **Sound** on one row.
 
@@ -161,6 +184,18 @@ Correctness properties from the design are tested as property-based tests with [
 Run `npm test` for the current file and test counts. They change as the project grows, so they are not copied here.
 
 ## Architecture
+
+```mermaid
+flowchart LR
+  S["Source\n(Wikipedia · GitHub · Web · Markdown)"] --> A["adapters/\nRead & Extract"]
+  A --> C["model/compile/\nSeeded Compiler\n(Articles · SVG Scene · Trivia · Maze)"]
+  C --> V["model/loadDisc\nValidator & BFS Solver"]
+  V --> D["DiscManifest\n(localStorage / .json)"]
+  D --> U1["Article + MediaReel + Read Aloud"]
+  D --> U2["Interactive Diagram + Timeline"]
+  D --> U3["Flashcards + Tour + Notebook"]
+  D --> U4["KeepMaze Trivia Dungeon"]
+```
 
 ```text
 src/
