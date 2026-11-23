@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { playDoorUnlock, playTorch, playVictoryFanfare } from '../audio/audio';
 import { loadBest, saveBest } from '../library/best';
 import type { StorageLike } from '../library/discLibrary';
@@ -8,7 +9,7 @@ import type { GameAction, GameState } from '../model/game';
 import { ENTRANCE_ROOM_ID } from '../model/manifest';
 import type { DiscManifest, Dungeon } from '../model/manifest';
 import { BevelButton } from './BevelButton';
-import { DungeonViewport } from './DungeonViewport';
+import { DungeonViewport, roomVariant } from './DungeonViewport';
 import { MiniMap } from './MiniMap';
 import { PixelIcon } from './PixelIcon';
 import '../styles/keepmaze.css';
@@ -99,50 +100,27 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);
   const locked = !started || state.pending !== null || state.lastWrong !== null;
+
+  /** Top hero stage: the room panorama across the full width. */
+  const stage = (
+    <div className="keepmaze__stage">
+      {/* Remounts on every room change, which replays the one-shot CSS torchlight pulse. */}
+      {started ? <span key={state.roomId} className="keepmaze__torch" aria-hidden="true" /> : null}
+      <DungeonViewport
+        locked={locked}
+        victory={state.won}
+        variant={roomVariant(room)}
+        label={state.won ? 'Dungeon view: the way is open' : locked ? 'Dungeon view: a locked door' : 'Dungeon view: a door'}
+      />
+    </div>
+  );
+
   /**
-   * Torch rack and Score Medallion beside the mini-map, during play only. Purely visual: the Quest
-   * card carries the same Score, Streak, Torches, and Personal Best for assistive technology.
+   * Left HUD cluster: the mini-map with its legend and progress, beside the torch rack and the Score
+   * Medallion. These are the only Score, Streak, Torches, and Personal Best on screen.
    */
-  const trophy =
-    started && !state.won ? (
-      <div className="keepmaze__trophy" aria-hidden="true">
-        <div className="torch-rack" data-lit-count={state.torches}>
-          {Array.from({ length: STARTING_TORCHES }, (_, i) => (
-            <span key={i} className="torch-rack__slot" data-lit={i < state.torches ? 'true' : 'false'}>
-              <PixelIcon name="torch" size={24} />
-            </span>
-          ))}
-        </div>
-        <div className="medallion">
-          <svg className="medallion__coin" viewBox="0 0 32 32">
-            <circle cx={16} cy={16} r={15} className="medallion__rim" />
-            <circle cx={16} cy={16} r={11} className="medallion__face" />
-            <text x={16} y={17} textAnchor="middle" dominantBaseline="central" className="medallion__letter">
-              P
-            </text>
-          </svg>
-          <span className="medallion__score">{state.score} pts</span>
-          <span className="medallion__row">
-            <span className="medallion__label">Streak</span> <span className="medallion__value">{state.streak}</span>
-          </span>
-          <span className="medallion__row">
-            <span className="medallion__label">Best</span>{' '}
-            <span className="medallion__value">{best ? `${best.bestScore} pts` : '--'}</span>
-          </span>
-        </div>
-      </div>
-    ) : null;
-  const scene = (
-    <div className="keepmaze__scene">
-      <div className="keepmaze__view">
-        {/* Remounts on every room change, which replays the one-shot CSS torchlight pulse. */}
-        {started ? <span key={state.roomId} className="keepmaze__torch" aria-hidden="true" /> : null}
-        <DungeonViewport
-          locked={locked}
-          victory={state.won}
-          label={state.won ? 'Dungeon view: the way is open' : locked ? 'Dungeon view: a locked door' : 'Dungeon view: a door'}
-        />
-      </div>
+  const hud = (
+    <div className="keepmaze__hud-cluster">
       <div className="keepmaze__map">
         <MiniMap dungeon={dungeon} visited={visited} currentRoomId={state.roomId} />
         <ul className="minimap-legend" aria-label="Mini-map legend">
@@ -150,23 +128,88 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
           <li><span className="minimap-legend__swatch minimap-legend__swatch--visited" aria-hidden="true" />Visited</li>
           <li><span className="minimap-legend__swatch minimap-legend__swatch--unknown" aria-hidden="true" />Unexplored</li>
         </ul>
+        <p className="quest-card__progress">
+          Rooms explored: {visited.length} of {dungeon.rooms.length}
+        </p>
       </div>
-      {trophy}
+      <div className="keepmaze__trophy">
+        <dl className="quest-card__stats medallion" aria-label="Knowledge stats">
+          <div className="quest-card__stat torch-rack">
+            <dt>Torches</dt>
+            <dd>
+              <span className="torches" role="img" aria-label={`${state.torches} of ${STARTING_TORCHES} torches lit`}>
+                {Array.from({ length: STARTING_TORCHES }, (_, i) => (
+                  <span key={i} className="torches__torch torch-rack__slot" data-lit={i < state.torches ? 'true' : 'false'}>
+                    <PixelIcon name="torch" size={24} />
+                  </span>
+                ))}
+              </span>
+            </dd>
+          </div>
+          <svg className="medallion__coin" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <circle cx={16} cy={16} r={15} className="medallion__rim" />
+            <circle cx={16} cy={16} r={11} className="medallion__face" />
+            <text x={16} y={17} textAnchor="middle" dominantBaseline="central" className="medallion__letter">
+              P
+            </text>
+          </svg>
+          <div className="quest-card__stat medallion__score">
+            <dt>Score</dt>
+            <dd>{state.score}</dd>
+          </div>
+          <div className="quest-card__stat medallion__streak">
+            <dt>Streak</dt>
+            <dd>{state.streak}</dd>
+          </div>
+        </dl>
+        {best ? (
+          <p className="quest-card__best medallion__best">
+            Personal Best: {best.bestScore} pts ({best.bestRank})
+          </p>
+        ) : (
+          <p className="medallion__best medallion__best--none">No best yet</p>
+        )}
+      </div>
     </div>
+  );
+
+  /** The right main panel: one warm ivory manuscript card with a navy caption bar and gold and burgundy trim. */
+  const panel = (body: ReactNode, mode: 'welcome' | 'room' | 'question') => (
+    <div className="keepmaze__panel" data-mode={mode}>
+      <p className="quest-card__title">KeepMaze Quest</p>
+      <div className="keepmaze__panel-body">{body}</div>
+    </div>
+  );
+
+  /** Bottom console strip: the HUD cluster beside the main panel. */
+  const consoleStrip = (body: ReactNode, mode: 'welcome' | 'room' | 'question') => (
+    <section className="keepmaze__console quest-card" aria-label="KeepMaze Quest">
+      {hud}
+      {panel(body, mode)}
+    </section>
   );
 
   if (!started) {
     return (
       <div className="keepmaze">
-        {scene}
-        <h2 className="keepmaze__room">{dungeon.title}</h2>
-        <BevelButton disabled={noTrivia} onClick={() => setStarted(true)}>
-          Start
-        </BevelButton>
-        {noTrivia && (
-          <p className="keepmaze__message" role="status">
-            This dungeon needs trivia questions before it can be played.
-          </p>
+        {stage}
+        {consoleStrip(
+          <div className="keepmaze__welcome">
+            <p className="keepmaze__kicker">Welcome to KeepMaze</p>
+            <h2 className="keepmaze__room keepmaze__dungeon-title">{dungeon.title}</h2>
+            <p className="quest-card__objective">
+              Reach the Throne Room by unlocking doors with encyclopedia trivia.
+            </p>
+            <BevelButton className="keepmaze__start" disabled={noTrivia} onClick={() => setStarted(true)}>
+              Start
+            </BevelButton>
+            {noTrivia && (
+              <p className="keepmaze__message" role="status">
+                This dungeon needs trivia questions before it can be played.
+              </p>
+            )}
+          </div>,
+          'welcome',
         )}
       </div>
     );
@@ -180,7 +223,7 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   if (state.won) {
     return (
       <div className="keepmaze">
-        {scene}
+        {stage}
         <section className="certificate" aria-label="Victory Certificate">
           <div className="certificate__inner">
             <p className="certificate__kicker">DiscLore '97 &bull; KeepMaze</p>
@@ -227,8 +270,10 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
               </text>
             </svg>
           </div>
+          <div className="certificate__actions">
+            <BevelButton onClick={restart}>Restart</BevelButton>
+          </div>
         </section>
-        <BevelButton onClick={restart}>Restart</BevelButton>
       </div>
     );
   }
@@ -245,139 +290,106 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
     dispatch({ type: 'answer', index });
   };
 
-  return (
-    <div className="keepmaze">
-      {scene}
-      <div className="keepmaze__panels">
-      <div className="keepmaze__hud">
-        <p className="keepmaze__room">{room?.name ?? state.roomId}</p>
-        <p className="keepmaze__message">{room?.description}</p>
-        <div className="keepmaze__stats">
-          <span>Moves: {state.moves}</span>
-          <span>Incorrect: {state.incorrect}</span>
-          <BevelButton className="keepmaze__restart" onClick={restart}>
-            Restart
-          </BevelButton>
-        </div>
-        <div>
-          <span>Exits:</span>
-          <ul className="keepmaze__list">
-            {(room?.exits ?? []).map((exit, i) => {
-              const dest = dungeon.rooms.find((r) => r.room_id === exit.to);
-              return (
-                <li key={`${exit.to}-${i}`}>
-                  <BevelButton
-                    disabled={pending !== null}
-                    onClick={() => dispatch({ type: 'selectExit', to: exit.to })}
-                  >
-                    {dest?.name ?? exit.to}
-                  </BevelButton>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+  const roomCard = (
+    <div className="keepmaze__room-card">
+      <p className="keepmaze__room">{room?.name ?? state.roomId}</p>
+      <p className="keepmaze__message keepmaze__description">{room?.description}</p>
+      <div className="keepmaze__stats">
+        <span>Moves: {state.moves}</span>
+        <span>Incorrect: {state.incorrect}</span>
+        <BevelButton className="keepmaze__restart" onClick={restart}>
+          Restart
+        </BevelButton>
       </div>
-
-      <section className="keepmaze__side quest-card" aria-label="KeepMaze Quest">
-        <p className="quest-card__title">KeepMaze Quest</p>
-        <div className="quest-card__body">
-          <p className="quest-card__objective">
-            Reach the Throne Room by unlocking doors with encyclopedia trivia.
-          </p>
-          <p className="quest-card__progress">
-            Rooms explored: {visited.length} of {dungeon.rooms.length}
-          </p>
-          {best ? (
-            <p className="quest-card__best">
-              Personal Best: {best.bestScore} pts ({best.bestRank})
-            </p>
-          ) : null}
-          <dl className="quest-card__stats" aria-label="Knowledge stats">
-            <div className="quest-card__stat">
-              <dt>Score</dt>
-              <dd>{state.score}</dd>
-            </div>
-            <div className="quest-card__stat">
-              <dt>Streak</dt>
-              <dd>{state.streak}</dd>
-            </div>
-            <div className="quest-card__stat">
-              <dt>Torches</dt>
-              <dd>
-                <span className="torches" role="img" aria-label={`${state.torches} of ${STARTING_TORCHES} torches lit`}>
-                  {Array.from({ length: STARTING_TORCHES }, (_, i) => (
-                    <span key={i} className="torches__torch" data-lit={i < state.torches ? 'true' : 'false'}>
-                      <PixelIcon name="torch" />
-                    </span>
-                  ))}
-                </span>
-              </dd>
-            </div>
-          </dl>
-      {!pending && !state.lastWrong && (
-        <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
-      )}
-      {pending && (
-        <div className="keepmaze__question keepmaze__question--manuscript" role="group" aria-label="Trivia question">
-          {/* Illuminated drop cap. A span, not a <p>, so the prompt stays the group's first paragraph. */}
-          <span className="keepmaze__dropcap" aria-hidden="true">
-            Q
-          </span>
-          <p className="keepmaze__message keepmaze__prompt">{pending.question.prompt}</p>
-          <ul className="keepmaze__options">
-            {pending.question.options.map((opt, i) => (
-              <li key={i}>
-                <BevelButton className="keepmaze__option" onClick={() => answer(i)}>
-                  {/* The letter badge is hidden from the accessible name, so the button is named by its option text. */}
-                  <span className="keepmaze__letter" aria-hidden="true">
-                    {`${OPTION_LETTERS[i] ?? String(i + 1)}.`}
-                  </span>
-                  {opt}
+      <div className="keepmaze__exits">
+        <span className="keepmaze__exits-label">Exits:</span>
+        <ul className="keepmaze__list">
+          {(room?.exits ?? []).map((exit, i) => {
+            const dest = dungeon.rooms.find((r) => r.room_id === exit.to);
+            return (
+              <li key={`${exit.to}-${i}`}>
+                <BevelButton
+                  disabled={pending !== null}
+                  onClick={() => dispatch({ type: 'selectExit', to: exit.to })}
+                >
+                  {dest?.name ?? exit.to}
                 </BevelButton>
               </li>
-            ))}
-          </ul>
-          <BevelButton
-            className="keepmaze__peek-button"
-            aria-expanded={peekId === pending.question.question_id}
-            onClick={() => {
-              dispatch({ type: 'peek' });
-              setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id));
-            }}
-          >
-            Peek Hint
-          </BevelButton>
-          {peekId === pending.question.question_id && peekSection ? (
-            <div className="keepmaze__peek" role="note" aria-label="Hint preview">
-              <p className="keepmaze__peek-title">{peekSection.title}</p>
-              <p className="keepmaze__peek-text">{firstSentence(peekSection.paragraphs[0] ?? '')}</p>
-            </div>
-          ) : null}
-          {pending.hinted ? (
-            <p className="keepmaze__peek-note">Hint used: a right answer is worth 50 points.</p>
-          ) : null}
-        </div>
-      )}
-
-      {state.lastWrong && (
-        <div className="keepmaze__question" role="status">
-          <p className="keepmaze__message">
-            Incorrect. The door stays locked.
-            {wrongSection && <> See: {wrongSection.title}.</>}
-          </p>
-          <button
-            type="button"
-            className="keepmaze__link"
-            onClick={() => onOpenSection(state.lastWrong!.section_id)}
-          >
-            Open {wrongSection ? `"${wrongSection.title}"` : 'section'} in the article viewer
-          </button>
-        </div>
-      )}
-        </div>
-      </section>
+            );
+          })}
+        </ul>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="keepmaze">
+      {stage}
+      {consoleStrip(
+        <>
+          {roomCard}
+          {!pending && !state.lastWrong && (
+            <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
+          )}
+          {pending && (
+            <div className="keepmaze__question keepmaze__question--manuscript" role="group" aria-label="Trivia question">
+              {/* Illuminated drop cap. A span, not a <p>, so the prompt stays the group's first paragraph. */}
+              <span className="keepmaze__dropcap" aria-hidden="true">
+                Q
+              </span>
+              <p className="keepmaze__message keepmaze__prompt">{pending.question.prompt}</p>
+              <ul className="keepmaze__options">
+                {pending.question.options.map((opt, i) => (
+                  <li key={i}>
+                    <BevelButton className="keepmaze__option" onClick={() => answer(i)}>
+                      {/* The letter badge is hidden from the accessible name, so the button is named by its option text. */}
+                      <span className="keepmaze__letter" aria-hidden="true">
+                        {`${OPTION_LETTERS[i] ?? String(i + 1)}.`}
+                      </span>
+                      {opt}
+                    </BevelButton>
+                  </li>
+                ))}
+              </ul>
+              <BevelButton
+                className="keepmaze__peek-button"
+                aria-expanded={peekId === pending.question.question_id}
+                onClick={() => {
+                  dispatch({ type: 'peek' });
+                  setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id));
+                }}
+              >
+                Peek Hint
+              </BevelButton>
+              {peekId === pending.question.question_id && peekSection ? (
+                <div className="keepmaze__peek" role="note" aria-label="Hint preview">
+                  <p className="keepmaze__peek-title">{peekSection.title}</p>
+                  <p className="keepmaze__peek-text">{firstSentence(peekSection.paragraphs[0] ?? '')}</p>
+                </div>
+              ) : null}
+              {pending.hinted ? (
+                <p className="keepmaze__peek-note">Hint used: a right answer is worth 50 points.</p>
+              ) : null}
+            </div>
+          )}
+          {state.lastWrong && (
+            <div className="keepmaze__question keepmaze__wrong" role="status">
+              <p className="keepmaze__message">
+                Incorrect. The door stays locked.
+                {wrongSection && <> See: {wrongSection.title}.</>}
+              </p>
+              <button
+                type="button"
+                className="keepmaze__link"
+                onClick={() => onOpenSection(state.lastWrong!.section_id)}
+              >
+                Open {wrongSection ? `"${wrongSection.title}"` : 'section'} in the article viewer
+              </button>
+            </div>
+          )}
+        </>,
+        pending ? 'question' : 'room',
+      )}
     </div>
   );
 }

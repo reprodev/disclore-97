@@ -1,32 +1,454 @@
+/*
+ * KeepMaze, laid out like a 1997 MindMaze screen: a full-width room panorama on top, and a console
+ * strip below it with the HUD cluster (mini-map, torch rack, Score Medallion) beside one ivory
+ * manuscript panel. The frame between them is dark dungeon slate, so no empty gray slab shows.
+ */
 .keepmaze {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   box-sizing: border-box;
   font-family: var(--font-ui);
   font-size: 12px;
   color: var(--color-bevel-edge);
-  background: var(--color-surface);
-  padding: 6px;
+  background: var(--color-dungeon-bg);
+  padding: 4px;
+  /* Fill the whole pane, like the disc cover, so no gray shows below the console. */
+  min-height: 100%;
 }
 
-.keepmaze__hud {
+/* ---- Top hero stage ---------------------------------------------------------------------- */
+.keepmaze__stage {
+  flex: 0 0 auto;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 440 / 200;
+  min-height: 200px;
+  max-height: 300px;
+  overflow: hidden;
+  background: var(--color-stone-dark);
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.viewport {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.viewport__flame {
+  animation: torch-flicker 0.6s steps(2, end) infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+@keyframes torch-flicker {
+  0% {
+    transform: scale(1, 1);
+  }
+  100% {
+    transform: scale(0.92, 1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport__flame {
+    animation: none;
+  }
+}
+
+/* Torchlight pulse: a flat amber wash that steps down once on every room entry. */
+.keepmaze__torch {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--color-flame);
+  opacity: 0;
+  animation: torch-step 0.45s steps(3, end) 1;
+}
+
+@keyframes torch-step {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keepmaze__torch {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ---- Bottom console strip ---------------------------------------------------------------- */
+.keepmaze__console {
+  /* Takes the rest of the pane's height, so the HUD and the ivory panel reach the bottom. */
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) minmax(0, 3fr);
+  gap: 4px;
+  align-items: stretch;
+}
+
+@media (max-width: 720px) {
+  .keepmaze__console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Left HUD cluster: mini-map beside the torch rack and the Score Medallion. */
+.keepmaze__hud-cluster {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+.keepmaze__map {
+  flex: 1 1 auto;
+  min-width: 130px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+  overflow: hidden;
+  background: var(--color-dungeon-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.minimap {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.keepmaze__map .minimap {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 240px;
+}
+
+.minimap__bg {
+  fill: var(--color-dungeon-bg);
+}
+
+.minimap__edge {
+  stroke: var(--color-stone-dark);
+  stroke-width: 2px;
+}
+
+.minimap__room--visited {
+  fill: var(--color-parchment);
+  stroke: var(--color-bevel-edge);
+  stroke-width: 1px;
+}
+
+.minimap__room--current {
+  fill: var(--color-flame);
+  stroke: var(--color-gold-light);
+  stroke-width: 2px;
+}
+
+.minimap__room--unknown {
+  fill: var(--color-dungeon-stone);
+  stroke: var(--color-stone-dark);
+  stroke-width: 1px;
+  stroke-dasharray: 2 2;
+}
+
+.minimap-legend {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 2px 4px;
+  list-style: none;
+  font-size: 11px;
+  color: var(--color-console-text);
+}
+
+.minimap-legend li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.minimap-legend__swatch {
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+}
+
+.minimap-legend__swatch--current {
+  background: var(--color-flame);
+  border: 1px solid var(--color-gold-light);
+}
+
+.minimap-legend__swatch--visited {
+  background: var(--color-parchment);
+  border: 1px solid var(--color-bevel-edge);
+}
+
+.minimap-legend__swatch--unknown {
+  background: var(--color-dungeon-stone);
+  border: 1px dashed var(--color-stone-dark);
+}
+
+.keepmaze__map .quest-card__progress {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-gold-light);
+}
+
+/* Torch rack and Score Medallion: one ivory plaque holding the only Score, Streak, and Torches. */
+.keepmaze__trophy {
+  flex: 0 0 118px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 2px solid var(--color-gold-dark);
+  outline: 1px solid var(--color-crimson);
+  outline-offset: -5px;
+}
+
+.medallion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+}
+
+.quest-card__stat dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-bevel-shadow);
+}
+
+.quest-card__stat dd {
+  margin: 0;
+  font-weight: bold;
+}
+
+.torch-rack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.torches {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.torches__torch {
+  display: inline-flex;
+}
+
+.torch-rack__slot {
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-gold-light);
+  background: var(--color-gold-dark);
+}
+
+.torch-rack__slot[data-lit="false"] {
+  border-color: var(--color-stone);
+  background: var(--color-stone-dark);
+}
+
+.torch-rack__slot[data-lit="false"] .pixel-icon {
+  opacity: 0.3;
+}
+
+.medallion__coin {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.medallion__rim {
+  fill: var(--color-gold-dark);
+  stroke: var(--color-bevel-edge);
+  stroke-width: 1px;
+}
+
+.medallion__face {
+  fill: var(--color-gold);
+  stroke: var(--color-gold-light);
+  stroke-width: 1px;
+}
+
+.medallion__letter {
+  fill: var(--color-crimson);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.medallion__score,
+.medallion__streak {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.medallion__score dd {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-crimson);
+}
+
+/* The unit is drawn, not written, so the Score value stays a bare number. */
+.medallion__score dd::after {
+  content: " pts";
+  font-size: 11px;
+}
+
+.medallion__streak dd {
+  font-size: 13px;
+}
+
+.medallion__best {
+  margin: 0;
+  padding-top: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-crimson);
+  border-top: 1px solid var(--color-gold);
+}
+
+.medallion__best--none {
+  font-weight: normal;
+  font-style: italic;
+  color: var(--color-bevel-shadow);
+}
+
+/* Right main panel: one warm ivory manuscript card, navy caption bar, gold and burgundy trim. */
+.keepmaze__panel {
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 2px solid var(--color-title-bg);
+}
+
+.quest-card__title {
+  margin: 0;
+  padding: 2px 8px;
+  font-weight: bold;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border-bottom: 2px solid var(--color-gold);
+}
+
+.keepmaze__panel-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 3px;
   padding: 6px 8px;
+  border: 1px solid var(--color-crimson);
+  outline: 1px solid var(--color-gold);
+  outline-offset: 1px;
+}
+
+/* Before Start: the Welcome card. */
+.keepmaze__welcome {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.keepmaze__kicker {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-gold-dark);
 }
 
 .keepmaze__room {
-  font-size: 14px;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 15px;
   font-weight: bold;
-  margin: 0 0 4px;
+  color: var(--color-title-bg);
+}
+
+.keepmaze__dungeon-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--color-crimson);
+}
+
+.quest-card__objective {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+.keepmaze__start {
+  min-width: 96px;
+}
+
+/* While exploring: the room card. */
+.keepmaze__room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--color-gold);
+}
+
+.keepmaze__message {
+  margin: 0;
+}
+
+.keepmaze__description {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.3;
 }
 
 .keepmaze__stats {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 4px 0 6px;
 }
 
 .keepmaze__restart {
@@ -35,13 +457,30 @@
   padding: 1px 10px;
 }
 
+.keepmaze__exits {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+
+.keepmaze__exits-label {
+  font-weight: bold;
+}
+
 .keepmaze__list {
   list-style: none;
-  margin: 4px 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+}
+
+.keepmaze__hint {
+  margin: 0;
+  font-style: italic;
+  color: var(--color-bevel-shadow);
 }
 
 .keepmaze__question {
@@ -75,163 +514,93 @@
   outline: 1px dotted var(--color-bevel-edge);
 }
 
-.keepmaze__message {
-  margin: 4px 0;
+/* During a question: the illuminated manuscript card in a stepped navy, gold, and burgundy frame. */
+.keepmaze__question--manuscript {
+  position: relative;
+  padding: 10px 12px;
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  border: 3px solid var(--color-title-bg);
+  outline: 2px solid var(--color-gold);
+  outline-offset: -6px;
 }
 
-/* Top row: archway viewport and mini-map side by side, at most 175px tall. */
-.keepmaze__scene {
-  display: flex;
-  gap: 6px;
+.keepmaze__question--manuscript::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  border: 1px solid var(--color-crimson);
+  pointer-events: none;
+}
+
+.keepmaze__question--manuscript::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* The drop cap: a large serif Q on a gold square, framed in navy with a burgundy keyline. */
+.keepmaze__dropcap {
+  float: left;
+  position: relative;
+  box-sizing: border-box;
+  width: 40px;
+  height: 44px;
+  margin: 2px 8px 4px 2px;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 40px;
+  text-align: center;
+  color: var(--color-crimson);
+  background: var(--color-gold-light);
+  border: 2px solid var(--color-title-bg);
+  outline: 1px solid var(--color-crimson-dark);
+  outline-offset: -5px;
+  user-select: none;
+}
+
+.keepmaze__question--manuscript .keepmaze__prompt {
+  margin: 2px 0 6px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.35;
+}
+
+/* Answer strips: full-width buttons, each led by a navy A. / B. / C. / D. badge. */
+.keepmaze__question--manuscript .keepmaze__options {
+  clear: both;
   align-items: stretch;
-  max-height: 175px;
 }
 
-.keepmaze__view {
-  flex: 0 1 262px;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 2px;
-  background: var(--color-surface);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
-}
-
-.keepmaze__map {
-  flex: 1 1 0;
-  min-width: 120px;
-  box-sizing: border-box;
+.keepmaze__option {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 2px;
-  overflow: hidden;
-  background: var(--color-dungeon-bg);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
-}
-
-.viewport {
-  display: block;
   width: 100%;
-  height: auto;
-  max-height: 167px;
+  text-align: left;
 }
 
-.minimap {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 165px;
+.keepmaze__letter {
+  flex: 0 0 auto;
+  min-width: 20px;
+  margin-right: 6px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  font-weight: bold;
+  text-align: center;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border: 1px solid var(--color-gold);
 }
 
-/* Lower row: room and exits on the left, the active question on the right. */
-.keepmaze__panels {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 6px;
-  align-items: start;
-}
-
-.keepmaze__side {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.keepmaze__hint {
-  margin: 0;
-  padding: 6px 8px;
-  color: var(--color-bevel-shadow);
-}
-
-@media (max-width: 720px) {
-  .keepmaze__panels {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.viewport__flame {
-  animation: torch-flicker 0.6s steps(2, end) infinite;
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-}
-
-@keyframes torch-flicker {
-  0% {
-    transform: scale(1, 1);
-  }
-  100% {
-    transform: scale(0.92, 1.08);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .viewport__flame {
-    animation: none;
-  }
-}
-
-.minimap__bg {
-  fill: var(--color-dungeon-bg);
-}
-
-.minimap__edge {
-  stroke: var(--color-stone-dark);
-  stroke-width: 2px;
-}
-
-.minimap__room--visited {
-  fill: var(--color-parchment);
-  stroke: var(--color-bevel-edge);
-  stroke-width: 1px;
-}
-
-.minimap__room--current {
-  fill: var(--color-flame);
-  stroke: var(--color-gold-light);
-  stroke-width: 2px;
-}
-
-.minimap__room--unknown {
-  fill: var(--color-dungeon-stone);
-  stroke: var(--color-stone-dark);
-  stroke-width: 1px;
-  stroke-dasharray: 2 2;
-}
-
-/* Torchlight pulse: a flat amber wash that steps down once on every room entry. */
-.keepmaze__view {
-  position: relative;
-}
-
-.keepmaze__torch {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  bottom: 2px;
-  left: 2px;
-  z-index: 1;
-  pointer-events: none;
-  background: var(--color-flame);
-  opacity: 0;
-  animation: torch-step 0.45s steps(3, end) 1;
-}
-
-@keyframes torch-step {
-  0% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .keepmaze__torch {
-    animation: none;
-    display: none;
-  }
+/* A wrong answer: a quiet ivory note with the link to the article. */
+.keepmaze__wrong {
+  background: var(--color-tooltip-bg);
+  border-color: var(--color-crimson);
 }
 
 /* Peek Hint: a tooltip-yellow note under the question. */
@@ -260,7 +629,14 @@
   line-height: 1.35;
 }
 
-/* Victory Certificate: parchment sheet, double gold border, crimson seal. */
+.keepmaze__peek-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-crimson);
+}
+
+/* ---- Victory Certificate: parchment sheet, double gold border, crimson seal ----------------- */
 .certificate {
   box-sizing: border-box;
   padding: 4px;
@@ -270,6 +646,10 @@
   color: var(--color-ink);
 }
 
+.keepmaze > .certificate {
+  flex: 1 1 auto;
+}
+
 .certificate__inner {
   position: relative;
   box-sizing: border-box;
@@ -277,6 +657,12 @@
   text-align: center;
   font-family: var(--font-serif);
   border: 1px solid var(--color-crimson);
+}
+
+.certificate__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
 }
 
 .certificate__kicker {
@@ -360,157 +746,10 @@
   font-weight: bold;
 }
 
-/* KeepMaze Quest card: ivory sheet with a navy caption bar and an antique-gold rule. */
-.keepmaze__side.quest-card {
-  gap: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  border: 2px solid var(--color-bevel-edge);
-  outline: 1px solid var(--color-gold);
-  outline-offset: -4px;
-}
-
-.quest-card__title {
-  margin: 0;
-  padding: 2px 8px;
-  font-weight: bold;
-  color: var(--color-title-text);
-  background: var(--color-title-bg);
-}
-
-.quest-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px;
-}
-
-.quest-card__objective {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1.3;
-  color: var(--color-crimson);
-}
-
-.quest-card__progress {
-  margin: 0;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--color-gold);
-}
-
-.quest-card .keepmaze__hint {
-  padding: 0;
-  color: var(--color-ink);
-}
-
-/* Mini-map panel: map above, legend strip below. */
-.keepmaze__map {
-  flex-direction: column;
-  gap: 2px;
-}
-
-.keepmaze__map .minimap {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: 138px;
-}
-
-.minimap-legend {
-  flex: 0 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2px 10px;
-  margin: 0;
-  padding: 2px 4px;
-  list-style: none;
-  font-size: 11px;
-  color: var(--color-console-text);
-}
-
-.minimap-legend li {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.minimap-legend__swatch {
-  width: 8px;
-  height: 8px;
-  box-sizing: border-box;
-}
-
-.minimap-legend__swatch--current {
-  background: var(--color-flame);
-  border: 1px solid var(--color-gold-light);
-}
-
-.minimap-legend__swatch--visited {
-  background: var(--color-parchment);
-  border: 1px solid var(--color-bevel-edge);
-}
-
-.minimap-legend__swatch--unknown {
-  background: var(--color-dungeon-stone);
-  border: 1px dashed var(--color-stone-dark);
-}
-
-/* MindMaze stats in the Quest card: Score, Streak, and Torches. */
-.quest-card__stats {
-  display: flex;
-  gap: 14px;
-  margin: 0;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--color-gold);
-}
-
-.quest-card__stat dt {
-  font-size: 10px;
-  text-transform: uppercase;
-  color: var(--color-bevel-shadow);
-}
-
-.quest-card__stat dd {
-  margin: 0;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.torches {
-  display: inline-flex;
-  gap: 2px;
-}
-
-.torches__torch {
-  display: inline-flex;
-}
-
-.torches__torch[data-lit="false"] {
-  opacity: 0.25;
-}
-
-.keepmaze__peek-note {
-  margin: 4px 0 0;
-  font-size: 11px;
-  font-style: italic;
-  color: var(--color-crimson);
-}
-
 .certificate__rank {
   margin: 4px 0;
   font-size: 14px;
   color: var(--color-crimson);
-}
-
-/* Personal Best: a quiet line in the Quest card, and a stamped badge on the certificate. */
-.quest-card__best {
-  margin: 0;
-  padding-bottom: 4px;
-  font-weight: bold;
-  color: var(--color-crimson);
-  border-bottom: 1px solid var(--color-gold);
 }
 
 .certificate__best {
@@ -530,186 +769,4 @@
   color: var(--color-crimson-dark);
   background: var(--color-gold-light);
   border: 2px solid var(--color-crimson);
-}
-
-/* Illuminated manuscript question card: parchment inside a stepped navy, gold, and burgundy frame. */
-.keepmaze__question--manuscript {
-  position: relative;
-  padding: 10px 12px;
-  background: var(--color-parchment);
-  color: var(--color-ink);
-  border: 3px solid var(--color-title-bg);
-  outline: 2px solid var(--color-gold);
-  outline-offset: -6px;
-}
-
-.keepmaze__question--manuscript::before {
-  content: "";
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  bottom: 6px;
-  left: 6px;
-  border: 1px solid var(--color-crimson);
-  pointer-events: none;
-}
-
-.keepmaze__question--manuscript::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
-/* The drop cap: a large serif Q on a gold square, framed in navy with a burgundy keyline. */
-.keepmaze__dropcap {
-  float: left;
-  position: relative;
-  box-sizing: border-box;
-  width: 40px;
-  height: 44px;
-  margin: 2px 8px 4px 2px;
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: bold;
-  line-height: 40px;
-  text-align: center;
-  color: var(--color-crimson);
-  background: var(--color-gold-light);
-  border: 2px solid var(--color-title-bg);
-  outline: 1px solid var(--color-crimson-dark);
-  outline-offset: -5px;
-  user-select: none;
-}
-
-.keepmaze__question--manuscript .keepmaze__prompt {
-  margin: 2px 0 6px;
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1.35;
-}
-
-/* Answer strips: full-width buttons, each led by a navy A. / B. / C. / D. badge. */
-.keepmaze__question--manuscript .keepmaze__options {
-  clear: both;
-  align-items: stretch;
-}
-
-.keepmaze__option {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  text-align: left;
-}
-
-.keepmaze__letter {
-  flex: 0 0 auto;
-  min-width: 20px;
-  margin-right: 6px;
-  padding: 0 3px;
-  box-sizing: border-box;
-  font-weight: bold;
-  text-align: center;
-  color: var(--color-title-text);
-  background: var(--color-title-bg);
-  border: 1px solid var(--color-gold);
-}
-
-/* Torch rack and Score Medallion, beside the mini-map. */
-.keepmaze__trophy {
-  flex: 0 0 96px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 4px;
-  padding: 4px;
-  overflow: hidden;
-  background: var(--color-dungeon-bg);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
-}
-
-.torch-rack {
-  display: flex;
-  justify-content: center;
-  gap: 2px;
-}
-
-.torch-rack__slot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 28px;
-  box-sizing: border-box;
-  border: 1px solid var(--color-gold-light);
-  background: var(--color-gold-dark);
-}
-
-.torch-rack__slot[data-lit="false"] {
-  border-color: var(--color-stone);
-  background: var(--color-stone-dark);
-}
-
-.torch-rack__slot[data-lit="false"] .pixel-icon {
-  opacity: 0.3;
-}
-
-.medallion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 3px 2px;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  border: 2px solid var(--color-gold-dark);
-  outline: 1px solid var(--color-crimson);
-  outline-offset: -4px;
-}
-
-.medallion__coin {
-  display: block;
-  width: 32px;
-  height: 32px;
-}
-
-.medallion__rim {
-  fill: var(--color-gold-dark);
-  stroke: var(--color-bevel-edge);
-  stroke-width: 1px;
-}
-
-.medallion__face {
-  fill: var(--color-gold);
-  stroke: var(--color-gold-light);
-  stroke-width: 1px;
-}
-
-.medallion__letter {
-  fill: var(--color-crimson);
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.medallion__score {
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--color-crimson);
-}
-
-.medallion__row {
-  font-size: 10px;
-}
-
-.medallion__label {
-  text-transform: uppercase;
-  color: var(--color-bevel-shadow);
-}
-
-.medallion__value {
-  font-weight: bold;
 }
