@@ -102,3 +102,17 @@
   outline: 1px dotted var(--color-bevel-edge);
   outline-offset: -4px;
 }
+
+/* Ways forward after a failed burn: Burn offline, and Try as Wikipedia topic for a page that cannot be read. */
+.burn-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-top: 4px;
+}
+
+.burn-error__actions .bevel-button {
+  min-width: 0;
+  padding: 2px 8px;
+  font-size: 11px;
+}

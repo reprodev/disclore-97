@@ -45,6 +45,12 @@ const jsonFile = (text: string, name = 'disc.json') => new File([text], name, { 
 const input = () => document.querySelector('input[type="file"]') as HTMLInputElement;
 const pick = (file: File) => fireEvent.change(input(), { target: { files: [file] } });
 const dialog = () => screen.getByRole('dialog', { name: 'Mount Disc Image' });
+/**
+ * Mounting reads the file, parses and validates it (BFS included), then renders the disc. That can
+ * take well over Testing Library's 1-second default on a busy machine, so these waits get 4 seconds,
+ * the same allowance burn-app.test.tsx gives its compile-heavy waits.
+ */
+const MOUNT_WAIT = { timeout: 4000 };
 
 let savedBlobs: Blob[];
 let savedNames: string[];
@@ -147,7 +153,7 @@ describe('Mount Disc Image (.json)', () => {
 
     pick(jsonFile(serializeDiscImage(m)));
 
-    await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0), MOUNT_WAIT);
     expect(screen.getByRole('menuitem', { name: 'File' })).toBeTruthy(); // a disc window is open
     expect(storage.map.has(KEY_PREFIX + m.disc_id)).toBe(true);
     expect(createDiscLibrary(storage).load().map((d) => d.disc_id)).toEqual([m.disc_id]);
@@ -171,7 +177,7 @@ describe('Mount Disc Image (.json)', () => {
     const second = memoryStorage();
     render(<App sources={sources} storage={second} />);
     pick(jsonFile(text, savedNames[0]!));
-    await waitFor(() => expect(screen.getAllByText(stored.title).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(stored.title).length).toBeGreaterThan(0), MOUNT_WAIT);
     expect(createDiscLibrary(second).load()[0]).toEqual(stored);
   });
 
@@ -180,15 +186,15 @@ describe('Mount Disc Image (.json)', () => {
     const storage = memoryStorage();
     render(<App sources={sources} storage={storage} />);
     pick(jsonFile(serializeDiscImage(m)));
-    await waitFor(() => expect(storage.map.size).toBe(1));
+    await waitFor(() => expect(storage.map.size).toBe(1), MOUNT_WAIT);
     pick(jsonFile(serializeDiscImage(m)));
-    await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0), MOUNT_WAIT);
     expect(storage.map.size).toBe(1);
   });
 
   const expectRejected = async (text: string, messagePattern: RegExp, storage: ReturnType<typeof memoryStorage>) => {
     pick(jsonFile(text));
-    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' });
+    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(messagePattern);
     expect(storage.map.size).toBe(0);
     expect(screen.queryByText(/Lighthouses/)).toBeNull();
@@ -247,7 +253,7 @@ describe('Mount Disc Image (.json)', () => {
     const storage = memoryStorage();
     render(<App sources={sources} storage={storage} />);
     pick(jsonFile(serializeDiscImage({ ...burned(), disc_id: 'disc1' })));
-    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' });
+    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(/same ID \("disc1"\) as a built-in disc/);
     expect(storage.map.size).toBe(0);
   });
@@ -258,7 +264,7 @@ describe('Mount Disc Image (.json)', () => {
     const big = jsonFile('{}');
     Object.defineProperty(big, 'size', { value: MAX_IMAGE_BYTES + 1 });
     pick(big);
-    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' });
+    const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(/too large/);
     expect(storage.map.size).toBe(0);
   });
@@ -269,7 +275,7 @@ describe('Mount Disc Image (.json)', () => {
     render(<App sources={sources} storage={storage} />);
     await openTestDisc(user);
     pick(jsonFile('[]'));
-    await screen.findByRole('dialog', { name: 'Mount Disc Image' });
+    await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(screen.getAllByText('Test Disc').length).toBeGreaterThan(0);
     expect(screen.getByRole('menuitem', { name: 'File' })).toBeTruthy();
   });

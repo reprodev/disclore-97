@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
 const FOCUSABLE =
@@ -16,7 +16,10 @@ export function useModalDialog(
   const cancelRef = useRef(onCancel);
   cancelRef.current = onCancel;
 
-  useEffect(() => {
+  // A layout effect runs in the same commit that puts the dialog on screen, so the dialog never appears
+  // without its Escape and Tab handling. A passive useEffect would leave a gap until after the paint, and
+  // an Escape pressed in that gap (or sent by a test right after the dialog shows) would be lost.
+  useLayoutEffect(() => {
     if (!active) return;
     const previous = document.activeElement as HTMLElement | null;
 

@@ -158,3 +158,30 @@ body {
   justify-content: flex-end;
   gap: 6px;
 }
+
+/*
+ * Narrow screens (phones and small tablets, under 768px): the desktop shortcuts move from the 104px
+ * left column into a compact strip along the top, so a restored window gets the full width.
+ */
+@media (max-width: 767px) {
+  .desktop__work {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .desktop__work .desktop-icons {
+    position: static;
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: auto;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .desktop__work .desktop-icon {
+    flex: 0 0 64px;
+    width: 64px;
+    font-size: 10px;
+  }
+}

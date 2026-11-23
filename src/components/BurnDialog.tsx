@@ -6,6 +6,7 @@ import { ERROR_MESSAGES } from '../adapters/errors';
 import type { BurnError, FetchLike } from '../adapters/types';
 import type { DiscManifest } from '../model/manifest';
 import { parseInput } from '../model/sourceInput';
+import { topicFromUrl } from '../model/topicGuess';
 import { BevelButton } from './BevelButton';
 import { BurnProgress } from './BurnProgress';
 import { PresetList } from './PresetList';
@@ -28,6 +29,12 @@ export interface BurnDialogProps {
 }
 
 const OFFLINE_NOTICE = 'URL sources need a connection.';
+
+/**
+ * Web-page failures that offer "Try as Wikipedia topic": the page could not be fetched (a site that
+ * blocks readers, or refuses the request), or the page reader itself is not available.
+ */
+const WIKI_FALLBACK_CODES: ReadonlySet<BurnError['code']> = new Set<BurnError['code']>(['fetch-failed', 'unavailable']);
 
 const defaultOnline = (): boolean => typeof navigator === 'undefined' || navigator.onLine !== false;
 
@@ -132,6 +139,13 @@ export function BurnDialog({
     void run((signal) => burnFallback(topic, { signal }));
   };
 
+  /** Burns the page's guessed subject as a topic: /api/topic when it can, the offline outline otherwise. */
+  const onTryTopic = (topic: string) => {
+    if (busy) return;
+    setText(topic);
+    void run((signal) => burn(topic, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal }));
+  };
+
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
     setError(null);
@@ -147,6 +161,9 @@ export function BurnDialog({
   const fallbackTopic = !isOfflineNotice && error?.fallbackTopic ? error.fallbackTopic : undefined;
   const offlineTopic = isOfflineNotice ? fallbackTopicFor(text) : fallbackTopic;
   const message = error ? (isOfflineNotice ? OFFLINE_NOTICE : ERROR_MESSAGES[error.code]) : '';
+  // Typing clears the error, so the box still holds the address that failed.
+  const failedInput = error && !isOfflineNotice && WIKI_FALLBACK_CODES.has(error.code) ? parseInput(text) : undefined;
+  const wikiTopic = failedInput?.ok && failedInput.kind === 'webpage' ? topicFromUrl(failedInput.url) : undefined;
 
   return (
     <div ref={layerRef} className="modal-layer">
@@ -178,10 +195,24 @@ export function BurnDialog({
                     ))}
                   </ul>
                 ) : null}
-                {offlineTopic ? (
-                  <BevelButton disabled={busy} onClick={() => onBurnOffline(offlineTopic)}>
-                    {`Burn offline from "${offlineTopic}"`}
-                  </BevelButton>
+                {offlineTopic || wikiTopic ? (
+                  <div className="burn-error__actions">
+                    {offlineTopic ? (
+                      <BevelButton disabled={busy} onClick={() => onBurnOffline(offlineTopic)}>
+                        {`Burn offline from "${offlineTopic}"`}
+                      </BevelButton>
+                    ) : null}
+                    {wikiTopic ? (
+                      <BevelButton
+                        className="burn-error__wiki"
+                        disabled={busy}
+                        title={`Burn "${wikiTopic}" from English Wikipedia instead of the page`}
+                        onClick={() => onTryTopic(wikiTopic)}
+                      >
+                        {`Try as Wikipedia topic: "${wikiTopic}"`}
+                      </BevelButton>
+                    ) : null}
+                  </div>
                 ) : null}
               </>
             ) : null}

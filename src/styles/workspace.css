@@ -362,3 +362,28 @@
     visibility: visible;
   }
 }
+
+/*
+ * Narrow screens (under 768px): the contents sidebar sits above the main pane instead of taking 236px
+ * beside it. Both still scroll on their own inside the locked window, and a scroll inside the pane
+ * does not chain to the page.
+ */
+@media (max-width: 767px) {
+  .disc-window {
+    max-width: none;
+  }
+
+  .disc-workspace {
+    flex-direction: column;
+  }
+
+  .disc-workspace .disc-tree {
+    flex: 0 1 auto;
+    max-height: 32vh;
+  }
+
+  .disc-main {
+    flex: 1 1 auto;
+    overscroll-behavior: contain;
+  }
+}

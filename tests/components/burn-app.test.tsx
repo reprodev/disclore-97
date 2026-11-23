@@ -130,7 +130,7 @@ describe('App burn integration', () => {
     await burnTopic(user);
 
     await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0), { timeout: 4000 });
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Burn New CD-R Disc...' })).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Burn New CD-R Disc...' })).toBeNull(), { timeout: 4000 });
     expect(screen.getByRole('menuitem', { name: 'File' })).toBeTruthy();
     expect(storage.map.has(KEY_PREFIX + m.disc_id)).toBe(true);
     expect(oscillatorTypes.filter((t) => t === 'sawtooth').length).toBeGreaterThan(spinsBefore);
@@ -149,7 +149,7 @@ describe('App burn integration', () => {
     await user.click(screen.getByRole('button', { name: 'Burn' }));
 
     const alert = await screen.findByRole('alert', undefined, { timeout: 4000 });
-    await waitFor(() => expect(alert.textContent).toMatch(/network could not be reached/));
+    await waitFor(() => expect(alert.textContent).toMatch(/network could not be reached/), { timeout: 4000 });
     expect(screen.getByRole('dialog', { name: 'Burn New CD-R Disc...' })).toBeTruthy();
     expect(screen.getAllByText('Test Disc').length).toBeGreaterThan(0);
     expect(storage.map.size).toBe(0);

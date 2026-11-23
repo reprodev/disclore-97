@@ -816,3 +816,30 @@
   background: var(--color-gold-light);
   border: 2px solid var(--color-crimson);
 }
+
+/*
+ * Narrow screens (under 768px): the console stacks under the stage and KeepMaze scrolls inside the
+ * main pane. Wider screens keep the zero-scroll layout, which only these rules change.
+ */
+@media (max-width: 767px) {
+  .keepmaze__console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .keepmaze__hud-cluster {
+    flex-wrap: wrap;
+  }
+
+  .keepmaze__map {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+
+  .keepmaze__trophy {
+    flex: 1 1 118px;
+  }
+
+  .keepmaze__qheader {
+    flex-wrap: wrap;
+  }
+}

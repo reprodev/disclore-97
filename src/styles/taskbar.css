@@ -289,3 +289,45 @@
   width: 16px;
   text-align: center;
 }
+
+/*
+ * Narrow screens (under 768px): a compact taskbar. The clock and the Drive D: light give way, and the
+ * window tab shrinks with an ellipsis, so Start and Sound always fit on one row.
+ */
+@media (max-width: 767px) {
+  .taskbar {
+    gap: 2px;
+  }
+
+  .taskbar__start {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+  }
+
+  .taskbar__tab {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .taskbar__tray {
+    flex: 0 0 auto;
+    gap: 2px;
+    padding: 1px 2px;
+  }
+
+  .taskbar__clock,
+  .taskbar__drive {
+    display: none;
+  }
+
+  .mute-toggle {
+    padding: 1px 4px;
+  }
+}
+
+/* Very narrow phones: Ambience gives way too, so Start and Sound never wrap. */
+@media (max-width: 420px) {
+  .ambience-toggle {
+    display: none;
+  }
+}

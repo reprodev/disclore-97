@@ -46,4 +46,32 @@ export function applyTheme(root: Element, theme: Theme): void {
   root.classList.toggle(HAUNTED_CLASS, t === 'haunted');
   root.classList.toggle(CHRISTMAS_CLASS, t === 'christmas');
   root.classList.remove(...LEGACY_CLASSES);
+  syncThemeColor(root);
+}
+
+/** The token the browser's address-bar colour follows: the night-sky navy of the current edition. */
+export const THEME_COLOR_TOKEN = '--color-night';
+
+/**
+ * Sets `<meta name="theme-color">` from the current edition's `--color-night` token, creating the tag
+ * if needed. The colour is read from tokens.css at run time, so it is defined once and never written as
+ * a literal in index.html. Does nothing without a document or a resolved token. Never throws.
+ */
+export function syncThemeColor(root: Element): void {
+  try {
+    const doc = root.ownerDocument;
+    const view = doc?.defaultView;
+    if (!doc || !view || !doc.head) return;
+    const value = view.getComputedStyle(root).getPropertyValue(THEME_COLOR_TOKEN).trim();
+    if (value === '') return;
+    let meta = doc.head.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) {
+      meta = doc.createElement('meta');
+      meta.name = 'theme-color';
+      doc.head.appendChild(meta);
+    }
+    meta.content = value;
+  } catch {
+    // A theme colour is cosmetic; it must never break the app.
+  }
 }

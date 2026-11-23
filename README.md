@@ -13,7 +13,20 @@ Use a desktop browser window of 1280 x 720 or larger. Sound starts after your fi
 3. **Take a Tour or Flashcards.** Press **Tour**, then **Play Show**, to have the disc narrated stop by stop. Or press **Flashcards** and flip cards with **Space**. Shortcuts: [`?disc=castles&view=tour`](https://disclore-97.reprodev.com/?disc=castles&view=tour), [`?disc=halloween&view=flashcards`](https://disclore-97.reprodev.com/?disc=halloween&view=flashcards).
 4. **Switch Editions.** Use **Start > Edition Switcher** to move between **Classic '97**, **Haunted Edition**, and **Christmas Edition**. The colours, artwork, lettering, and chime all change.
 
-The live site is Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions, with no keys or accounts.
+The live site is Cloudflare Pages: the static app plus the `/api/extract`, `/api/topic`, and `/api/define` Pages Functions, with no keys or accounts. On a phone or a window under 768px wide, the desktop icons fold into a strip along the top, the Home columns and the disc sidebar stack, KeepMaze scrolls inside its pane, and the taskbar keeps **Start** and **Sound** on one row.
+
+## Screenshots
+
+Captured at 1280 x 720 from the production build (`npm run build` then `vite preview`) in headless Microsoft Edge.
+
+| | |
+| --- | --- |
+| ![The Encarta-style Home window: the DISCLORE 97 masthead, the Expansion Packs shelf with the Pinpointer search, Quick Jump Modes, and Utilities](docs/screenshots/home-disclore-97.png) | ![A burned Apollo 11 disc: the article with its pinned title and tool row, the MediaReel picture frame, and Quick Facts](docs/screenshots/article-and-viewer.png) |
+| **Home.** The Encarta '97-style masthead, the disc shelf with the Pinpointer, Quick Jump Modes, and Utilities. | **Article and MediaReel.** A disc burned from the Wikipedia topic "Apollo 11", with its pinned header, picture reel, and Quick Facts. |
+| ![KeepMaze: the gate room under a night sky, the mini-map, the torch rack and P medallion, and an illuminated Q question with A to D answer strips](docs/screenshots/keepmaze-disclore-97.png) | ![The Haunted Edition of the Home window: midnight indigo chrome, an amber crescent moon over a haunted keep, and bat and lantern watermarks](docs/screenshots/haunted-edition.png) |
+| **KeepMaze.** The gate room under a starry sky, the mini-map, the torch rack and "P" medallion, and an open "Q" question. | **Haunted Edition.** The same Home window in the Kiroween edition. |
+
+The article screenshot shows text from the English Wikipedia article [Apollo 11](https://en.wikipedia.org/wiki/Apollo_11), available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), so that one image is shared under the same license. Its picture is [*A Man on the Moon*](https://commons.wikimedia.org/wiki/File:A_Man_on_the_Moon,_AS11-40-5903_(cropped).jpg) by Neil A. Armstrong (NASA), in the public domain. The other three screenshots show only this project's original content.
 
 ## Features
 
@@ -70,7 +83,7 @@ The live site is Cloudflare Pages: the static app plus the `/api/extract`, `/api
   - **A. / B. / C. / D. answer strips.** Each option is a full-width button led by a navy letter badge, with slightly tighter padding than a standard button so all four fit. The badge is `aria-hidden`, so the button's accessible name is still the option text.
   - **Victory.** The room stage stays on top and the Victory Certificate, with its Restart button, fills the rest of the pane.
 
-  `tests/components/keepmaze-mindmaze-look.test.tsx` checks the stage and console layout, the panel in all three states and its styling, the one-row question header, the CSS that keeps the legend and plaque inside the console, that no stat or label appears twice, the variant rules, each scene's own furniture and materials, token-only paints in every scene, and the scene changing as the player moves.
+  `tests/components/keepmaze-look.test.tsx` checks the stage and console layout, the panel in all three states and its styling, the one-row question header, the CSS that keeps the legend and plaque inside the console, that no stat or label appears twice, the variant rules, each scene's own furniture and materials, token-only paints in every scene, and the scene changing as the player moves.
 - **KeepMaze MindMaze scoring.** The Score Medallion shows **Score** and **Streak**, and the torch rack shows **Torches**. A right answer earns 100 points plus a streak bonus of 10 per answer already in a row (capped at +50), or 50 points with no bonus if Peek Hint was used. A wrong answer resets the streak and dims one of three torches. The score never goes down and torches stop at zero, so a player can never be locked out of finishing the maze. The Victory Certificate is stamped with Score, Best Streak, and a **Scholar Rank** (Royal Archivist, Court Scholar, Keep Explorer, or Torchbearer), set by the share of the best possible score for the moves taken. The rules are pure functions in `src/model/game.ts`.
 - **KeepMaze Personal Best.** Each disc remembers its best finished run in `localStorage` under `disclore97.best.<disc_id>` (`src/library/best.ts`), apart from bookmarks and visited articles. A run replaces the best when its score is higher, or equal with a higher Scholar Rank (`beatsBest` in `src/model/game.ts`). The Score Medallion shows "Personal Best: 210 pts (Royal Archivist)" once one exists, and a run that sets a record gets a **New Personal Best!** badge on the Victory Certificate. The first finished run on a disc counts as a record. Malformed saved data is ignored.
 - **Real printing.** The **Print...** button in Cite / Print Preview plays the usual click and calls `window.print()`. While the dialog is open, `<body>` carries a `cite-printing` class, and `src/styles/print.css` (`@media print`) hides the desktop, taskbar, disc windows, toolbars, sidebar, dialog title bar, buttons, and the modal backdrop. Only the citation sheet prints, in dark ink on ivory paper, with no scroll box or offset shadow. Colors are tokens only.
@@ -194,6 +207,8 @@ Four source kinds are supported:
 | **webpage** | A public web page, fetched through `/api/extract`. The text and safe `og:image`, `twitter:image`, and `<img>` pictures are extracted. |
 | **topic** | A free-text topic, looked up on English Wikipedia through `/api/topic`. The article text, section headings, and pictures become a disc. |
 | **markdown** | Markdown text you paste in. |
+
+**When a source cannot be read.** A failed burn never leaves you stuck. A failed GitHub or web-page burn offers **Burn offline from "<name>"**, which builds an offline study outline. A web page that blocks readers or cannot be fetched (`fetch-failed`), or a missing page reader (`unavailable`), also offers **Try as Wikipedia topic: "<subject>"**. It guesses the page's subject from the address with `topicFromUrl` in `src/model/topicGuess.ts`, and burns that subject through `/api/topic`. The guess is the last meaningful path segment, so `.../history/lighthouses-of-maine.html` gives "lighthouses of maine", or else the site's name. The Wikipedia option is not offered when the network itself is down, because a topic lookup would fail too.
 
 **Sample burns.** While the library has no burned discs, the empty **Burned CD-Rs** tab on the Home shelf offers three quick-start buttons: **Burn Sample: Halloween**, **Burn Sample: Gothic fiction**, and **Burn Sample: CD-ROM**. Each opens the Burn dialog and starts a Wikipedia topic burn for that topic (or the offline outline, if the lookup fails). The topics depend on the active edition: Haunted offers Halloween, Gothic fiction, and Ghostlore, and Christmas offers Christmas, A Christmas Carol, and Christmas tree.
 

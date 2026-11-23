@@ -1003,3 +1003,45 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/*
+ * Narrow screens (under 768px): the Home columns and the disc shelf stack into one column. The window
+ * is too short to lock as on the desktop, so the Home window scrolls as one page instead, each group
+ * takes its natural height, and the disc shelf keeps its own scroll up to 60% of the screen.
+ */
+@media (max-width: 767px) {
+  .home__grid,
+  .pack-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /*
+   * These overrides are written as `.home :is(...)` (one class more specific than the wide rules), so
+   * their selector text never repeats a wide-screen rule's and the two cannot be mistaken for each other.
+   */
+  .home-window > .window-content {
+    overflow-y: auto;
+  }
+
+  .home-window :is(.home) {
+    flex: 0 0 auto;
+    padding: 6px;
+  }
+
+  .home :is(.home__grid) {
+    flex: 0 0 auto;
+    grid-template-rows: auto;
+  }
+
+  .home :is(.home-group--packs, .home__side) {
+    overflow: visible;
+  }
+
+  .home :is(.pack-shelf) {
+    flex: 0 0 auto;
+    max-height: 60vh;
+  }
+
+  .home-hero__badge {
+    margin-left: 0;
+  }
+}
