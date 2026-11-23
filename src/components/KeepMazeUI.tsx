@@ -26,6 +26,9 @@ export interface KeepMazeUIProps {
 
 const PEEK_MAX = 160;
 
+/** Answer strip letters, as on a 1997 quiz card. Options past the fourth fall back to numbers. */
+const OPTION_LETTERS = ['A', 'B', 'C', 'D'] as const;
+
 /** First sentence of a paragraph, capped so a hint stays a hint. */
 function firstSentence(text: string): string {
   const t = text.trim();
@@ -96,6 +99,39 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);
   const locked = !started || state.pending !== null || state.lastWrong !== null;
+  /**
+   * Torch rack and Score Medallion beside the mini-map, during play only. Purely visual: the Quest
+   * card carries the same Score, Streak, Torches, and Personal Best for assistive technology.
+   */
+  const trophy =
+    started && !state.won ? (
+      <div className="keepmaze__trophy" aria-hidden="true">
+        <div className="torch-rack" data-lit-count={state.torches}>
+          {Array.from({ length: STARTING_TORCHES }, (_, i) => (
+            <span key={i} className="torch-rack__slot" data-lit={i < state.torches ? 'true' : 'false'}>
+              <PixelIcon name="torch" size={24} />
+            </span>
+          ))}
+        </div>
+        <div className="medallion">
+          <svg className="medallion__coin" viewBox="0 0 32 32">
+            <circle cx={16} cy={16} r={15} className="medallion__rim" />
+            <circle cx={16} cy={16} r={11} className="medallion__face" />
+            <text x={16} y={17} textAnchor="middle" dominantBaseline="central" className="medallion__letter">
+              P
+            </text>
+          </svg>
+          <span className="medallion__score">{state.score} pts</span>
+          <span className="medallion__row">
+            <span className="medallion__label">Streak</span> <span className="medallion__value">{state.streak}</span>
+          </span>
+          <span className="medallion__row">
+            <span className="medallion__label">Best</span>{' '}
+            <span className="medallion__value">{best ? `${best.bestScore} pts` : '--'}</span>
+          </span>
+        </div>
+      </div>
+    ) : null;
   const scene = (
     <div className="keepmaze__scene">
       <div className="keepmaze__view">
@@ -115,6 +151,7 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
           <li><span className="minimap-legend__swatch minimap-legend__swatch--unknown" aria-hidden="true" />Unexplored</li>
         </ul>
       </div>
+      {trophy}
     </div>
   );
 
@@ -282,12 +319,22 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
         <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
       )}
       {pending && (
-        <div className="keepmaze__question" role="group" aria-label="Trivia question">
-          <p className="keepmaze__message">{pending.question.prompt}</p>
+        <div className="keepmaze__question keepmaze__question--manuscript" role="group" aria-label="Trivia question">
+          {/* Illuminated drop cap. A span, not a <p>, so the prompt stays the group's first paragraph. */}
+          <span className="keepmaze__dropcap" aria-hidden="true">
+            Q
+          </span>
+          <p className="keepmaze__message keepmaze__prompt">{pending.question.prompt}</p>
           <ul className="keepmaze__options">
             {pending.question.options.map((opt, i) => (
               <li key={i}>
-                <BevelButton onClick={() => answer(i)}>{opt}</BevelButton>
+                <BevelButton className="keepmaze__option" onClick={() => answer(i)}>
+                  {/* The letter badge is hidden from the accessible name, so the button is named by its option text. */}
+                  <span className="keepmaze__letter" aria-hidden="true">
+                    {`${OPTION_LETTERS[i] ?? String(i + 1)}.`}
+                  </span>
+                  {opt}
+                </BevelButton>
               </li>
             ))}
           </ul>

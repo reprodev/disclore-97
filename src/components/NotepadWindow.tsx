@@ -76,6 +76,12 @@ The small light beside Drive D: in the taskbar is gold while a disc is in the dr
 KEEPMAZE
 KeepMaze is a trivia dungeon. Choose an exit, answer a question about the disc to unlock the door, and make your way to the throne room. The Quest card shows your goal and how many rooms you have explored, and the mini-map legend explains its colours. Peek Hint shows the first sentence of the article that holds the answer. A wrong answer keeps the door locked and points you to that article. Every dungeon is checked with a breadth-first search, so the throne room can always be reached.
 
+Each room is drawn like a castle chamber from a 1990s quiz game: timber beams across the ceiling, stone-block walls, a framed portrait and a hanging tapestry, two arched oak side doors, flickering wall torches, and a woven rug in front of the main door. The padlock on the main door shows whether it is locked.
+
+When a door asks its question, the question appears on a parchment page with a gold, burgundy, and navy frame and a large decorated Q in the corner, like an illuminated manuscript. Each answer is a strip that starts with its letter, A. to D. Click the strip to give that answer.
+
+Beside the mini-map, a torch rack shows your three torches (gold while lit, grey once spent), and a gold P medallion shows your score in points, your streak, and your best score on this disc.
+
 Your Knowledge Score, Streak, and Torches are in the Quest card. A right answer is worth 100 points, plus 10 more for each right answer you already have in a row (the bonus stops growing after five). If you used Peek Hint on the question, the answer is worth 50 points with no bonus. A wrong answer ends your streak and dims one of your three torches. Torches are only a tally of mistakes: they never lock a door, and you can always keep going. Reach the throne room to earn a Victory Certificate stamped with your Score, Best Streak, and Scholar Rank: Royal Archivist, Court Scholar, Keep Explorer, or Torchbearer.
 
 Your Personal Best for each disc is kept on this computer. It is replaced when you finish a maze with a higher score, or with the same score and a better rank. Once there is one, the Quest card shows it, for example Personal Best: 210 pts (Royal Archivist), and a run that sets a new record is marked New Personal Best! on the certificate.

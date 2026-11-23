@@ -531,3 +531,185 @@
   background: var(--color-gold-light);
   border: 2px solid var(--color-crimson);
 }
+
+/* Illuminated manuscript question card: parchment inside a stepped navy, gold, and burgundy frame. */
+.keepmaze__question--manuscript {
+  position: relative;
+  padding: 10px 12px;
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  border: 3px solid var(--color-title-bg);
+  outline: 2px solid var(--color-gold);
+  outline-offset: -6px;
+}
+
+.keepmaze__question--manuscript::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  border: 1px solid var(--color-crimson);
+  pointer-events: none;
+}
+
+.keepmaze__question--manuscript::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* The drop cap: a large serif Q on a gold square, framed in navy with a burgundy keyline. */
+.keepmaze__dropcap {
+  float: left;
+  position: relative;
+  box-sizing: border-box;
+  width: 40px;
+  height: 44px;
+  margin: 2px 8px 4px 2px;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 40px;
+  text-align: center;
+  color: var(--color-crimson);
+  background: var(--color-gold-light);
+  border: 2px solid var(--color-title-bg);
+  outline: 1px solid var(--color-crimson-dark);
+  outline-offset: -5px;
+  user-select: none;
+}
+
+.keepmaze__question--manuscript .keepmaze__prompt {
+  margin: 2px 0 6px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.35;
+}
+
+/* Answer strips: full-width buttons, each led by a navy A. / B. / C. / D. badge. */
+.keepmaze__question--manuscript .keepmaze__options {
+  clear: both;
+  align-items: stretch;
+}
+
+.keepmaze__option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+}
+
+.keepmaze__letter {
+  flex: 0 0 auto;
+  min-width: 20px;
+  margin-right: 6px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  font-weight: bold;
+  text-align: center;
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+  border: 1px solid var(--color-gold);
+}
+
+/* Torch rack and Score Medallion, beside the mini-map. */
+.keepmaze__trophy {
+  flex: 0 0 96px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px;
+  overflow: hidden;
+  background: var(--color-dungeon-bg);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+
+.torch-rack {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.torch-rack__slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-gold-light);
+  background: var(--color-gold-dark);
+}
+
+.torch-rack__slot[data-lit="false"] {
+  border-color: var(--color-stone);
+  background: var(--color-stone-dark);
+}
+
+.torch-rack__slot[data-lit="false"] .pixel-icon {
+  opacity: 0.3;
+}
+
+.medallion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 2px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 2px solid var(--color-gold-dark);
+  outline: 1px solid var(--color-crimson);
+  outline-offset: -4px;
+}
+
+.medallion__coin {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.medallion__rim {
+  fill: var(--color-gold-dark);
+  stroke: var(--color-bevel-edge);
+  stroke-width: 1px;
+}
+
+.medallion__face {
+  fill: var(--color-gold);
+  stroke: var(--color-gold-light);
+  stroke-width: 1px;
+}
+
+.medallion__letter {
+  fill: var(--color-crimson);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.medallion__score {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--color-crimson);
+}
+
+.medallion__row {
+  font-size: 10px;
+}
+
+.medallion__label {
+  text-transform: uppercase;
+  color: var(--color-bevel-shadow);
+}
+
+.medallion__value {
+  font-weight: bold;
+}
