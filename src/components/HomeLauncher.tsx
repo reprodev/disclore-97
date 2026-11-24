@@ -3,6 +3,7 @@ import { playSlideClick } from '../audio/audio';
 import type { Theme } from '../library/theme';
 import { editionOf } from '../model/editions';
 import { pickRandomSection } from '../model/discSearch';
+import { ARCHIVE_KEY_STAMP } from '../model/easterEggs';
 import type { DiscManifest } from '../model/manifest';
 import type { QuickJumpMode } from '../model/nav';
 import { BevelButton } from './BevelButton';
@@ -15,6 +16,7 @@ import { EngravedWatermarks, HeroArt } from './SplashArt';
 import { Window } from './Window';
 import '../styles/home.css';
 import '../styles/workspace.css';
+import '../styles/eastereggs.css';
 
 export interface HomeLauncherProps {
   discs: DiscManifest[];
@@ -53,6 +55,8 @@ export interface HomeLauncherProps {
   demoDiscs?: boolean;
   /** Turns the built-in demo discs on or off. When given, the shelf has a Demo Discs checkbox. */
   onToggleDemoDiscs?: (on: boolean) => void;
+  /** Shows the "Archive Key '97" collector stamp in the status bar. */
+  archiveKey?: boolean;
 }
 
 function Card({
@@ -129,6 +133,7 @@ export function HomeLauncher({
   onMinimize,
   demoDiscs = true,
   onToggleDemoDiscs,
+  archiveKey = false,
 }: HomeLauncherProps) {
   const noDiscs = discs.length === 0;
   const canTurnOnDemo = onToggleDemoDiscs !== undefined && !demoDiscs;
@@ -349,6 +354,11 @@ export function HomeLauncher({
         <div className="status-bar home-status" role="group" aria-label="Home status bar">
           <div className="status-bar__panel status-bar__panel--disc">DiscLore '97 Home</div>
           <div className="status-bar__panel status-bar__panel--view">{packs}</div>
+          {archiveKey ? (
+            <div className="status-bar__panel status-bar__panel--stamp" title="You found the Archive Key.">
+              {ARCHIVE_KEY_STAMP}
+            </div>
+          ) : null}
           <div className="status-bar__panel status-bar__panel--cd">CD-ROM: AutoPlay Ready</div>
         </div>
       </div>

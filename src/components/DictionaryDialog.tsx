@@ -5,10 +5,12 @@ import type { Definition } from '../adapters/define';
 import type { FetchLike } from '../adapters/types';
 import type { DiscManifest } from '../model/manifest';
 import { findMentions } from '../model/discSearch';
+import { editorialNote } from '../model/easterEggs';
 import { BevelButton } from './BevelButton';
 import { useModalDialog } from './useModalDialog';
 import { Window } from './Window';
 import '../styles/dictionary.css';
+import '../styles/eastereggs.css';
 
 export interface DictionaryDialogProps {
   /** Every mounted disc. Matches are searched offline across all of them. */
@@ -46,6 +48,8 @@ export function DictionaryDialog({ discs, initialWord = '', onClose, onOpenSecti
   useModalDialog(layerRef, cancel, true);
 
   const mentions = useMemo(() => findMentions(discs, word), [discs, word]);
+  // Easter egg: a few words carry a note from the 1997 editors. Plain data, so it shows offline too.
+  const editorial = editorialNote(word);
 
   const lookUp = useCallback(
     async (raw: string) => {
@@ -139,6 +143,15 @@ export function DictionaryDialog({ discs, initialWord = '', onClose, onOpenSecti
               {note}
             </p>
           </section>
+
+          {editorial ? (
+            <section className="dictionary-dialog__editorial" aria-label="Editorial Note (1997)">
+              <h2 className="dictionary-dialog__editorial-title">Editorial Note (1997)</h2>
+              <p className="dictionary-dialog__editorial-text">
+                <strong>{editorial.headword}</strong> {editorial.note}
+              </p>
+            </section>
+          ) : null}
 
           <section className="dictionary-dialog__matches" aria-label="In your discs">
             <h2 className="dictionary-dialog__heading">In your discs</h2>

@@ -337,6 +337,65 @@ export function playVictoryFanfare(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Easter-egg sounds: short, soft, and silent while muted, like every other effect.
+// ---------------------------------------------------------------------------
+
+/** Liner notes: a soft, airy two-note music-box chime. */
+export function playLinerChime(): void {
+  play((c, t) => {
+    crystal(c, 1046.5, t, 0.6, 0.14);
+    crystal(c, 1318.51, t + 0.14, 0.8, 0.12);
+    tone(c, 'sine', 523.25, 523.25, t, 1.0, 0.05);
+  });
+}
+
+/** Eject: a soft motor whirr that winds down, then a gentle tray clunk. */
+export function playEject(): void {
+  play((c, t) => {
+    tone(c, 'triangle', 320, 140, t, 0.5, 0.12);
+    noise(c, 'lowpass', 600, t, 0.45, 0.06);
+    tone(c, 'sine', 110, 82, t + 0.48, 0.12, 0.18);
+  });
+}
+
+/** Konami code: a quick, bright retro arpeggio that climbs two octaves and lands on a chord. */
+export function playKonamiArpeggio(): void {
+  play((c, t) => {
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98];
+    notes.forEach((f, i) => tone(c, 'triangle', f, f, t + i * 0.06, 0.1, 0.2));
+    warmChord(c, [1046.5, 1318.51, 1567.98], t + notes.length * 0.06, 0.4, 0.22);
+  });
+}
+
+/** How long the modem chirp lasts, in seconds. */
+export const MODEM_CHIRP_SECONDS = 1.2;
+
+/**
+ * A gentle 1.2 s dial-up chirp: two dial-tone sines, a rising handshake sweep, a soft warble, and a
+ * hush of filtered line noise, all at a low level.
+ */
+export function playModemChirp(): void {
+  play((c, t) => {
+    tone(c, 'sine', 350, 350, t, 0.3, 0.06);
+    tone(c, 'sine', 440, 440, t, 0.3, 0.06);
+    tone(c, 'sine', 1100, 2100, t + 0.3, 0.3, 0.07);
+    tone(c, 'sine', 1650, 1650, t + 0.6, 0.12, 0.06);
+    tone(c, 'sine', 1300, 1300, t + 0.72, 0.12, 0.06);
+    tone(c, 'sine', 1650, 1650, t + 0.84, 0.12, 0.06);
+    noise(c, 'bandpass', 1800, t + 0.6, MODEM_CHIRP_SECONDS - 0.6, 0.05);
+  });
+}
+
+/** KeepMaze torch tap: a soft, hollow wood knock. */
+export function playWoodKnock(): void {
+  play((c, t) => {
+    tone(c, 'triangle', 220, 160, t, 0.09, 0.22);
+    tone(c, 'sine', 440, 300, t, 0.05, 0.08);
+    noise(c, 'bandpass', 900, t, 0.04, 0.06);
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Ambient soundscape
 // ---------------------------------------------------------------------------
 

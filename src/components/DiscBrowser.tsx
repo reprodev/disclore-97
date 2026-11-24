@@ -102,6 +102,8 @@ export interface DiscBrowserProps {
   onRefreshDisc?: () => void;
   /** True while a refresh is running: the Refresh controls are dimmed. */
   refreshing?: boolean;
+  /** Shows the "Archive Key '97" collector stamp in the Home status bar (the Konami code toggles it). */
+  archiveKey?: boolean;
 }
 
 /** Plain words for where an outline came from, for its banner. */
@@ -185,6 +187,7 @@ export function DiscBrowser({
   onToggleDemoDiscs,
   onRefreshDisc,
   refreshing = false,
+  archiveKey = false,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -390,6 +393,7 @@ export function DiscBrowser({
         onMinimize={onMinimize}
         demoDiscs={demoDiscs}
         onToggleDemoDiscs={onToggleDemoDiscs}
+        archiveKey={archiveKey}
       />
     </div>
   );

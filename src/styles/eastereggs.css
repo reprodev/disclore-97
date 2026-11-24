@@ -1,0 +1,199 @@
+/* Easter eggs: liner notes, the starfield screensaver, Pinpointer whispers, editorial notes,
+   the Archive Key stamp, and KeepMaze torch whispers. Token colours only, square corners, no
+   gradients, and no blurred shadows. */
+
+/* ---- Drive D:\LINER_NOTES.TXT ---- */
+.window.liner-notes {
+  width: min(480px, 100%);
+  max-height: 100%;
+  font-family: var(--font-ui);
+  color: var(--color-ink);
+}
+
+.liner-notes .window-content {
+  overflow: auto;
+}
+
+.liner-notes__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.liner-notes__page {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border-radius: 0;
+}
+
+.liner-notes__page p {
+  margin: 0 0 6px;
+}
+
+.liner-notes__rule {
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--color-bevel-shadow);
+}
+
+.liner-notes__hints {
+  margin: 0;
+  padding-left: 18px;
+  font-style: italic;
+}
+
+.liner-notes__eject {
+  min-height: 1.3em;
+  margin: 0;
+  font-weight: bold;
+}
+
+.liner-notes__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* The Eject Disc pulse on the Drive D: light uses the seek flash, a little longer. */
+.taskbar__drive[data-eject='true'] .taskbar__led {
+  background: var(--color-flame-hot);
+}
+
+/* ---- Starfield screensaver ---- */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  cursor: none;
+  background: var(--color-bevel-edge);
+  border: 0;
+  border-radius: 0;
+}
+
+.starfield__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.starfield__star {
+  fill: var(--color-bevel-hi);
+}
+
+.starfield__lane {
+  transform-origin: 50px 50px;
+  animation: starfield-warp 3.2s linear infinite;
+}
+
+.starfield__lane--1 {
+  animation-delay: -0.8s;
+}
+
+.starfield__lane--2 {
+  animation-delay: -1.6s;
+}
+
+.starfield__lane--3 {
+  animation-delay: -2.4s;
+}
+
+@keyframes starfield-warp {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starfield__lane {
+    animation: none;
+  }
+}
+
+/* ---- Pinpointer whispers ---- */
+.pinpointer__whisper {
+  margin: 0;
+  padding: 2px 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-bevel-shadow);
+  background: var(--color-tooltip-bg);
+  border-top: 1px solid var(--color-bevel-shadow);
+}
+
+/* ---- Dictionary editorial note ---- */
+.dictionary-dialog__editorial {
+  margin: 0;
+  padding: 4px 6px;
+  color: var(--color-ink);
+  background: var(--color-tooltip-bg);
+  border: 1px solid var(--color-bevel-edge);
+  border-radius: 0;
+}
+
+.dictionary-dialog__editorial-title {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dictionary-dialog__editorial-text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+}
+
+/* ---- Archive Key '97 stamp ---- */
+.status-bar__panel--stamp {
+  flex: 0 0 auto;
+  font-weight: bold;
+  color: var(--color-crimson);
+  letter-spacing: 0.04em;
+}
+
+/* ---- KeepMaze torch tap ---- */
+.keepmaze__panel {
+  position: relative;
+}
+
+.keepmaze__whisper {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  max-width: 60%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-style: italic;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-gold-light);
+  pointer-events: none;
+}
+
+.torch-rack[data-tappable='true'] {
+  cursor: pointer;
+}

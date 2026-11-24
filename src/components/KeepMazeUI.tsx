@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { playDoorUnlock, playTorch, playVictoryFanfare } from '../audio/audio';
+import { playDoorUnlock, playTorch, playVictoryFanfare, playWoodKnock } from '../audio/audio';
 import { loadBest, saveBest } from '../library/best';
 import type { StorageLike } from '../library/discLibrary';
+import { torchWhisper } from '../model/easterEggs';
 import { beatsBest, gameReducer, initGame, scholarRank, STARTING_TORCHES } from '../model/game';
 import type { PersonalBest } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
@@ -13,6 +14,7 @@ import { DungeonViewport, roomVariant } from './DungeonViewport';
 import { MiniMap } from './MiniMap';
 import { PixelIcon } from './PixelIcon';
 import '../styles/keepmaze.css';
+import '../styles/eastereggs.css';
 
 export interface KeepMazeUIProps {
   disc: DiscManifest;
@@ -52,6 +54,16 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   );
   const [started, setStarted] = useState(false);
   const [visited, setVisited] = useState<string[]>(() => [state.roomId]);
+  /**
+   * Easter egg: tapping the torch rack knocks softly and rotates a dungeon whisper in the panel's
+   * caption bar. It is local to the view and never touches the score, the streak, or the torches.
+   */
+  const [torchTaps, setTorchTaps] = useState(0);
+  const tapTorches = () => {
+    playWoodKnock();
+    setTorchTaps((n) => n + 1);
+  };
+  const whisper = torchTaps > 0 ? torchWhisper(torchTaps - 1) : null;
   /** Question whose Peek Hint is open. A new question starts with the hint closed. */
   const [peekId, setPeekId] = useState<string | null>(null);
 
@@ -134,7 +146,7 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
       </div>
       <div className="keepmaze__trophy">
         <dl className="quest-card__stats medallion" aria-label="Knowledge stats">
-          <div className="quest-card__stat torch-rack">
+          <div className="quest-card__stat torch-rack" data-tappable="true" title="Tap the torches" onClick={tapTorches}>
             <dt>Torches</dt>
             <dd>
               <span className="torches" role="img" aria-label={`${state.torches} of ${STARTING_TORCHES} torches lit`}>
@@ -177,6 +189,11 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   const panel = (body: ReactNode, mode: 'welcome' | 'room' | 'question') => (
     <div className="keepmaze__panel" data-mode={mode}>
       <p className="quest-card__title">KeepMaze Quest</p>
+      {whisper ? (
+        <span className="keepmaze__whisper" aria-live="polite">
+          {whisper}
+        </span>
+      ) : null}
       <div className="keepmaze__panel-body">{body}</div>
     </div>
   );

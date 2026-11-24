@@ -1,10 +1,13 @@
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
+import { playModemChirp } from '../audio/audio';
 import { discOrigin, originClassName } from '../library/discOrigin';
+import { MODEM_WHISPER_ID, pinpointerWhisper } from '../model/easterEggs';
 import type { DiscManifest } from '../model/manifest';
 import { MIN_QUERY_CHARS, searchSections } from '../model/discSearch';
 import type { SectionRef } from '../model/discSearch';
 import '../styles/home.css';
+import '../styles/eastereggs.css';
 
 export interface PinpointerProps {
   discs: DiscManifest[];
@@ -37,6 +40,17 @@ export function Pinpointer({ discs, removableIds, onOpenSection, onBurnTopic }: 
   const hits = useMemo(() => searchSections(discs, query), [discs, query]);
   const showList = open && searching;
   const byId = useMemo(() => new Map(discs.map((d) => [d.disc_id, d])), [discs]);
+
+  // Easter egg: a few old words get a quiet one-line whisper under the results. It is not a row,
+  // so the results and the Burn CD-R row work exactly as they always do.
+  const whisper = pinpointerWhisper(query);
+  const whisperId = whisper?.id ?? null;
+  const chirped = useRef<string | null>(null);
+  useEffect(() => {
+    // The dial-up words chirp once each time they are typed (Mute keeps it silent).
+    if (whisperId === MODEM_WHISPER_ID && chirped.current !== MODEM_WHISPER_ID) playModemChirp();
+    chirped.current = whisperId;
+  }, [whisperId]);
 
   // Rows are the local results, then the burn row when it is offered.
   const burnRow = onBurnTopic !== undefined;
@@ -111,9 +125,9 @@ export function Pinpointer({ discs, removableIds, onOpenSection, onBurnTopic }: 
         {showList ? (
           // Mouse presses must not take focus from the input, or the list would close before the click lands.
           <div className="pinpointer__results" onMouseDown={(e) => e.preventDefault()}>
-            {rowCount === 0 ? (
+            {rowCount === 0 && !whisper ? (
               <p className="pinpointer__empty">No matching articles.</p>
-            ) : (
+            ) : rowCount === 0 ? null : (
               <ul id={listId} role="listbox" aria-label="Matching articles" className="pinpointer__list">
                 {hits.map((hit, i) => {
                   const disc = byId.get(hit.discId);
@@ -153,6 +167,16 @@ export function Pinpointer({ discs, removableIds, onOpenSection, onBurnTopic }: 
                 ) : null}
               </ul>
             )}
+            {whisper ? (
+              <p
+                className="pinpointer__whisper"
+                data-whisper={whisper.id}
+                aria-live="polite"
+                onClick={whisper.id === MODEM_WHISPER_ID ? () => playModemChirp() : undefined}
+              >
+                {whisper.text}
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>

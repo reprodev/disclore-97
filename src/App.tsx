@@ -1,6 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import type { FetchLike } from './adapters/types';
-import { ambienceKindFor, playBurnComplete, playEditionSwitch, playSpinUp, setAmbienceKind, setAudioEdition } from './audio/audio';
+import {
+  ambienceKindFor,
+  playBurnComplete,
+  playEditionSwitch,
+  playKonamiArpeggio,
+  playSpinUp,
+  setAmbienceKind,
+  setAudioEdition,
+} from './audio/audio';
+import { Starfield } from './components/Starfield';
+import { KONAMI_SEQUENCE, konamiStep, STARFIELD_CLICK_GAP_MS, STARFIELD_CLICKS } from './model/easterEggs';
 import { refreshDisc } from './adapters/burn';
 import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
@@ -215,6 +226,45 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     setVisited(next);
     saveVisited(bookmarkStorage, disc.disc_id, next);
   }, [marksDiscId, openSectionId]);
+
+  // Easter egg: the Konami code toggles the "Archive Key '97" stamp in the Home status bar. It listens
+  // only while nothing is being typed and no dialog or screensaver is up.
+  const [archiveKey, setArchiveKey] = useState(false);
+  const konami = useRef(0);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      const typing = el !== null && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+      if (typing || document.querySelector('.modal-layer, .starfield')) {
+        konami.current = 0;
+        return;
+      }
+      konami.current = konamiStep(konami.current, e.key);
+      if (konami.current === KONAMI_SEQUENCE.length) {
+        konami.current = 0;
+        playKonamiArpeggio();
+        setArchiveKey((on) => !on);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Easter egg: three quick clicks on the bare desktop (not an icon or a window) start the Starfield.
+  const [starfieldOn, setStarfieldOn] = useState(false);
+  const desktopClicks = useRef<{ count: number; last: number }>({ count: 0, last: 0 });
+  const onDesktopClick = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    const c = desktopClicks.current;
+    c.count = e.timeStamp - c.last <= STARFIELD_CLICK_GAP_MS ? c.count + 1 : 1;
+    c.last = e.timeStamp;
+    if (c.count >= STARFIELD_CLICKS) {
+      c.count = 0;
+      setStarfieldOn(true);
+    }
+  };
+  const endStarfield = useCallback(() => setStarfieldOn(false), []);
 
   // Ctrl+D / Cmd+D opens the Dictionary while a disc is open, instead of the browser's bookmark dialog.
   const discIsOpen = disc !== undefined;
@@ -583,7 +633,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
 
   return (
     <div className="desktop">
-      <div className="desktop__work app-shell">
+      <div className="desktop__work app-shell" onClick={onDesktopClick}>
         <DesktopIcons
           discs={discs}
           onOpenDisc={openDisc}
@@ -639,6 +689,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           removableIds={removable}
           demoDiscs={demoDiscs}
           onToggleDemoDiscs={onToggleDemoDiscs}
+          archiveKey={archiveKey}
           onRefreshDisc={disc && removable.has(disc.disc_id) ? () => void onRefreshDisc(disc.disc_id) : undefined}
           refreshing={refreshingId !== null && refreshingId === disc?.disc_id}
         />
@@ -757,6 +808,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           onToggleDemoDiscs,
         }}
       />
+      {starfieldOn ? <Starfield onExit={endStarfield} /> : null}
     </div>
   );
 }

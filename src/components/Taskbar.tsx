@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { playClick } from '../audio/audio';
+import { LINER_NOTES_CLICK_GAP_MS, LINER_NOTES_CLICKS } from '../model/easterEggs';
 import type { DiscManifest } from '../model/manifest';
+import { LinerNotesDialog } from './LinerNotesDialog';
 import { AmbienceToggle } from './AmbienceToggle';
 import { MuteToggle } from './MuteToggle';
 import { PixelIcon } from './PixelIcon';
@@ -90,6 +92,30 @@ export function Taskbar({
   }, [activityKey, settledKey]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<HTMLButtonElement | null>(null);
+
+  // Easter egg: five quick clicks on the Drive D: light open its liner notes.
+  const [linerOpen, setLinerOpen] = useState(false);
+  const driveClicks = useRef<{ count: number; last: number }>({ count: 0, last: 0 });
+  const onDriveClick = (e: { timeStamp: number }) => {
+    const now = e.timeStamp;
+    const c = driveClicks.current;
+    c.count = now - c.last <= LINER_NOTES_CLICK_GAP_MS ? c.count + 1 : 1;
+    c.last = now;
+    if (c.count >= LINER_NOTES_CLICKS) {
+      c.count = 0;
+      setLinerOpen(true);
+    }
+  };
+  // Eject Disc pulses the LED for a little longer than a seek, then it settles again.
+  const [ejectPulse, setEjectPulse] = useState(0);
+  const [settledEject, setSettledEject] = useState(0);
+  const ejecting = ejectPulse !== settledEject;
+  useEffect(() => {
+    if (ejectPulse === settledEject) return;
+    const id = window.setTimeout(() => setSettledEject(ejectPulse), SEEK_PULSE_MS * 2);
+    return () => window.clearTimeout(id);
+  }, [ejectPulse, settledEject]);
+  const flashing = seeking || ejecting;
 
   // Close the menu when the pointer goes down anywhere outside the taskbar.
   useEffect(() => {
@@ -186,16 +212,21 @@ export function Taskbar({
           aria-label={driveActive ? 'Drive D: (CD-ROM), disc loaded' : 'Drive D: (CD-ROM), empty'}
           title="Drive D: (CD-ROM)"
           data-active={driveActive ? 'true' : 'false'}
-          data-seek={seeking ? 'true' : 'false'}
+          data-seek={flashing ? 'true' : 'false'}
+          data-eject={ejecting ? 'true' : 'false'}
+          onClick={onDriveClick}
         >
           <PixelIcon name="cd" size={16} />
           {/* Keyed by the activity so each new seek restarts the flash from its first step. */}
-          <span key={seeking ? activityKey : 'steady'} className="taskbar__led" aria-hidden="true" />
+          <span key={flashing ? `${activityKey}-${ejectPulse}` : 'steady'} className="taskbar__led" aria-hidden="true" />
         </span>
         <AmbienceToggle />
         <MuteToggle />
         <TrayClock />
       </div>
+      {linerOpen ? (
+        <LinerNotesDialog onClose={() => setLinerOpen(false)} onEject={() => setEjectPulse((n) => n + 1)} />
+      ) : null}
     </div>
   );
 }
