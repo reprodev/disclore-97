@@ -573,9 +573,13 @@
   margin: 2px 0 0;
 }
 
+/*
+ * 3px rather than 4px top and bottom: at 1280 x 720 the right column (Quick Jump Modes, Utilities, and
+ * this box) came to 509px in a 508px column, which showed a scrollbar for a single pixel.
+ */
 .home-info {
   flex: 0 0 auto;
-  padding: 4px 8px;
+  padding: 3px 8px;
 }
 
 .home-info__title {

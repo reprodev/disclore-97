@@ -588,5 +588,7 @@ describe('Home right column fits without a scrollbar', () => {
     expect(rule('.home__side')).toContain('gap: 4px');
     expect(rule('.home .home__cards')).toContain('gap: 3px');
     expect(rule('.home__side')).toContain('overflow-y: auto');
+    // 4px here made the column 1px too tall at 1280 x 720, which showed a scrollbar.
+    expect(rule('.home-info')).toContain('padding: 3px 8px');
   });
 });
