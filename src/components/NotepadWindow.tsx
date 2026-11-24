@@ -26,7 +26,7 @@ DISCS
 
 BURN NEW CD-R DISC
 Compile your own disc from:
-- A public GitHub repository (read through the GitHub API).
+- A public GitHub repository, read straight from your own computer through the GitHub API. GitHub takes about 20 repository burns an hour from each connection. After that, wait up to an hour, or burn an offline outline instead.
 - A web page address (the text and pictures are read by a small server function).
 - A topic. The topic is looked up on English Wikipedia and built into a disc with its text and pictures. If you are offline, or nothing matches, you get an offline study outline instead, and it says so.
 - Markdown text that you paste in.

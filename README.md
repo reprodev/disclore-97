@@ -192,7 +192,7 @@ Four source kinds are supported:
 
 | Source | How it is read |
 | --- | --- |
-| **github** | A public repository, read through the GitHub REST API: description, facts, languages, README text, the owner's avatar, and README images. |
+| **github** | A public repository, read from your browser through the GitHub REST API: description, facts, languages, README text, the owner's avatar, and README images. |
 | **webpage** | A public web page, fetched through `/api/extract`. The text and safe `og:image`, `twitter:image`, and `<img>` pictures are extracted. |
 | **topic** | A free-text topic, looked up on English Wikipedia through `/api/topic`. The article text, section headings, and pictures become a disc. |
 | **markdown** | Markdown text you paste in. |
@@ -228,7 +228,7 @@ Three optional Cloudflare Pages Functions do the work the browser cannot. The ap
 
 ### Limits
 
-- **GitHub rate limit.** Requests are unauthenticated, so GitHub allows 60 requests per hour per IP address. When the limit is reached, the burn fails with an error and you can retry later.
+- **GitHub rate limit.** GitHub sources are read straight from your browser through the public GitHub REST API, with no token and no server in between. GitHub allows 60 unauthenticated requests per hour per IP address, and a repository burn uses 3 (repository info, languages, and README), so you can burn about 20 repositories an hour. The limit belongs to your address and is not shared by everyone using the site, though people behind one shared address (an office, a school, or a VPN) share it. When it runs out, the burn reports "All lines to the GitHub archive are busy" and offers **Burn offline**. Full access returns within an hour.
 - **Disc library.** Burned discs are stored in `localStorage` in your browser, up to 10 discs. They never leave your device.
 
 ## Getting started
