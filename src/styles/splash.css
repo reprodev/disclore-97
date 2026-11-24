@@ -10,7 +10,11 @@
   overflow: auto;
 }
 
-/* Card: navy field, bevel on the outside, a thin gold rule inside. Fades in once. */
+/*
+ * Card: the Home screen's palette, so each edition flows straight into its own Home. A Win95 bevel
+ * outside, warm parchment inside with ink text, burgundy for the year and the badge, and antique-gold
+ * rules. Fades in once.
+ */
 .boot-card {
   width: min(620px, 100%);
   box-sizing: border-box;
@@ -18,69 +22,69 @@
   background: var(--color-surface);
   border: var(--bevel-w) solid;
   border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+  border-radius: 0;
   animation: boot-fade 0.9s ease-out both;
 }
-
 .boot-card__frame {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  color: var(--color-title-text);
-  background: var(--color-night);
+  color: var(--color-ink);
+  background: var(--color-parchment);
   border: 2px solid var(--color-gold-dark);
-  outline: 1px solid var(--color-gold);
+  outline: 1px solid var(--color-gold-dark);
   outline-offset: -6px;
 }
-
+/* The artwork keeps its framed night-sky box, like .home-hero__emblem on Home. */
 .boot-hero {
   display: flex;
   justify-content: center;
   max-height: 32vh;
   overflow: hidden;
   background: var(--color-night);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border: 2px solid var(--color-gold-dark);
 }
-
 .boot-hero__art {
   display: block;
   width: 100%;
   height: auto;
   max-height: 32vh;
 }
-
-/* Title block: staggered fade after the card. */
+/* Title block: staggered fade after the card, closed by a double gold rule as on Home. */
 .boot-titleblock {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  padding-bottom: 8px;
   text-align: center;
+  border-bottom: 3px double var(--color-gold-dark);
 }
-
 .boot-title {
   margin: 0;
   font-family: var(--font-display, var(--font-serif));
-  font-size: 52px;
-  font-weight: bold;
+  /* 52px on desktop; on a phone it shrinks so the widely tracked Christmas title stays on one line. */
+  font-size: clamp(32px, 9vw, 52px);
+  font-weight: var(--display-weight, bold);
   line-height: 1;
-  letter-spacing: 1px;
-  color: var(--color-gold-light);
-  text-shadow: 2px 2px 0 var(--color-crimson-dark);
+  letter-spacing: var(--display-tracking, 1px);
+  color: var(--color-ink);
   animation: boot-fade 0.7s ease-out 0.3s both;
 }
-
+.boot-title__year {
+  color: var(--color-crimson);
+}
 .boot-subtitle {
   margin: 0;
   font-family: var(--font-serif);
   font-size: 13px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--color-paper);
+  color: var(--color-ink);
   animation: boot-fade 0.7s ease-out 0.6s both;
 }
-
+/* The edition badge: light title text on burgundy, framed in antique gold. */
 .boot-seal {
   margin: 2px 0 0;
   padding: 3px 12px;
@@ -89,53 +93,45 @@
   font-weight: bold;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-gold-light);
+  color: var(--color-title-text);
   background: var(--color-crimson);
-  border: 2px solid var(--color-gold);
+  border: 2px solid var(--color-gold-dark);
   outline: 1px solid var(--color-crimson-dark);
   animation: boot-fade 0.7s ease-out 0.9s both;
 }
-
-/* Driver console: inset panel with the progress bar, status line, and spec strip. */
-.boot-console {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px;
-  background: var(--color-console-bg);
-  border: var(--bevel-w) solid;
-  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
-}
-
+/* Compact 2 x 2 spec strip, right under the title banner. */
 .boot-specs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2px 16px;
-  margin: 4px 0 0;
-  padding-top: 6px;
-  border-top: 1px solid var(--color-console-dim);
+  margin: 0;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--color-console-text);
+  color: var(--color-ink);
 }
-
 .boot-specs__row {
   display: flex;
   gap: 4px;
   min-width: 0;
 }
-
 .boot-specs dt {
   flex: 0 0 auto;
   font-weight: bold;
-  color: var(--color-console-accent);
+  color: var(--color-crimson);
 }
-
 .boot-specs dd {
   margin: 0;
   min-width: 0;
 }
-
+/* The bottom of the card: progress bar, status line, and the continue row, under a gold rule. */
+.boot-console {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-gold-dark);
+}
 .boot-footer {
   display: flex;
   align-items: center;
@@ -143,10 +139,8 @@
   gap: 8px;
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--color-sky-light);
-}
-
-@keyframes boot-fade {
+  color: var(--color-ink);
+}@keyframes boot-fade {
   from {
     opacity: 0;
   }
@@ -161,7 +155,7 @@
   min-height: 1.3em;
   font-family: var(--font-ui);
   font-size: 12px;
-  color: var(--color-console-text);
+  color: var(--color-ink);
 }
 
 .splash__bar {

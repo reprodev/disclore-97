@@ -16,7 +16,7 @@ export const BOOT_MESSAGES = [
 
 export const BOOT_DURATION_MS = 10000;
 
-/** Two-column spec strip under the progress bar. */
+/** Compact 2 x 2 spec strip under the title and edition banner. */
 const SPECS: [string, string][] = [
   ['Audio:', 'Procedural WebAudio'],
   ['Atlas:', 'Interactive SVG'],
@@ -79,33 +79,37 @@ export function BootSplash({ onDone, delayMs = BOOT_DURATION_MS, edition = 'clas
           </div>
 
           <div className="boot-titleblock">
-            <h1 className="boot-title">DiscLore '97</h1>
+            {/* Like the Home masthead: the name in ink, the year in burgundy. */}
+            <h1 className="boot-title">
+              DiscLore <span className="boot-title__year">'97</span>
+            </h1>
             <p className="boot-subtitle">{editionOf(edition).bootSubtitle}</p>
             <p className="boot-seal">KeepMaze Engine &bull; Procedural Audio</p>
           </div>
 
+          <dl className="boot-specs">
+            {SPECS.map(([label, value]) => (
+              <div key={label} className="boot-specs__row">
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {/* The bottom of the card: the driver progress and its status, then the way in. */}
           <div className="boot-console">
             <InitBar durationSec={delayMs / 1000} step={step} message={BOOT_MESSAGES[step]!} />
-            <dl className="boot-specs">
-              {SPECS.map(([label, value]) => (
-                <div key={label} className="boot-specs__row">
-                  <dt>{label}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div className="boot-footer">
-            <span className="boot-plaque__hint">Click or press Enter to continue</span>
-            <BevelButton
-              onClick={(e) => {
-                e.stopPropagation();
-                finish(true);
-              }}
-            >
-              Skip
-            </BevelButton>
+            <div className="boot-footer">
+              <span className="boot-plaque__hint">Click or press Enter to continue</span>
+              <BevelButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  finish(true);
+                }}
+              >
+                Skip
+              </BevelButton>
+            </div>
           </div>
         </div>
       </div>
