@@ -23,8 +23,12 @@
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  /* A thin, wide panorama: the console below keeps room for a whole question without scrolling. */
-  height: clamp(130px, 26vh, 175px);
+  /*
+   * A thin, wide panorama: the console below keeps room for a whole question without scrolling.
+   * 24vh rather than 26vh: at 1024 x 640 an open question overflowed the pane by 9px. Above about
+   * 729px of height the 175px cap applies either way, so taller screens are unchanged.
+   */
+  height: clamp(130px, 24vh, 175px);
   overflow: hidden;
   background: var(--color-stone-dark);
   border: var(--bevel-w) solid;

@@ -308,7 +308,7 @@ describe('hero stage and console layout', () => {
 
   it('sizes the stage as a thin, wide panorama and lets the console fill the rest of the pane', () => {
     const stage = rule('.keepmaze__stage');
-    expect(stage).toContain('height: clamp(130px, 26vh, 175px)');
+    expect(stage).toContain('height: clamp(130px, 24vh, 175px)');
     expect(stage).not.toContain('aspect-ratio');
     expect(rule('.keepmaze')).toContain('min-height: 100%');
     expect(rule('.keepmaze')).toContain('background: var(--color-dungeon-bg)');

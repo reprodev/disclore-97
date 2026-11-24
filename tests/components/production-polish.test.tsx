@@ -282,7 +282,7 @@ describe('narrow screens (under 768px)', () => {
 
   it('stacks the KeepMaze console and lets it scroll, while the wide zero-scroll stage is unchanged', () => {
     const css = read('src/styles/keepmaze.css');
-    expect(css).toMatch(/\n\.keepmaze__stage\s*\{[^}]*height: clamp\(130px, 26vh, 175px\)/);
+    expect(css).toMatch(/\n\.keepmaze__stage\s*\{[^}]*height: clamp\(130px, 24vh, 175px\)/);
     expect(css).toMatch(/\n\.keepmaze__console\s*\{[^}]*grid-template-columns: minmax\(260px, 2fr\) minmax\(0, 3fr\)/);
     const m = mobileBlock('src/styles/keepmaze.css');
     expect(ruleIn(m, '.keepmaze__console')).toContain('grid-template-columns: minmax(0, 1fr)');
