@@ -1,8 +1,9 @@
-import { ENTRANCE_ROOM_ID, SHAPE_ANIMS, THRONE_ROOM_ID } from './manifest';
+import { ENTRANCE_ROOM_ID, MAX_OUTLINE_INPUT, OUTLINE_KINDS, SHAPE_ANIMS, THRONE_ROOM_ID } from './manifest';
 import type {
   DiscManifest,
   Dungeon,
   ErrorCode,
+  OutlineKind,
   ShapeAnim,
   ValidationError,
   ValidationResult,
@@ -179,6 +180,16 @@ export function validateManifest(input: unknown): ValidationResult {
       });
     }
 
+    // Optional offline-outline marker: checked only when present.
+    if ('outline' in root && root.outline !== undefined) {
+      if (!isObj(root.outline)) {
+        err('$.outline', 'wrong-type', `Expected object at $.outline but found ${describe(root.outline)}`);
+      } else {
+        field(root.outline, 'kind', '$.outline', 'string');
+        field(root.outline, 'input', '$.outline', 'string');
+      }
+    }
+
     if (errors.length > 0) return { ok: false, errors };
 
     // ---------- Pass 2: semantic checks on well-typed data ----------
@@ -269,6 +280,20 @@ export function validateManifest(input: unknown): ValidationResult {
           err(`${p}.caption`, 'unsafe-media', `Media caption must be plain, non-empty text at ${p}.caption`);
         }
       });
+    }
+
+    if (m.outline !== undefined) {
+      if (!OUTLINE_KINDS.includes(m.outline.kind as OutlineKind)) {
+        err('$.outline.kind', 'wrong-type', 'Outline kind must be github, webpage, or topic at $.outline.kind');
+      }
+      const input = m.outline.input;
+      if (input.trim() === '' || input.length > MAX_OUTLINE_INPUT || /[\u0000-\u001f\u007f]/.test(input)) {
+        err(
+          '$.outline.input',
+          'wrong-type',
+          `Outline input must be plain, non-empty text of at most ${MAX_OUTLINE_INPUT} characters at $.outline.input`,
+        );
+      }
     }
 
     if (errors.length > 0) return { ok: false, errors };

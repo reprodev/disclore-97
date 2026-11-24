@@ -189,7 +189,7 @@ describe('ambient soundscape', () => {
     expect(m.sources).toHaveLength(0);
   });
 
-  it.each(['castle', 'retro', 'study'] as const)('%s builds a looping bed of voices', (kind) => {
+  it.each(['castle', 'night', 'retro', 'web', 'study'] as const)('%s builds a looping bed of voices', (kind) => {
     const m = makeMock();
     __setContextFactory(() => m.ctx as unknown as AudioContext);
     startAmbience(kind);
@@ -276,11 +276,12 @@ describe('ambient soundscape', () => {
   it('picks a soundscape for a disc id', () => {
     expect(ambienceKindFor('castles')).toBe('castle');
     expect(ambienceKindFor('topic-medieval-castles-ab12')).toBe('castle');
-    expect(ambienceKindFor('halloween')).toBe('castle');
+    expect(ambienceKindFor('halloween')).toBe('night');
+    expect(ambienceKindFor('topic-folklore-of-ireland-77aa')).toBe('night');
     expect(ambienceKindFor('resurrection')).toBe('retro');
     expect(ambienceKindFor('retro-dialup')).toBe('retro');
     expect(ambienceKindFor('github-octo-hello-1a2b')).toBe('retro');
-    expect(ambienceKindFor('webpage-example-com-9z8y')).toBe('retro');
+    expect(ambienceKindFor('webpage-example-com-9z8y')).toBe('web');
     expect(ambienceKindFor('markdown-notes-0000')).toBe('study');
     expect(ambienceKindFor(undefined)).toBe('study');
   });

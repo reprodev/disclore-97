@@ -83,7 +83,7 @@ The article screenshot shows text from the English Wikipedia article [Apollo 11]
 - **Start menu, shortcuts, and deep links.** A keyboard-driven Start menu, **Help > Shortcuts...**, and links such as `?disc=castles&view=keepmaze` or `?topic=Lighthouse`, with **View > Copy Share Link**.
 - **Three Editions.** Classic '97, Haunted Edition, and Christmas Edition, each with its own colours, artwork, lettering, and chimes.
 - **Small hardware touches.** A Drive D: light that flashes on every disc seek, a pixel emblem for each built-in disc, and gentle SVG animations that stop under `prefers-reduced-motion`.
-- **Procedural sound.** Every effect, chime, and the optional Ambience is synthesized with WebAudio, with no audio files. One **Sound** button mutes everything, narration included.
+- **Procedural sound.** Every effect, chime, and the optional Ambience is synthesized with WebAudio, with no audio files. The Ambience is a quiet, slowly drifting bed of warm pads and filtered noise, with its own atmosphere for castles, folklore nights, code and lost formats, web pages, and everything else, coloured by the edition. One **Sound** button mutes everything, narration included.
 - **Phones and small windows.** Under 768px wide, the desktop icons fold into a strip, the Home columns and disc sidebar stack, and the taskbar keeps **Start** and **Sound** on one row.
 - **No blank screens.** An error boundary turns a crash into a Win95 message box with a restart.
 
@@ -201,6 +201,8 @@ Four source kinds are supported:
 
 **Topic fallback.** If a topic lookup fails (offline, no matching article, a disambiguation page, or no `/api/topic` function), the burn still succeeds. It builds an **offline study outline** that says plainly that it is an outline and not an encyclopedia article.
 
+**Refreshing an outline.** Every offline outline remembers the GitHub address, web page, or topic it stands in for. Opening it shows a yellow banner with **Refresh Full Disc from Source...** (also **File > Refresh Disc from Source...**). When the source can be read, the full disc replaces the outline in the same place on the shelf, under the same disc ID, so its notes, bookmarks, and Personal Best stay. If the source still cannot be read, the outline is left as it was and a message box says why.
+
 **Pictures.** A disc can carry up to 8 pictures. Only public `https` image addresses are kept. The compiler and the validator reject `http`, `javascript:`, `data:`, localhost and private addresses, credentials, odd ports, and SVG files.
 
 **Sample burns.** While the library has no burned discs, the empty **Burned CD-Rs** tab on the Home shelf offers three quick-start buttons: **Burn Sample: Halloween**, **Burn Sample: Gothic fiction**, and **Burn Sample: CD-ROM**. Each opens the Burn dialog and starts a Wikipedia topic burn for that topic (or the offline outline, if the lookup fails). The topics depend on the active edition: Haunted offers Halloween, Gothic fiction, and Ghostlore, and Christmas offers Christmas, A Christmas Carol, and Christmas tree.
@@ -228,7 +230,7 @@ Three optional Cloudflare Pages Functions do the work the browser cannot. The ap
 
 ### Limits
 
-- **GitHub rate limit.** GitHub sources are read straight from your browser through the public GitHub REST API, with no token and no server in between. GitHub allows 60 unauthenticated requests per hour per IP address, and a repository burn uses 3 (repository info, languages, and README), so you can burn about 20 repositories an hour. The limit belongs to your address and is not shared by everyone using the site, though people behind one shared address (an office, a school, or a VPN) share it. When it runs out, the burn reports "All lines to the GitHub archive are busy" and offers **Burn offline**. Full access returns within an hour.
+- **GitHub rate limit.** GitHub sources are read straight from your browser through the public GitHub REST API, with no token and no server in between. GitHub allows 60 unauthenticated requests per hour per IP address, and a repository burn uses 3 (repository info, languages, and README), so you can burn about 20 repositories an hour. The limit belongs to your address and is not shared by everyone using the site, though people behind one shared address (an office, a school, or a VPN) share it. When it runs out, the burn reports "All lines to the GitHub archive are busy", quotes the wait in minutes when GitHub sends a reset time, and offers **Burn offline**. An outline burned that way can be refreshed into the full disc later.
 - **Disc library.** Burned discs are stored in `localStorage` in your browser, up to 10 discs. They never leave your device.
 
 ## Getting started

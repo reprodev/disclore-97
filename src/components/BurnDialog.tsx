@@ -136,7 +136,11 @@ export function BurnDialog({
 
   const onBurnOffline = (topic: string) => {
     if (busy) return;
-    void run((signal) => burnFallback(topic, { signal }));
+    // The outline remembers the address it stands in for, so it can be refreshed into the full disc later.
+    const parsed = parseInput(text);
+    const origin =
+      parsed.ok && (parsed.kind === 'github' || parsed.kind === 'webpage') ? { kind: parsed.kind, input: text.trim() } : undefined;
+    void run((signal) => burnFallback(topic, { signal }, origin));
   };
 
   /** Burns the page's guessed subject as a topic: /api/topic when it can, the offline outline otherwise. */
@@ -160,7 +164,8 @@ export function BurnDialog({
   const isOfflineNotice = error?.message === OFFLINE_NOTICE;
   const fallbackTopic = !isOfflineNotice && error?.fallbackTopic ? error.fallbackTopic : undefined;
   const offlineTopic = isOfflineNotice ? fallbackTopicFor(text) : fallbackTopic;
-  const message = error ? (isOfflineNotice ? OFFLINE_NOTICE : ERROR_MESSAGES[error.code]) : '';
+  // The error's own message, which can carry details such as the quoted wait on a busy GitHub line.
+  const message = error ? (isOfflineNotice ? OFFLINE_NOTICE : error.message || ERROR_MESSAGES[error.code]) : '';
   // Typing clears the error, so the box still holds the address that failed.
   const failedInput = error && !isOfflineNotice && WIKI_FALLBACK_CODES.has(error.code) ? parseInput(text) : undefined;
   const wikiTopic = failedInput?.ok && failedInput.kind === 'webpage' ? topicFromUrl(failedInput.url) : undefined;

@@ -7,7 +7,11 @@ export type SaveResult = { saved: true } | { saved: false; reason: 'unavailable'
 export interface DiscLibrary {
   /** Validated manifests, oldest first. */
   load(): DiscManifest[];
-  save(m: DiscManifest): SaveResult;
+  /**
+   * Saves a disc as the newest one. With `keepPosition`, a disc that is already saved under the same
+   * id is replaced where it is (used when an outline is refreshed into the full disc).
+   */
+  save(m: DiscManifest, options?: { keepPosition?: boolean }): SaveResult;
   remove(discId: string): void;
 }
 
@@ -87,12 +91,15 @@ export function createDiscLibrary(storage: StorageLike | null | undefined): Disc
       }
     },
 
-    save(m: DiscManifest): SaveResult {
+    save(m: DiscManifest, options?: { keepPosition?: boolean }): SaveResult {
       if (!storage) return { saved: false, reason: 'unavailable' };
       try {
         const key = KEY_PREFIX + m.disc_id;
-        const others = readAll(storage).filter((e) => e.key !== key);
-        const seq = 1 + others.reduce((max, e) => Math.max(max, e.seq), 0);
+        const all = readAll(storage);
+        const existing = all.find((e) => e.key === key);
+        const others = all.filter((e) => e.key !== key);
+        const seq =
+          options?.keepPosition && existing ? existing.seq : 1 + others.reduce((max, e) => Math.max(max, e.seq), 0);
         const value = JSON.stringify({ v: 1, seq, manifest: m });
         // Make room first so the saved disc is never the one evicted.
         while (others.length > MAX_DISCS - 1) {

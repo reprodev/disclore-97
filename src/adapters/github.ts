@@ -1,6 +1,6 @@
 // GitHub adapter: public REST API to ExtractedSource. Never throws.
 
-import { makeError } from './errors';
+import { makeError, rateLimitedError } from './errors';
 import { fetchWithDeadline } from './http';
 import { extractImages } from '../extract/htmlExtract';
 import { parseMarkdown } from './markdown';
@@ -19,6 +19,31 @@ const IMAGE_SCAN_CHARS = 60000;
 /** Where GitHub serves repository files as raw bytes. Built from parts so no address literal sits in source. */
 const RAW_BASE = ['https:', '', 'raw.githubusercontent.com'].join('/');
 const INIT: RequestInit = { method: 'GET', headers: { Accept: 'application/vnd.github+json' } };
+/** The longest wait worth quoting. Beyond this the busy-line message falls back to "up to an hour". */
+const MAX_QUOTED_WAIT_MINUTES = 120;
+
+/**
+ * Roughly how many minutes until GitHub takes requests again, from `X-RateLimit-Reset` (epoch seconds)
+ * or, failing that, `Retry-After` (seconds). Rounds up to whole minutes. Returns undefined when neither
+ * header is present, readable, and within the next two hours.
+ */
+export function minutesUntilReset(headers: Headers | undefined, nowMs: number = Date.now()): number | undefined {
+  try {
+    const reset = Number(headers?.get('x-ratelimit-reset') ?? '');
+    let seconds: number | undefined;
+    if (headers?.get('x-ratelimit-reset') && Number.isFinite(reset) && reset > 0) {
+      seconds = reset - nowMs / 1000;
+    } else {
+      const retry = Number(headers?.get('retry-after') ?? '');
+      if (headers?.get('retry-after') && Number.isFinite(retry) && retry >= 0) seconds = retry;
+    }
+    if (seconds === undefined) return undefined;
+    const minutes = Math.max(1, Math.ceil(seconds / 60));
+    return minutes <= MAX_QUOTED_WAIT_MINUTES ? minutes : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Base64 to bytes to UTF-8 text, at most 100000 characters. Returns '' on invalid base64. */
 export function decodeReadme(content: string): string {
@@ -108,7 +133,9 @@ export async function fetchGithubSource(
   if (!first.ok) return first;
   const { status } = first.value;
   if (status === 404) return { ok: false, error: makeError('repo-not-found') };
-  if (status === 403 || status === 429) return { ok: false, error: makeError('rate-limited') };
+  if (status === 403 || status === 429) {
+    return { ok: false, error: rateLimitedError(minutesUntilReset(first.value.headers)) };
+  }
   if (!first.value.ok) return { ok: false, error: makeError('fetch-failed') };
   const info = parseJson(first.value.text);
   if (!isObj(info)) return { ok: false, error: makeError('fetch-failed') };

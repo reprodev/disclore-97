@@ -12,6 +12,7 @@ const OFFLINE_OUTLINE = /offline study outline/i;
  */
 export function discOrigin(disc: DiscManifest, builtIn: boolean): DiscOrigin {
   if (builtIn) return 'Built-In';
+  if (disc.outline !== undefined) return 'Outline';
   const id = disc.disc_id;
   if (id.startsWith('github-')) return 'GitHub';
   if (id.startsWith('webpage-')) return 'Web';

@@ -31,6 +31,7 @@ Compile your own disc from:
 - A topic. The topic is looked up on English Wikipedia and built into a disc with its text and pictures. If you are offline, or nothing matches, you get an offline study outline instead, and it says so.
 - Markdown text that you paste in.
 Burned discs are checked by the same safety checks as the built-in ones, then kept in this browser (up to 10 discs). They never leave your device unless you save one.
+- Refreshing an outline: an offline outline remembers the GitHub address, web page, or topic it stands in for. A yellow strip above the disc offers Refresh Full Disc from Source... (also File > Refresh Disc from Source...). When the source can be read, the full disc replaces the outline in the same place, and your notes, bookmarks, and best score stay with it. If it still cannot be read, the outline stays as it was and a message box says why.
 
 DISC IMAGES
 - File > Save Disc Image (.json) writes the open disc to a file on your computer.
@@ -107,7 +108,7 @@ Your Personal Best for each disc is kept on this computer. It is replaced when y
 SOUND
 All sound effects are generated live, and no audio files are used: soft chords for clicks and door locks, a projector click when you change pictures, a ding when a disc finishes burning, and a fanfare when you reach the throne room.
 
-The Ambience button in the taskbar is Off until you press it. When it is On, it plays a quiet background atmosphere that suits the open disc: wind and a hearth for castles, a CRT hum for code and web discs, and a soft study tone for the rest. Use the Sound button to mute everything, including Ambience and Read Aloud.
+The Ambience button in the taskbar is Off until you press it. When it is On, it plays a quiet background atmosphere that suits the open disc: wind and a muffled hearth for castles, a still night for folklore and Halloween, a soft CRT purr for code and lost-format discs, a calm network room for web pages, and a quiet reading-room tone for the rest. It swells in slowly, drifts a little over time, and the Haunted and Christmas Editions add their own low bell or soft bell fifths. Use the Sound button to mute everything, including Ambience and Read Aloud.
 
 A few pictures move a little: a blinking cursor on the computer screens, flickering torch windows, a glint on the CD, and the twinkling stars, blinking rack lights, and flickering lamp in burned-disc diagrams. They stand still if your system asks for reduced motion.
 

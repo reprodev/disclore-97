@@ -387,3 +387,33 @@
     overscroll-behavior: contain;
   }
 }
+
+/* Offline outline banner: a slim tooltip-yellow strip above the workspace, shown only on outline discs. */
+.outline-banner {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  margin: 2px 2px 0;
+  padding: 2px 4px 2px 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink);
+  background: var(--color-tooltip-bg);
+  border: 1px solid var(--color-bevel-edge);
+  border-radius: 0;
+}
+
+.outline-banner__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.outline-banner__refresh {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}

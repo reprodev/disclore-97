@@ -12,10 +12,14 @@ import type { Theme } from '../model/editions';
 type Factory = () => AudioContext;
 
 const MASTER_LEVEL = 0.25;
-/** Ambience bus level, relative to the master level. */
-const AMBIENCE_LEVEL = 0.45;
-const AMBIENCE_FADE_IN = 1.5;
-const AMBIENCE_FADE_OUT = 0.25;
+/** Ambience bus level, relative to the master level. Kept low so a long session never tires the ear. */
+export const AMBIENCE_LEVEL = 0.22;
+/** Seconds the ambience takes to swell in from silence. */
+export const AMBIENCE_FADE_IN = 4;
+/** Seconds the ambience takes to fade away when it is turned off or a new soundscape takes over. */
+export const AMBIENCE_FADE_OUT = 1.5;
+/** Every noise layer in the ambience ends in a low-pass at or below this cutoff, so nothing hisses. */
+export const AMBIENCE_MAX_CUTOFF = 2400;
 
 let factory: Factory | null = null;
 let ctx: AudioContext | null = null;
@@ -336,7 +340,12 @@ export function playVictoryFanfare(): void {
 // Ambient soundscape
 // ---------------------------------------------------------------------------
 
-export type AmbienceKind = 'castle' | 'retro' | 'study';
+/**
+ * The soundscape families. Castles get wind and a hearth, folklore and Halloween discs a still night,
+ * code and lost-format discs a soft CRT purr, web pages a calm network room, and the rest a reading room.
+ */
+export type AmbienceKind = 'castle' | 'night' | 'retro' | 'web' | 'study';
+export const AMBIENCE_KINDS: readonly AmbienceKind[] = ['castle', 'night', 'retro', 'web', 'study'];
 
 let ambienceOn = false;
 let ambienceKind: AmbienceKind = 'study';
@@ -344,27 +353,42 @@ let ambienceBus: GainNode | null = null;
 let ambienceNodes: AudioScheduledSourceNode[] = [];
 const ambienceListeners = new Set<(on: boolean) => void>();
 
-/** Picks the soundscape for a disc: castles and Halloween get wind and hearth, code, web, and lost-format discs a CRT hum, the rest a study tone. */
+/** Picks the soundscape for a disc from its id. */
 export function ambienceKindFor(discId: string | undefined): AmbienceKind {
   const id = (discId ?? '').toLowerCase();
-  if (id.includes('castle') || id.includes('keep') || id.includes('fort') || id.includes('halloween')) return 'castle';
-  if (id.startsWith('retro') || id.startsWith('resurrection') || id.startsWith('github-') || id.startsWith('webpage-')) {
-    return 'retro';
-  }
+  if (id.includes('halloween') || id.includes('folklore') || id.includes('ghost') || id.includes('samhain')) return 'night';
+  if (id.includes('castle') || id.includes('keep') || id.includes('fort')) return 'castle';
+  if (id.startsWith('webpage-')) return 'web';
+  if (id.startsWith('retro') || id.startsWith('resurrection') || id.startsWith('github-')) return 'retro';
   return 'study';
 }
 
+/** A small random spread (about +/-15%) so two sessions never move in exactly the same way. */
+function drift(x: number): number {
+  return x * (0.85 + Math.random() * 0.3);
+}
+
+/**
+ * A looping noise layer. It is always shaped by a first filter and then softened by a low-pass at or
+ * below AMBIENCE_MAX_CUTOFF, so the ambience never carries bright hiss.
+ */
 function ambienceNoise(
   c: AudioContext,
   bus: GainNode,
   filterType: BiquadFilterType,
   freq: number,
   level: number,
+  soften = AMBIENCE_MAX_CUTOFF,
 ): { filter: BiquadFilterNode; gain: GainNode } {
-  const len = Math.max(1, Math.floor(c.sampleRate * 2));
+  const len = Math.max(1, Math.floor(c.sampleRate * 3));
   const buf = c.createBuffer(1, len, c.sampleRate);
   const data = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  // Gently smoothed noise: a one-pole average takes the edge off before any filter.
+  let last = 0;
+  for (let i = 0; i < len; i++) {
+    last = last * 0.6 + (Math.random() * 2 - 1) * 0.4;
+    data[i] = last;
+  }
   const src = c.createBufferSource();
   src.buffer = buf;
   src.loop = true;
@@ -374,36 +398,58 @@ function ambienceNoise(
   const gain = c.createGain();
   gain.gain.setValueAtTime(level, c.currentTime);
   src.connect(filter);
-  filter.connect(gain);
+  if (filterType === 'lowpass' && freq <= soften) {
+    filter.connect(gain);
+  } else {
+    const warm = c.createBiquadFilter();
+    warm.type = 'lowpass';
+    warm.frequency.setValueAtTime(Math.min(soften, AMBIENCE_MAX_CUTOFF), c.currentTime);
+    filter.connect(warm);
+    warm.connect(gain);
+  }
   gain.connect(bus);
   src.start();
   ambienceNodes.push(src);
   return { filter, gain };
 }
 
-function ambienceDrone(
+/**
+ * A warm pad voice: a sine or triangle at the given pitch, plus a quieter twin tuned a hair sharp,
+ * so the two beat slowly against each other instead of sitting dead still.
+ */
+function ambiencePad(
   c: AudioContext,
   bus: GainNode,
-  type: OscillatorType,
+  type: 'sine' | 'triangle',
   freq: number,
   level: number,
 ): GainNode {
-  const osc = c.createOscillator();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, c.currentTime);
   const gain = c.createGain();
   gain.gain.setValueAtTime(level, c.currentTime);
-  osc.connect(gain);
   gain.connect(bus);
-  osc.start();
-  ambienceNodes.push(osc);
+  const voices: [number, number][] = [
+    [freq, 1],
+    [freq * 1.0035, 0.45],
+  ];
+  for (const [f, share] of voices) {
+    const osc = c.createOscillator();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f, c.currentTime);
+    const g = c.createGain();
+    g.gain.setValueAtTime(share, c.currentTime);
+    osc.connect(g);
+    g.connect(gain);
+    osc.start();
+    ambienceNodes.push(osc);
+  }
   return gain;
 }
 
 /** A slow sine that moves an audio parameter around its current value. */
 function ambienceLfo(c: AudioContext, target: AudioParam, rate: number, depth: number): void {
   const lfo = c.createOscillator();
-  lfo.frequency.setValueAtTime(rate, c.currentTime);
+  lfo.type = 'sine';
+  lfo.frequency.setValueAtTime(drift(rate), c.currentTime);
   const amount = c.createGain();
   amount.gain.setValueAtTime(depth, c.currentTime);
   lfo.connect(amount);
@@ -412,18 +458,22 @@ function ambienceLfo(c: AudioContext, target: AudioParam, rate: number, depth: n
   ambienceNodes.push(lfo);
 }
 
-/** The edition's own layer, added over any soundscape: an eerie low bell and wind, or crisp crystalline fifths. */
+/** The edition's own layer, added over any soundscape: a low bell and night wind, or soft bell fifths. */
 function editionLayer(c: AudioContext, bus: GainNode): void {
   if (edition === 'haunted') {
-    ambienceDrone(c, bus, 'sine', 73.42, 0.16);
-    ambienceDrone(c, bus, 'sine', 73.42 * 2.76, 0.03);
-    const wind = ambienceNoise(c, bus, 'bandpass', 380, 0.2);
-    ambienceLfo(c, wind.filter.frequency, 0.07, 160);
+    const toll = ambiencePad(c, bus, 'sine', 73.42, 0.12);
+    ambienceLfo(c, toll.gain, 0.05, 0.05);
+    ambiencePad(c, bus, 'sine', 73.42 * 2.76, 0.015);
+    const wind = ambienceNoise(c, bus, 'bandpass', 380, 0.14, 900);
+    ambienceLfo(c, wind.filter.frequency, 0.06, 140);
+    ambienceLfo(c, wind.gain.gain, 0.04, 0.06);
   } else if (edition === 'christmas') {
-    const fifth = ambienceDrone(c, bus, 'sine', 523.25, 0.04);
-    ambienceLfo(c, fifth.gain, 0.12, 0.015);
-    ambienceDrone(c, bus, 'sine', 783.99, 0.03);
-    ambienceNoise(c, bus, 'highpass', 5000, 0.02);
+    const fifth = ambiencePad(c, bus, 'sine', 523.25, 0.03);
+    ambienceLfo(c, fifth.gain, 0.09, 0.012);
+    const upper = ambiencePad(c, bus, 'sine', 783.99, 0.02);
+    ambienceLfo(c, upper.gain, 0.07, 0.01);
+    // A faint wisp of frosty air: high noise, then softened hard so it is felt more than heard.
+    ambienceNoise(c, bus, 'highpass', 5000, 0.012);
   }
 }
 
@@ -436,26 +486,49 @@ function buildAmbience(c: AudioContext, kind: AmbienceKind): void {
   ambienceBus = bus;
 
   if (kind === 'castle') {
-    // Wind through the battlements, a low hearth crackle, and a quiet stone-hall drone.
-    const wind = ambienceNoise(c, bus, 'bandpass', 500, 0.7);
-    ambienceLfo(c, wind.filter.frequency, 0.11, 220);
-    const hearth = ambienceNoise(c, bus, 'lowpass', 280, 0.35);
-    ambienceLfo(c, hearth.gain.gain, 6.5, 0.12);
-    ambienceDrone(c, bus, 'sine', 98, 0.22);
-    ambienceDrone(c, bus, 'sine', 147, 0.12);
+    // Wind through the battlements that rises and falls, a muffled hearth, and a low stone-hall pad.
+    const wind = ambienceNoise(c, bus, 'bandpass', 420, 0.45, 1200);
+    ambienceLfo(c, wind.filter.frequency, 0.08, 180);
+    ambienceLfo(c, wind.gain.gain, 0.05, 0.18);
+    const hearth = ambienceNoise(c, bus, 'lowpass', 240, 0.22);
+    ambienceLfo(c, hearth.gain.gain, 0.6, 0.05);
+    const hall = ambiencePad(c, bus, 'sine', 98, 0.14);
+    ambienceLfo(c, hall.gain, 0.03, 0.04);
+    ambiencePad(c, bus, 'sine', 146.83, 0.06);
+  } else if (kind === 'night') {
+    // A still night: a hushed breeze, a dark minor pad, and a distant, slow-breathing hollow tone.
+    const breeze = ambienceNoise(c, bus, 'lowpass', 520, 0.2);
+    ambienceLfo(c, breeze.filter.frequency, 0.05, 160);
+    ambienceLfo(c, breeze.gain.gain, 0.035, 0.08);
+    const low = ambiencePad(c, bus, 'sine', 110, 0.12);
+    ambienceLfo(c, low.gain, 0.04, 0.04);
+    ambiencePad(c, bus, 'sine', 130.81, 0.06);
+    const hollow = ambiencePad(c, bus, 'triangle', 164.81, 0.025);
+    ambienceLfo(c, hollow.gain, 0.025, 0.02);
   } else if (kind === 'retro') {
-    // The hum of a CRT and a power supply, with a faint hiss.
-    ambienceDrone(c, bus, 'sine', 60, 0.4);
-    ambienceDrone(c, bus, 'sine', 120, 0.18);
-    ambienceDrone(c, bus, 'sine', 180, 0.06);
-    ambienceNoise(c, bus, 'highpass', 6000, 0.03);
+    // A soft, warm CRT purr: a low fundamental and a quiet octave, rounded off, never a buzz.
+    const purr = ambiencePad(c, bus, 'sine', 60, 0.16);
+    ambienceLfo(c, purr.gain, 0.07, 0.03);
+    ambiencePad(c, bus, 'sine', 120, 0.04);
+    const room = ambienceNoise(c, bus, 'lowpass', 900, 0.05);
+    ambienceLfo(c, room.filter.frequency, 0.04, 200);
+  } else if (kind === 'web') {
+    // A calm network room: a gentle open fifth that glows and fades, over a quiet line murmur.
+    const root = ambiencePad(c, bus, 'triangle', 146.83, 0.08);
+    ambienceLfo(c, root.gain, 0.06, 0.03);
+    const fifth = ambiencePad(c, bus, 'sine', 220, 0.05);
+    ambienceLfo(c, fifth.gain, 0.045, 0.025);
+    const line = ambienceNoise(c, bus, 'bandpass', 700, 0.06, 1600);
+    ambienceLfo(c, line.filter.frequency, 0.03, 220);
   } else {
-    // A quiet reading-room tone: a soft fifth with a slow swell, over faint room noise.
-    const root = ambienceDrone(c, bus, 'sine', 110, 0.3);
-    ambienceLfo(c, root.gain, 0.18, 0.08);
-    ambienceDrone(c, bus, 'sine', 164.81, 0.16);
-    ambienceDrone(c, bus, 'triangle', 220, 0.04);
-    ambienceNoise(c, bus, 'lowpass', 220, 0.12);
+    // A quiet reading room: a soft fifth with a slow swell, over faint, warm room tone.
+    const root = ambiencePad(c, bus, 'sine', 110, 0.16);
+    ambienceLfo(c, root.gain, 0.05, 0.05);
+    ambiencePad(c, bus, 'sine', 164.81, 0.08);
+    const air = ambiencePad(c, bus, 'triangle', 220, 0.02);
+    ambienceLfo(c, air.gain, 0.03, 0.012);
+    const room = ambienceNoise(c, bus, 'lowpass', 220, 0.1);
+    ambienceLfo(c, room.filter.frequency, 0.02, 60);
   }
   editionLayer(c, bus);
 }
@@ -471,14 +544,27 @@ function stopAmbienceNodes(immediate: boolean): void {
   if (!immediate && ctx && bus) {
     try {
       const now = ctx.currentTime;
+      // Fade from wherever the swell has got to, so stopping mid-fade-in never jumps louder.
+      const current = bus.gain.value;
+      const from = current > 0 && current < AMBIENCE_LEVEL ? current : AMBIENCE_LEVEL;
       bus.gain.cancelScheduledValues(now);
-      bus.gain.setValueAtTime(AMBIENCE_LEVEL, now);
+      bus.gain.setValueAtTime(from, now);
       bus.gain.linearRampToValueAtTime(0.0001, now + AMBIENCE_FADE_OUT);
       when = now + AMBIENCE_FADE_OUT + 0.05;
     } catch {
       when = 0;
     }
   }
+  let busDone = false;
+  const releaseBus = () => {
+    if (busDone || !bus) return;
+    busDone = true;
+    try {
+      bus.disconnect();
+    } catch {
+      /* ignore */
+    }
+  };
   for (const n of nodes) {
     try {
       if (when > 0) n.stop(when);
@@ -492,6 +578,7 @@ function stopAmbienceNodes(immediate: boolean): void {
       } catch {
         /* ignore */
       }
+      releaseBus();
     };
     if (when === 0) {
       try {
@@ -501,18 +588,15 @@ function stopAmbienceNodes(immediate: boolean): void {
       }
     }
   }
-  if (bus && when === 0) {
-    try {
-      bus.disconnect();
-    } catch {
-      /* ignore */
-    }
-  }
+  if (when === 0) releaseBus();
 }
 
-/** (Re)builds the voices when the ambience is wanted and Sound is on. Never throws. */
-function syncAmbience(): void {
-  stopAmbienceNodes(true);
+/**
+ * (Re)builds the voices when the ambience is wanted and Sound is on. A change of soundscape or
+ * edition cross-fades: the old voices fade out while the new ones swell in. Never throws.
+ */
+function syncAmbience(crossfade = false): void {
+  stopAmbienceNodes(!crossfade);
   if (!ambienceOn || muted) return;
   const c = getContext();
   if (!c) return;
@@ -532,7 +616,7 @@ export function startAmbience(kind: AmbienceKind): void {
   const changed = !ambienceOn;
   ambienceOn = true;
   ambienceKind = kind;
-  syncAmbience();
+  syncAmbience(true);
   if (changed) notifyAmbience();
 }
 
@@ -540,7 +624,7 @@ export function startAmbience(kind: AmbienceKind): void {
 export function setAudioEdition(next: Theme): void {
   if (next === edition) return;
   edition = next;
-  if (ambienceOn) syncAmbience();
+  if (ambienceOn) syncAmbience(true);
 }
 
 export function getAudioEdition(): Theme {
@@ -551,7 +635,7 @@ export function getAudioEdition(): Theme {
 export function setAmbienceKind(kind: AmbienceKind): void {
   if (kind === ambienceKind) return;
   ambienceKind = kind;
-  if (ambienceOn) syncAmbience();
+  if (ambienceOn) syncAmbience(true);
 }
 
 export function stopAmbience(): void {

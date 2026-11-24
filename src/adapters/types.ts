@@ -19,6 +19,8 @@ export interface BurnError {
   message: string;
   validation?: ValidationError[];
   fallbackTopic?: string;
+  /** For a rate limit: roughly how many minutes until the source takes requests again, when known. */
+  retryMinutes?: number;
 }
 
 export type Result<T> = { ok: true; value: T } | { ok: false; error: BurnError };

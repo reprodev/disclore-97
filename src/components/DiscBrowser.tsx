@@ -6,8 +6,10 @@ import { editionOf } from '../model/editions';
 import type { DiscManifest } from '../model/manifest';
 import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
+import { BevelButton } from './BevelButton';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
+import { PixelIcon } from './PixelIcon';
 import { DiscCover } from './DiscCover';
 import { HomeLauncher } from './HomeLauncher';
 import { LoadDiscDialog } from './LoadDiscDialog';
@@ -93,6 +95,20 @@ export interface DiscBrowserProps {
   demoDiscs?: boolean;
   /** Turns the built-in demo discs on or off. Omit to hide the View menu item and the Home checkbox. */
   onToggleDemoDiscs?: (on: boolean) => void;
+  /**
+   * Burns the full disc for the open offline outline from its saved source. When given, an outline
+   * disc shows a banner with a Refresh button and a File > Refresh Disc from Source... item.
+   */
+  onRefreshDisc?: () => void;
+  /** True while a refresh is running: the Refresh controls are dimmed. */
+  refreshing?: boolean;
+}
+
+/** Plain words for where an outline came from, for its banner. */
+function outlineSourceLabel(kind: 'github' | 'webpage' | 'topic'): string {
+  if (kind === 'github') return 'the GitHub repository';
+  if (kind === 'webpage') return 'the web page';
+  return 'Wikipedia';
 }
 
 /** Breadcrumb trail and status-bar label for a view. */
@@ -167,6 +183,8 @@ export function DiscBrowser({
   removableIds,
   demoDiscs = true,
   onToggleDemoDiscs,
+  onRefreshDisc,
+  refreshing = false,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -204,6 +222,10 @@ export function DiscBrowser({
     const goDictionary = onOpenDictionary ? () => onOpenDictionary() : undefined;
     const goKeepMaze = first.dungeon === undefined ? undefined : () => onSelectDungeon(first.dungeon!);
     const { trail, label } = describeView(disc, view);
+    const refreshable = disc.outline !== undefined && onRefreshDisc !== undefined;
+    const goRefresh = () => {
+      if (refreshable && !refreshing) onRefreshDisc();
+    };
 
     return (
       <Window
@@ -225,6 +247,7 @@ export function DiscBrowser({
                   ...(onBurnNew ? [{ label: 'Burn New Disc...', onSelect: onBurnNew }] : []),
                   ...(onSaveImage ? [{ label: 'Save Disc Image (.json)', onSelect: onSaveImage }] : []),
                   ...(onMountImage ? [{ label: 'Mount Disc Image (.json)...', onSelect: onMountImage }] : []),
+                  ...(refreshable ? [{ label: 'Refresh Disc from Source...', onSelect: goRefresh }] : []),
                   { label: 'Close Disc', onSelect: onCloseDisc },
                 ],
               },
@@ -277,6 +300,19 @@ export function DiscBrowser({
         />
         <Breadcrumb discTitle={disc.title} trail={trail} onHome={goHome} />
         <SpinUpBar key={disc.disc_id} />
+        {refreshable && disc.outline ? (
+          <div className="outline-banner" role="region" aria-label="Offline outline">
+            <PixelIcon name="cd" size={16} />
+            <p className="outline-banner__text">
+              {refreshing
+                ? `Dialing ${outlineSourceLabel(disc.outline.kind)} for the full disc...`
+                : `Offline outline. This disc stands in for ${outlineSourceLabel(disc.outline.kind)}, which could not be read when it was burned. Your notes, bookmarks, and best score stay with it.`}
+            </p>
+            <BevelButton className="outline-banner__refresh" disabled={refreshing} onClick={goRefresh}>
+              Refresh Full Disc from Source...
+            </BevelButton>
+          </div>
+        ) : null}
         <div className="disc-workspace">
           <ContentsSidebar
             key={disc.disc_id}

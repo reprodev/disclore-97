@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FetchLike } from './adapters/types';
 import { ambienceKindFor, playBurnComplete, playEditionSwitch, playSpinUp, setAmbienceKind, setAudioEdition } from './audio/audio';
+import { refreshDisc } from './adapters/burn';
 import { BurnDialog } from './components/BurnDialog';
 import { ArticleViewer } from './components/ArticleViewer';
 import { BootSplash } from './components/BootSplash';
@@ -156,6 +157,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   /** A sample topic to burn at once when the Burn dialog opens, or null for a normal, empty dialog. */
   const [burnSample, setBurnSample] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState(false);
+  /** Id of the outline disc being refreshed from its source, or null. */
+  const [refreshingId, setRefreshingId] = useState<string | null>(null);
   /** A notice about a disc image that could not be mounted or saved, shown as a Win95 message box. */
   const [imageNotice, setImageNotice] = useState<{ title: string; message: string; details: string[]; footnote?: string } | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -288,6 +291,39 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     playSpinUp();
     playBurnComplete();
     setBurnOpen(false);
+  };
+  /**
+   * Refreshes an offline outline into the full disc from its saved source. On success the new disc
+   * replaces the outline in place, under the same disc_id, so its notes, bookmarks, and Personal Best
+   * stay. On failure the outline is left untouched and the error is shown in a message box.
+   */
+  const onRefreshDisc = async (discId: string) => {
+    if (refreshingId !== null) return;
+    const outline = burned.find((d) => d.disc_id === discId);
+    if (!outline?.outline) return;
+    setRefreshingId(discId);
+    let result;
+    try {
+      result = await refreshDisc(outline, fetchImpl ? { fetch: fetchImpl } : {});
+    } finally {
+      setRefreshingId(null);
+    }
+    if (!result.ok) {
+      setImageNotice({
+        title: 'Refresh Disc from Source',
+        message: result.error.message,
+        details: [],
+        footnote: 'Your outline disc was left as it was.',
+      });
+      return;
+    }
+    const full = result.manifest;
+    setBurned((b) => b.map((x) => (x.disc_id === full.disc_id ? full : x)));
+    const saved = library.save(full, { keepPosition: true });
+    setSaveNotice(!saved.saved);
+    // The articles changed, so start the refreshed disc at its cover.
+    if (nav.discId === full.disc_id) openDisc(full.disc_id);
+    playBurnComplete();
   };
   /** Saves a disc as a .json disc image download. */
   const saveDiscImage = (m: DiscManifest) => {
@@ -603,6 +639,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           removableIds={removable}
           demoDiscs={demoDiscs}
           onToggleDemoDiscs={onToggleDemoDiscs}
+          onRefreshDisc={disc && removable.has(disc.disc_id) ? () => void onRefreshDisc(disc.disc_id) : undefined}
+          refreshing={refreshingId !== null && refreshingId === disc?.disc_id}
         />
         {notFound ? (
           <p role="alert" className="app-not-found">

@@ -37,6 +37,24 @@ export interface DiscManifest {
   dungeons: Dungeon[];
   /** Optional pictures for the Multimedia Reel: at most 8, omitted when there are none. */
   media?: MediaItem[];
+  /**
+   * Present only on an offline study outline: the source it stands in for, so the app can offer to
+   * burn the full disc later. Omitted on every full disc.
+   */
+  outline?: OutlineSource;
+}
+
+/** The source kinds an offline study outline can stand in for. */
+export type OutlineKind = 'github' | 'webpage' | 'topic';
+export const OUTLINE_KINDS: readonly OutlineKind[] = ['github', 'webpage', 'topic'];
+/** Longest `outline.input` accepted: a web address or a topic, never a pasted document. */
+export const MAX_OUTLINE_INPUT = 2048;
+
+/** What an offline outline was burned from: the source kind and the exact text that was entered. */
+export interface OutlineSource {
+  kind: OutlineKind;
+  /** The GitHub address, web page address, or topic text, as typed. Plain text, never markup. */
+  input: string;
 }
 
 /** One dated entry in an article's timeline callout. */
