@@ -1045,3 +1045,80 @@
     margin-left: 0;
   }
 }
+
+/* ---- Demo Discs (Built-In): a Win95 checkbox beside the shelf's folder tabs ---- */
+.pack-tabs-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+
+.pack-tabs-bar .pack-tabs {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.pack-demo {
+  margin: 0 4px 4px auto;
+}
+
+/* A Win95 checkbox: a white sunken square with a hard-edged check, no rounding and no blur. */
+.win95-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink);
+  cursor: default;
+  user-select: none;
+}
+
+.win95-check__box {
+  position: relative;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  appearance: none;
+  background: var(--color-bevel-hi);
+  border: 1px solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 var(--color-bevel-edge);
+  cursor: default;
+}
+
+.win95-check__box:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  width: 3px;
+  height: 7px;
+  border: solid var(--color-bevel-edge);
+  border-width: 0 2px 2px 0;
+  transform: rotate(40deg);
+}
+
+.win95-check__box:focus-visible {
+  outline: none;
+}
+
+.win95-check__box:focus-visible + .win95-check__label {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: 1px;
+}
+
+.win95-check__box:disabled + .win95-check__label {
+  color: var(--color-bevel-shadow);
+}
+
+/* The Did You Know? box when there is nothing to show yet. */
+.spotlight--empty .spotlight__fact {
+  font-style: italic;
+  color: var(--color-bevel-shadow);
+}

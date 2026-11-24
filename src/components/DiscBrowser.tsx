@@ -89,6 +89,10 @@ export interface DiscBrowserProps {
   onRemoveDisc?: (discId: string) => void;
   /** Ids of burned discs that may be removed. */
   removableIds?: ReadonlySet<string>;
+  /** Whether the built-in demo discs are mounted. */
+  demoDiscs?: boolean;
+  /** Turns the built-in demo discs on or off. Omit to hide the View menu item and the Home checkbox. */
+  onToggleDemoDiscs?: (on: boolean) => void;
 }
 
 /** Breadcrumb trail and status-bar label for a view. */
@@ -161,6 +165,8 @@ export function DiscBrowser({
   onBurnSample,
   onRemoveDisc,
   removableIds,
+  demoDiscs = true,
+  onToggleDemoDiscs,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -243,6 +249,9 @@ export function DiscBrowser({
                   ...(goNotebook ? [{ label: 'Notebook...', onSelect: () => goNotebook() }] : []),
                   ...(onCycleTheme ? [{ label: `Edition: ${editionOf(theme).name}`, onSelect: onCycleTheme }] : []),
                   ...(onCopyShareLink ? [{ label: 'Copy Share Link', onSelect: onCopyShareLink }] : []),
+                  ...(onToggleDemoDiscs
+                    ? [{ label: 'Demo Discs (Built-In)', checked: demoDiscs, onSelect: () => onToggleDemoDiscs(!demoDiscs) }]
+                    : []),
                 ],
               },
               ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
@@ -343,6 +352,8 @@ export function DiscBrowser({
         onBurnSample={onBurnSample}
         minimized={minimized}
         onMinimize={onMinimize}
+        demoDiscs={demoDiscs}
+        onToggleDemoDiscs={onToggleDemoDiscs}
       />
     </div>
   );

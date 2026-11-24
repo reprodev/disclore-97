@@ -49,6 +49,10 @@ export interface HomeLauncherProps {
   /** Hides the Home window without closing it. The parent owns this state. */
   minimized?: boolean;
   onMinimize?: () => void;
+  /** Whether the built-in demo discs are mounted. */
+  demoDiscs?: boolean;
+  /** Turns the built-in demo discs on or off. When given, the shelf has a Demo Discs checkbox. */
+  onToggleDemoDiscs?: (on: boolean) => void;
 }
 
 function Card({
@@ -123,7 +127,11 @@ export function HomeLauncher({
   onBurnSample,
   minimized = false,
   onMinimize,
+  demoDiscs = true,
+  onToggleDemoDiscs,
 }: HomeLauncherProps) {
+  const noDiscs = discs.length === 0;
+  const canTurnOnDemo = onToggleDemoDiscs !== undefined && !demoDiscs;
   const hasDiagrams = discs.some((d) => d.diagrams.length > 0);
   const hasDungeons = discs.some((d) => d.dungeons.length > 0);
   const hasSections = discs.some((d) => d.sections.length > 0);
@@ -185,8 +193,33 @@ export function HomeLauncher({
               onRemoveDisc={onRemoveDisc}
               onBurnSample={onBurnSample}
               sampleBurns={edition.sampleBurns}
+              demoDiscs={demoDiscs}
+              onToggleDemoDiscs={onToggleDemoDiscs}
+              onBurnNew={onBurnNew}
+              onMountImage={onMountImage}
             />
-            {onOpenSection ? <DidYouKnow discs={discs} onOpenSection={onOpenSection} random={random} edition={theme} /> : null}
+            {onOpenSection ? (
+              <DidYouKnow
+                discs={discs}
+                onOpenSection={onOpenSection}
+                random={random}
+                edition={theme}
+                empty={
+                  noDiscs ? (
+                    <>
+                      <p className="spotlight__fact">No facts yet: every fact here comes from a mounted disc.</p>
+                      {canTurnOnDemo ? (
+                        <div className="spotlight__buttons">
+                          <BevelButton className="spotlight__button" onClick={() => onToggleDemoDiscs!(true)}>
+                            Turn On Demo Discs
+                          </BevelButton>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : undefined
+                }
+              />
+            ) : null}
           </Group>
 
           <div className="home__side">
@@ -224,13 +257,19 @@ export function HomeLauncher({
                   <Card
                     icon="book"
                     title="Surprise Me!"
-                    text="open a random article from any disc"
+                    text={noDiscs ? 'needs a mounted disc' : 'open a random article from any disc'}
                     disabled={!hasSections}
                     onClick={surprise}
                   />
                 ) : null}
               </div>
-              <p className="home__note">Uses the last disc you opened, or the first one.</p>
+              <p className="home__note">
+                {noDiscs
+                  ? canTurnOnDemo
+                    ? 'No discs are mounted. Burn or mount a disc, or turn on the Demo Discs, to use these.'
+                    : 'No discs are mounted. Burn or mount a disc to use these.'
+                  : 'Uses the last disc you opened, or the first one.'}
+              </p>
             </Group>
 
             <Group legend="Utilities" className="home-group--editorial">

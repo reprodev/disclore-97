@@ -25,6 +25,7 @@ import { loadDisc } from './discs/loader';
 import { loadBookmarks, saveBookmarks, toggleBookmark } from './library/bookmarks';
 import { createDiscLibrary, getBrowserStorage } from './library/discLibrary';
 import { applyTheme, loadTheme, saveTheme } from './library/theme';
+import { loadDemoDiscs, saveDemoDiscs } from './library/demoDiscs';
 import { appendNote, formatNote, loadNotes, loadPinnedNotes, saveNotes, savePinnedNotes, togglePinnedNotes } from './library/notebook';
 import { decodeNotes } from './model/noteShare';
 import type { SharedNotes } from './model/noteShare';
@@ -86,8 +87,12 @@ interface Shell {
 
 const initialShell: Shell = { nav: initialNav, history: initialHistory };
 
+/** What the disc list starts from while Demo Discs (Built-In) is off: nothing, so only burned and mounted discs remain. */
+const NO_DISCS: readonly unknown[] = [];
+/** Ids of the built-in demo discs, used to leave one cleanly when Demo Discs is turned off. */
+const BUILT_IN_IDS: ReadonlySet<string> = new Set(prebakedDiscs.map((d) => d.disc_id));
+
 export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: AppProps) {
-  const discSources = sources ?? prebakedDiscs;
   /** A shared link, read once on load. A link to a disc or a topic skips the boot splash. */
   const [link] = useState(() => parseDeepLink(search ?? (typeof window !== 'undefined' ? window.location.search : '')));
   const [stage, setStage] = useState<'splash' | 'home'>(
@@ -121,6 +126,17 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
   // Bookmarks share the library's storage: the browser's localStorage unless a test or embedder supplies one.
   const [bookmarkStorage] = useState(() => storage ?? (sources === undefined ? getBrowserStorage() : undefined));
+  /**
+   * Demo Discs (Built-In), saved under disclore97.demoDiscs and on by default. It applies only to the
+   * built-in discs: a `sources` prop (tests, embedding) supplies its own discs, so it has no toggle.
+   * Everything that reads `discs` (the Home shelf, Pinpointer, Dictionary, Did You Know?, Surprise Me!,
+   * the desktop icons, and Start > Mounted Discs) follows this one source of truth.
+   */
+  const demoToggleable = sources === undefined;
+  const [demoDiscs, setDemoDiscs] = useState(() => loadDemoDiscs(bookmarkStorage));
+  const discSources = sources ?? (demoDiscs ? prebakedDiscs : NO_DISCS);
+  /** Built-in ids stay reserved while the demo discs are off, so a mounted image can never take one. */
+  const reservedSources = sources ?? prebakedDiscs;
   const [marks, setMarks] = useState<string[]>([]);
   /** Sections of the open disc that have been opened, saved under disclore97.visited.<disc_id>. */
   const [visited, setVisited] = useState<readonly string[]>([]);
@@ -309,7 +325,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
       return;
     }
     const m = parsed.manifest;
-    const builtIn = discSources.some(
+    const builtIn = reservedSources.some(
       (s) => typeof s === 'object' && s !== null && (s as { disc_id?: unknown }).disc_id === m.disc_id,
     );
     if (builtIn) {
@@ -334,6 +350,23 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     setMinimized(false);
     setShell(initialShell);
   };
+
+  /**
+   * Turns Demo Discs (Built-In) on or off and saves it. Turning it off while a built-in disc is open
+   * returns to Home, and forgets a built-in disc as the last one used or the open notebook.
+   */
+  const setDemo = (on: boolean) => {
+    if (on === demoDiscs) return;
+    setDemoDiscs(on);
+    saveDemoDiscs(bookmarkStorage, on);
+    if (on) return;
+    if (nav.discId !== null && BUILT_IN_IDS.has(nav.discId)) closeDisc();
+    if (lastDiscId !== null && BUILT_IN_IDS.has(lastDiscId)) setLastDiscId(null);
+    if (notebookDiscId !== null && BUILT_IN_IDS.has(notebookDiscId)) setNotebookDiscId(null);
+    setNotFound(null);
+  };
+  const onToggleDemoDiscs = demoToggleable ? setDemo : undefined;
+  const hasSections = discs.some((d) => d.sections.length > 0);
   /** Visits a view and records it in the history. */
   const visit = (view: View | null) => {
     seek();
@@ -568,6 +601,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           onMountImage={openImagePicker}
           onRemoveDisc={removeDisc}
           removableIds={removable}
+          demoDiscs={demoDiscs}
+          onToggleDemoDiscs={onToggleDemoDiscs}
         />
         {notFound ? (
           <p role="alert" className="app-not-found">
@@ -673,12 +708,15 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           },
           onMountImage: openImagePicker,
           onOpenDictionary: () => setDictionary({ word: '' }),
-          onTour: () => quickJump('tour'),
-          onFlashcards: () => quickJump('flashcards'),
+          // With no disc that has articles, these are dimmed rather than offered and then refused.
+          onTour: hasSections ? () => quickJump('tour') : undefined,
+          onFlashcards: hasSections ? () => quickJump('flashcards') : undefined,
           onOpenReadMe: openReadMe,
           onReplaySplash: () => setStage('splash'),
           onSetTheme: setEdition,
           theme,
+          demoDiscs,
+          onToggleDemoDiscs,
         }}
       />
     </div>

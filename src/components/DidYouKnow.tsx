@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { collectFacts } from '../model/discSearch';
 import { prefersDisc } from '../model/editions';
 import type { Theme } from '../model/editions';
@@ -14,6 +15,11 @@ export interface DidYouKnowProps {
   random?: () => number;
   /** The active edition. The first fact comes from a disc that suits it, when one is mounted. */
   edition?: Theme;
+  /**
+   * Shown in the box when there are no facts at all, for example with no discs mounted. Without it the
+   * box is simply left out.
+   */
+  empty?: ReactNode;
 }
 
 /**
@@ -21,12 +27,20 @@ export interface DidYouKnowProps {
  * disc and article it came from. Next Fact steps through the facts, moving from disc to disc.
  * Open Article jumps to the article that holds it.
  */
-export function DidYouKnow({ discs, onOpenSection, random = Math.random, edition = 'classic' }: DidYouKnowProps) {
+export function DidYouKnow({ discs, onOpenSection, random = Math.random, edition = 'classic', empty }: DidYouKnowProps) {
   const facts = useMemo(() => collectFacts(discs), [discs]);
   const [start] = useState(() => random());
   const [step, setStep] = useState(0);
 
-  if (facts.length === 0) return null;
+  if (facts.length === 0) {
+    if (empty === undefined) return null;
+    return (
+      <section className="spotlight spotlight--empty" aria-label="Did You Know?">
+        <h2 className="spotlight__title">Did You Know?</h2>
+        {empty}
+      </section>
+    );
+  }
   // Start from a fact of an edition-themed disc when there is one. Next Fact then walks every disc as usual.
   const themed = facts.flatMap((f, i) => (prefersDisc(edition, f.discId, f.discTitle) ? [i] : []));
   const base = themed.length > 0 ? themed[Math.min(themed.length - 1, Math.floor(start * themed.length))]! : Math.floor(start * facts.length);

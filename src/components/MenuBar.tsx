@@ -5,6 +5,8 @@ import '../styles/menubar.css';
 export interface MenuItemDef {
   label: string;
   onSelect: () => void;
+  /** Makes the item a checkable menu item (menuitemcheckbox) with a Win95 check mark when true. */
+  checked?: boolean;
 }
 
 export interface MenuDef {
@@ -150,8 +152,9 @@ export function MenuBar({ menus }: MenuBarProps) {
               {menu.items.map((item, i) => (
                 <div
                   key={item.label}
-                  role="menuitem"
-                  className="menubar__item"
+                  role={item.checked === undefined ? 'menuitem' : 'menuitemcheckbox'}
+                  aria-checked={item.checked}
+                  className={item.checked === undefined ? 'menubar__item' : 'menubar__item menubar__item--check'}
                   tabIndex={activeItem === i ? 0 : -1}
                   ref={(el) => {
                     itemRefs.current[i] = el;
@@ -160,6 +163,11 @@ export function MenuBar({ menus }: MenuBarProps) {
                   onClick={() => activate(m, i)}
                   onKeyDown={(e) => onItemKey(e, m, i)}
                 >
+                  {item.checked === undefined ? null : (
+                    <span className="menubar__check" aria-hidden="true">
+                      {item.checked ? '\u2713' : ''}
+                    </span>
+                  )}
                   {item.label}
                 </div>
               ))}

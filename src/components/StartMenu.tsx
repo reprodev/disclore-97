@@ -20,6 +20,10 @@ export interface StartMenuActions {
   /** Picks an edition. With theme, the Edition submenu shows which one is on. */
   onSetTheme?: (theme: Theme) => void;
   theme?: Theme;
+  /** Whether the built-in demo discs are mounted. */
+  demoDiscs?: boolean;
+  /** Turns the built-in demo discs on or off. Omit to hide the Demo Discs item. */
+  onToggleDemoDiscs?: (on: boolean) => void;
 }
 
 export interface StartMenuProps extends StartMenuActions {
@@ -51,6 +55,8 @@ export function StartMenu({
   onReplaySplash,
   onSetTheme,
   theme = 'classic',
+  demoDiscs = true,
+  onToggleDemoDiscs,
 }: StartMenuProps) {
   const [sub, setSub] = useState<Submenu>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -218,6 +224,21 @@ export function StartMenu({
               </button>
             ))}
           </div>
+        ) : null}
+        {onToggleDemoDiscs ? (
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={demoDiscs}
+            className="startmenu__item"
+            title="Show or hide the four built-in demo discs"
+            onClick={run(() => onToggleDemoDiscs(!demoDiscs))}
+          >
+            <span className="startmenu__check startmenu__check--wide" aria-hidden="true">
+              {demoDiscs ? '\u2713' : ''}
+            </span>
+            <span>Demo Discs (Built-In)</span>
+          </button>
         ) : null}
         <div className="startmenu__sep" role="separator" />
         {item('About / ReadMe.txt', 'notepad', onOpenReadMe)}

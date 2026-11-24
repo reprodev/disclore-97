@@ -7,6 +7,7 @@ import { BevelButton } from './BevelButton';
 import { discMeta } from './ExpansionPackList';
 import { PixelIcon } from './PixelIcon';
 import { emblemFor } from './discEmblems';
+import { prebakedDiscs } from '../discs';
 import '../styles/home.css';
 
 export type PackFilter = 'all' | 'builtin' | 'burned';
@@ -24,7 +25,18 @@ export interface PackShelfProps {
   onBurnSample?: (topic: string) => void;
   /** The sample burns to offer. Defaults to the Classic '97 list. */
   sampleBurns?: readonly { label: string; topic: string }[];
+  /** Whether the built-in demo discs are mounted. */
+  demoDiscs?: boolean;
+  /** Turns the built-in demo discs on or off. When given, a Demo Discs checkbox sits beside the tabs. */
+  onToggleDemoDiscs?: (on: boolean) => void;
+  /** Opens the Burn dialog, offered when the shelf is empty. */
+  onBurnNew?: () => void;
+  /** Opens the file picker for a .json disc image, offered when the shelf is empty. */
+  onMountImage?: () => void;
 }
+
+/** How many demo discs ship with the app, for the checkbox label. */
+const DEMO_DISC_COUNT = prebakedDiscs.length;
 
 /** Quick-start burns offered while the library has no burned discs: a button label and the topic to look up. */
 export const SAMPLE_BURNS: readonly { label: string; topic: string }[] = [
@@ -41,7 +53,19 @@ const TABS: readonly PackFilter[] = ['all', 'builtin', 'burned'];
  * scrolling shelf with a compact two-column grid of disc cards. Each card has an origin tag,
  * and burned discs add Save .json and Eject buttons.
  */
-export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemoveDisc, onBurnSample, sampleBurns = SAMPLE_BURNS }: PackShelfProps) {
+export function PackShelf({
+  discs,
+  removableIds,
+  onPick,
+  onSaveDiscImage,
+  onRemoveDisc,
+  onBurnSample,
+  sampleBurns = SAMPLE_BURNS,
+  demoDiscs = true,
+  onToggleDemoDiscs,
+  onBurnNew,
+  onMountImage,
+}: PackShelfProps) {
   const [filter, setFilter] = useState<PackFilter>('all');
   const uid = useId();
   const isBurned = (d: DiscManifest) => removableIds?.has(d.disc_id) ?? false;
@@ -75,26 +99,49 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
     document.getElementById(`${uid}-tab-${next}`)?.focus();
   };
 
+  const turnOnDemo =
+    onToggleDemoDiscs && !demoDiscs ? (
+      <BevelButton className="pack-sample" onClick={() => onToggleDemoDiscs(true)}>
+        Turn On Demo Discs
+      </BevelButton>
+    ) : null;
+
   return (
     <div className="pack-tabs-area">
-      <div className="pack-tabs" role="tablist" aria-label="Expansion Pack filter">
-        {TABS.map((t, i) => (
-          <button
-            key={t}
-            id={`${uid}-tab-${t}`}
-            type="button"
-            role="tab"
-            className="pack-tab"
-            aria-selected={filter === t}
-            aria-controls={`${uid}-panel`}
-            tabIndex={filter === t ? 0 : -1}
-            data-active={filter === t ? 'true' : 'false'}
-            onClick={() => choose(t)}
-            onKeyDown={(e) => onTabKeyDown(e, i)}
-          >
-            {labels[t]}
-          </button>
-        ))}
+      <div className="pack-tabs-bar">
+        <div className="pack-tabs" role="tablist" aria-label="Expansion Pack filter">
+          {TABS.map((t, i) => (
+            <button
+              key={t}
+              id={`${uid}-tab-${t}`}
+              type="button"
+              role="tab"
+              className="pack-tab"
+              aria-selected={filter === t}
+              aria-controls={`${uid}-panel`}
+              tabIndex={filter === t ? 0 : -1}
+              data-active={filter === t ? 'true' : 'false'}
+              onClick={() => choose(t)}
+              onKeyDown={(e) => onTabKeyDown(e, i)}
+            >
+              {labels[t]}
+            </button>
+          ))}
+        </div>
+        {onToggleDemoDiscs ? (
+          <label className="win95-check pack-demo" title="Show or hide the built-in demo discs. Your burned and mounted discs stay.">
+            <input
+              type="checkbox"
+              className="win95-check__box"
+              checked={demoDiscs}
+              onChange={(e) => {
+                playClick();
+                onToggleDemoDiscs(e.target.checked);
+              }}
+            />
+            <span className="win95-check__label">{`Demo Discs (${DEMO_DISC_COUNT} Built-In)`}</span>
+          </label>
+        ) : null}
       </div>
       <div id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${filter}`} className="pack-shelf">
         {shown.length === 0 ? (
@@ -102,8 +149,36 @@ export function PackShelf({ discs, removableIds, onPick, onSaveDiscImage, onRemo
             <p className="home__empty pack-shelf__message">
               {filter === 'burned'
                 ? 'No burned CD-Rs yet. Burn a new disc, or mount a saved disc image.'
-                : 'No discs are available.'}
+                : filter === 'builtin' && !demoDiscs
+                  ? 'The Demo Discs are turned off.'
+                  : 'No discs are available.'}
             </p>
+            {filter !== 'burned' && discs.length === 0 && (onBurnNew || onMountImage || turnOnDemo) ? (
+              <>
+                <p className="home__empty pack-shelf__message">
+                  {turnOnDemo
+                    ? 'Burn a new disc, mount a saved disc image, or turn the Demo Discs back on.'
+                    : 'Burn a new disc, or mount a saved disc image.'}
+                </p>
+                <div className="pack-samples" role="group" aria-label="Get started">
+                  {onBurnNew ? (
+                    <BevelButton className="pack-sample" onClick={onBurnNew}>
+                      Burn New CD-R Disc...
+                    </BevelButton>
+                  ) : null}
+                  {onMountImage ? (
+                    <BevelButton className="pack-sample" onClick={onMountImage}>
+                      Mount Disc Image (.json)...
+                    </BevelButton>
+                  ) : null}
+                  {turnOnDemo}
+                </div>
+              </>
+            ) : filter === 'builtin' && turnOnDemo ? (
+              <div className="pack-samples" role="group" aria-label="Demo Discs">
+                {turnOnDemo}
+              </div>
+            ) : null}
             {filter === 'burned' && onBurnSample ? (
               <div className="pack-samples" role="group" aria-label="Sample burns">
                 {sampleBurns.map((s) => (

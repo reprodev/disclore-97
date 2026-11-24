@@ -331,3 +331,8 @@
     display: none;
   }
 }
+
+/* The Demo Discs check mark sits in an icon-wide slot, so its label lines up with the other items. */
+.startmenu__check--wide {
+  width: 32px;
+}

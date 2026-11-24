@@ -218,6 +218,8 @@ The model layer has no React and no DOM. The compiler is pure and seeded, so the
 
 Four original discs ship with the app, so a first visit fills a 2 by 2 grid on the Home shelf. Each is a typed `DiscManifest` object in `src/discs/`, works offline, and passes the same validator and BFS solver as a burned disc.
 
+- **Demo Discs (4 Built-In) toggle:** Enabled by default (`disclore97.demoDiscs` in `localStorage`) so first-time visitors can explore right away. Unchecking **Demo Discs (4 Built-In)** on the Home shelf—or toggling **View > Demo Discs (Built-In)** / **Start > Demo Discs (Built-In)**—hides the four built-in discs across the shelf, **Pinpointer**, **Encarta Dictionary** (`findMentions`), **Did You Know?**, **Surprise Me!**, and **Start > Mounted Discs** so you can study exclusively with your own burned or mounted `.json` discs (while keeping built-in disc IDs reserved).
+
 | Disc | Sections | Diagrams / hotspots | Trivia questions | Dungeons |
 | --- | --- | --- | --- | --- |
 | DiscLore '97: Ancient Castles & Keeps | 5 | 1 diagram, 4 hotspots | 6 | 1 (10 rooms) |

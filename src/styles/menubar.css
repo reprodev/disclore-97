@@ -65,3 +65,11 @@
   background: var(--color-title-bg);
   color: var(--color-title-text);
 }
+
+/* A checkable menu item (menuitemcheckbox): a fixed slot for the check mark before the label. */
+.menubar__check {
+  display: inline-block;
+  width: 14px;
+  margin-left: -2px;
+  text-align: center;
+}
