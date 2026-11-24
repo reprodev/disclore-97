@@ -173,8 +173,11 @@ body {
     position: static;
     flex: 0 0 auto;
     flex-direction: row;
+    flex-wrap: wrap;
     width: auto;
+    max-height: none;
     gap: 4px;
+    /* The strip wraps onto a second row rather than scrolling sideways, so nothing overflows. */
     overflow-x: auto;
     overflow-y: hidden;
   }

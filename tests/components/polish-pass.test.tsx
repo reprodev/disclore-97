@@ -310,7 +310,8 @@ describe('Keyboard shortcuts', () => {
     await openArticle(user);
     expect(key({ key: 'f' })).toBe(true);
     expect(key({ key: 'f', ctrlKey: true, shiftKey: true })).toBe(true);
-    await user.click(screen.getByRole('button', { name: 'Dictionary' }));
+    // The disc toolbar's button: the desktop has a Dictionary shortcut of the same name.
+    await user.click(within(screen.getByRole('toolbar', { name: 'Navigation' })).getByRole('button', { name: 'Dictionary' }));
     expect(key({ key: 'f', ctrlKey: true })).toBe(true);
   });
 

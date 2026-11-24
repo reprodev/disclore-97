@@ -11,6 +11,8 @@ import {
   setAudioEdition,
 } from './audio/audio';
 import { Starfield } from './components/Starfield';
+import { DesktopContextMenu } from './components/DesktopContextMenu';
+import { DesktopWallpaper } from './components/DesktopWallpaper';
 import { KONAMI_SEQUENCE, konamiStep, STARFIELD_CLICK_GAP_MS, STARFIELD_CLICKS } from './model/easterEggs';
 import { refreshDisc } from './adapters/burn';
 import { BurnDialog } from './components/BurnDialog';
@@ -236,7 +238,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       const el = document.activeElement as HTMLElement | null;
       const typing = el !== null && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
-      if (typing || document.querySelector('.modal-layer, .starfield')) {
+      if (typing || document.querySelector('.modal-layer, .starfield, .desktop-menu')) {
         konami.current = 0;
         return;
       }
@@ -251,11 +253,19 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  /**
+   * Whether a pointer event landed on the bare desktop: the workspace itself, or the empty layout box
+   * that holds the windows (it fills the workspace, so with Home minimized it is what the pointer
+   * meets). Anything inside a window, an icon, or a dialog is not bare desktop.
+   */
+  const isBareDesktop = (target: EventTarget, current: EventTarget) =>
+    target === current || (target instanceof Element && target.classList.contains('disc-browser'));
+
   // Easter egg: three quick clicks on the bare desktop (not an icon or a window) start the Starfield.
   const [starfieldOn, setStarfieldOn] = useState(false);
   const desktopClicks = useRef<{ count: number; last: number }>({ count: 0, last: 0 });
   const onDesktopClick = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (e.target !== e.currentTarget) return;
+    if (!isBareDesktop(e.target, e.currentTarget)) return;
     const c = desktopClicks.current;
     c.count = e.timeStamp - c.last <= STARFIELD_CLICK_GAP_MS ? c.count + 1 : 1;
     c.last = e.timeStamp;
@@ -265,6 +275,16 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     }
   };
   const endStarfield = useCallback(() => setStarfieldOn(false), []);
+
+  // Right-clicking the bare desktop (not an icon or a window) opens the desktop's context menu.
+  const [desktopMenu, setDesktopMenu] = useState<{ x: number; y: number } | null>(null);
+  const closeDesktopMenu = useCallback(() => setDesktopMenu(null), []);
+  const onDesktopContextMenu = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!isBareDesktop(e.target, e.currentTarget)) return;
+    e.preventDefault();
+    const r = e.currentTarget.getBoundingClientRect();
+    setDesktopMenu({ x: Math.round(e.clientX - r.left), y: Math.round(e.clientY - r.top) });
+  };
 
   // Ctrl+D / Cmd+D opens the Dictionary while a disc is open, instead of the browser's bookmark dialog.
   const discIsOpen = disc !== undefined;
@@ -633,14 +653,39 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
 
   return (
     <div className="desktop">
-      <div className="desktop__work app-shell" onClick={onDesktopClick}>
+      <div className="desktop__work app-shell" onClick={onDesktopClick} onContextMenu={onDesktopContextMenu}>
+        <DesktopWallpaper edition={theme} />
         <DesktopIcons
           discs={discs}
           onOpenDisc={openDisc}
           onOpenReadMe={openReadMe}
           pinnedNotes={pinnedNotes}
           onOpenNotes={(id) => setNotebookDiscId(id)}
+          onBurnNew={() => {
+            setBurnSample(null);
+            setBurnOpen(true);
+          }}
+          onOpenDictionary={() => setDictionary({ word: '' })}
         />
+        {desktopMenu ? (
+          <DesktopContextMenu
+            x={desktopMenu.x}
+            y={desktopMenu.y}
+            onClose={closeDesktopMenu}
+            items={[
+              {
+                label: 'Burn New CD-R Disc...',
+                onSelect: () => {
+                  setBurnSample(null);
+                  setBurnOpen(true);
+                },
+              },
+              { label: 'Mount Disc Image (.json)...', onSelect: openImagePicker },
+              { label: 'Starfield Screensaver', onSelect: () => setStarfieldOn(true), separator: true },
+              { label: 'About / ReadMe.txt', onSelect: openReadMe, separator: true },
+            ]}
+          />
+        ) : null}
         <DiscBrowser
           discs={discs}
           openDiscId={nav.discId}

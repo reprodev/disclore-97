@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { playClick, playSpinUp } from '../audio/audio';
 import { shortDiscTitle } from '../library/notebook';
 import type { DiscManifest } from '../model/manifest';
+import { MessageDialog } from './MessageDialog';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
 import '../styles/shortcuts.css';
@@ -21,7 +22,14 @@ export interface DesktopIconsProps {
   pinnedNotes?: readonly string[];
   /** Opens the Research Notebook on a disc's notes. */
   onOpenNotes?: (discId: string) => void;
+  /** Opens the Burn New CD-R Disc dialog. Omit to hide the Burn CD-R shortcut. */
+  onBurnNew?: () => void;
+  /** Opens the Dictionary. Omit to hide the Dictionary shortcut. */
+  onOpenDictionary?: () => void;
 }
+
+/** What the Recycle Bin says when it is opened. */
+export const RECYCLE_BIN_MESSAGE = 'Recycle Bin is empty \u2014 nothing from 1997 is ever truly thrown away.';
 
 interface Shortcut {
   id: string;
@@ -34,8 +42,17 @@ interface Shortcut {
  * Win95 desktop shortcuts in a left column. Click selects, double-click or
  * Enter opens. Labels are white on the teal desktop.
  */
-export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = [], onOpenNotes }: DesktopIconsProps) {
+export function DesktopIcons({
+  discs,
+  onOpenDisc,
+  onOpenReadMe,
+  pinnedNotes = [],
+  onOpenNotes,
+  onBurnNew,
+  onOpenDictionary,
+}: DesktopIconsProps) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [recycleOpen, setRecycleOpen] = useState(false);
 
   const shortcuts: Shortcut[] = [
     ...DISC_SHORTCUTS.filter((s) => discs.some((d) => d.disc_id === s.discId)).map((s) => ({
@@ -47,6 +64,32 @@ export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = []
         onOpenDisc(s.discId);
       },
     })),
+    ...(onBurnNew
+      ? [
+          {
+            id: 'burn',
+            label: 'Burn CD-R',
+            icon: 'cd' as IconName,
+            open: () => {
+              playClick();
+              onBurnNew();
+            },
+          },
+        ]
+      : []),
+    ...(onOpenDictionary
+      ? [
+          {
+            id: 'dictionary',
+            label: 'Dictionary',
+            icon: 'book' as IconName,
+            open: () => {
+              playClick();
+              onOpenDictionary();
+            },
+          },
+        ]
+      : []),
     {
       id: 'readme',
       label: 'ReadMe.txt',
@@ -74,6 +117,16 @@ export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = []
           ];
         })
       : []),
+    // The Recycle Bin always sits last, as on a Win95 desktop.
+    {
+      id: 'recycle',
+      label: 'Recycle Bin',
+      icon: 'recycle',
+      open: () => {
+        playClick();
+        setRecycleOpen(true);
+      },
+    },
   ];
 
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>, s: Shortcut) => {
@@ -84,6 +137,7 @@ export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = []
   };
 
   return (
+    <>
     <div className="desktop-icons" role="group" aria-label="Desktop shortcuts">
       {shortcuts.map((s) => (
         <button
@@ -102,5 +156,9 @@ export function DesktopIcons({ discs, onOpenDisc, onOpenReadMe, pinnedNotes = []
         </button>
       ))}
     </div>
+    {recycleOpen ? (
+      <MessageDialog title="Recycle Bin" message={RECYCLE_BIN_MESSAGE} onClose={() => setRecycleOpen(false)} />
+    ) : null}
+    </>
   );
 }

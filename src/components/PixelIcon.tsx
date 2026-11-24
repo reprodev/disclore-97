@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home' | 'castle' | 'computer' | 'notepad' | 'lantern' | 'floppy';
+export type IconName = 'cd' | 'book' | 'diagram' | 'torch' | 'key' | 'speaker' | 'back' | 'forward' | 'home' | 'castle' | 'computer' | 'notepad' | 'lantern' | 'floppy' | 'recycle';
 
 /** Palette letters used in the pixel maps below. Every color is a shared token. */
 const PALETTE: Record<string, string> = {
@@ -83,6 +83,25 @@ const BACK_ARROW = [
 
 const MAPS: Record<IconName, string[]> = {
   cd: cdMap(),
+  // An empty Win95 Recycle Bin: a lidded wire basket.
+  recycle: [
+    '................',
+    '......kkkk......',
+    '..kkkkkkkkkkkk..',
+    '..kwwwwwwwwwgk..',
+    '..kkkkkkkkkkkk..',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kwsgwsgwsk...',
+    '...kkkkkkkkkk...',
+    '................',
+  ],
   castle: centered([
     '.....S.S.S......',
     '.....SSSSSS.....',
