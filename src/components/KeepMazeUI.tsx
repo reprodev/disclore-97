@@ -2,7 +2,11 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { playDoorUnlock, playTorch, playVictoryFanfare, playWoodKnock } from '../audio/audio';
 import { loadBest, saveBest } from '../library/best';
+import { loadDailyBook, saveDailyBook } from '../library/dailyChallenge';
+import { addVictory } from '../library/progress';
 import type { StorageLike } from '../library/discLibrary';
+import { dailyRng, dateKey, formatElapsed, recordDaily } from '../model/daily';
+import type { DailyResult } from '../model/daily';
 import { torchWhisper } from '../model/easterEggs';
 import { beatsBest, gameReducer, initGame, scholarRank, STARTING_TORCHES } from '../model/game';
 import type { PersonalBest } from '../model/game';
@@ -25,6 +29,10 @@ export interface KeepMazeUIProps {
   storage?: StorageLike;
   /** Injected for tests; defaults to Math.random. */
   rng?: () => number;
+  /** Today's date, for the Daily Challenge. Injected for tests; defaults to the clock. */
+  today?: () => Date;
+  /** Milliseconds, for timing a run. Injected for tests; defaults to Date.now. */
+  now?: () => number;
 }
 
 const PEEK_MAX = 160;
@@ -40,10 +48,20 @@ function firstSentence(text: string): string {
   return s.length > PEEK_MAX ? `${s.slice(0, PEEK_MAX - 3).trimEnd()}...` : s;
 }
 
-export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.random }: KeepMazeUIProps) {
+export function KeepMazeUI({
+  disc,
+  dungeon,
+  onOpenSection,
+  storage,
+  rng = Math.random,
+  today = () => new Date(),
+  now = () => Date.now(),
+}: KeepMazeUIProps) {
   const questions = disc.trivia;
+  /** The Daily Challenge's seeded generator while a daily run is on; null for a normal run. */
+  const dailyRngRef = useRef<(() => number) | null>(null);
   const rngRef = useRef(rng);
-  rngRef.current = rng;
+  rngRef.current = dailyRngRef.current ?? rng;
 
   const reducer = useCallback(
     (s: GameState, a: GameAction) => gameReducer(s, a, dungeon, questions, rngRef.current),
@@ -53,6 +71,27 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
     initGame(dungeon, questions, rng),
   );
   const [started, setStarted] = useState(false);
+  /**
+   * Daily Challenge: today's date (fixed when the view opens) seeds the question order, so every run
+   * of the day on this dungeon asks the same questions in the same order. The run is timed, and the
+   * day's best is kept under disclore97.dailyChallenge.
+   */
+  const [day] = useState(() => dateKey(today()));
+  const [daily, setDaily] = useState(false);
+  const startedAt = useRef(0);
+  const [runMs, setRunMs] = useState<number | null>(null);
+  const [dailyBest, setDailyBest] = useState<DailyResult | null>(() => loadDailyBook(storage)[day]?.[disc.disc_id] ?? null);
+  const [dailyNewBest, setDailyNewBest] = useState(false);
+  /** Starts (or restarts) a run in the chosen mode. A daily run always replays the day's order from the top. */
+  const beginRun = (asDaily: boolean) => {
+    const wasSeeded = dailyRngRef.current !== null;
+    dailyRngRef.current = asDaily ? dailyRng(day, disc.disc_id, dungeon.dungeon_id) : null;
+    rngRef.current = dailyRngRef.current ?? rng;
+    if (asDaily || wasSeeded) dispatch({ type: 'restart' });
+    startedAt.current = now();
+    setRunMs(null);
+    setDailyNewBest(false);
+  };
   const [visited, setVisited] = useState<string[]>(() => [state.roomId]);
   /**
    * Easter egg: tapping the torch rack knocks softly and rotates a dungeon whisper in the panel's
@@ -108,6 +147,24 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
       setNewBest(false);
     }
   }, [state.won, storage, disc.disc_id]);
+
+  // A finished run: time it, count the victory, and record a Daily Challenge result.
+  useEffect(() => {
+    if (!state.won) return;
+    const ms = Math.max(0, now() - startedAt.current);
+    setRunMs(ms);
+    if (storage) addVictory(storage, disc.disc_id);
+    if (!daily) return;
+    const run = { score: scoreRef.current.score, timeMs: ms };
+    if (!storage) {
+      setDailyBest((prev) => (prev && (prev.score > run.score || (prev.score === run.score && prev.timeMs <= run.timeMs)) ? prev : run));
+      return;
+    }
+    const recorded = recordDaily(loadDailyBook(storage), day, disc.disc_id, run);
+    saveDailyBook(storage, recorded.book);
+    setDailyBest(recorded.best);
+    setDailyNewBest(recorded.newBest);
+  }, [state.won]);
 
   const noTrivia = questions.length === 0;
   const room = dungeon.rooms.find((r) => r.room_id === state.roomId);
@@ -217,7 +274,27 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
             <p className="quest-card__objective">
               Reach the Throne Room by unlocking doors with encyclopedia trivia.
             </p>
-            <BevelButton className="keepmaze__start" disabled={noTrivia} onClick={() => setStarted(true)}>
+            <label className="win95-check keepmaze__daily">
+              <input
+                type="checkbox"
+                className="win95-check__box"
+                checked={daily}
+                disabled={noTrivia}
+                onChange={(e) => setDaily(e.target.checked)}
+              />
+              <span className="win95-check__label">{`Daily Challenge (${day})`}</span>
+            </label>
+            {dailyBest ? (
+              <p className="keepmaze__daily-note">{`Today's best: ${dailyBest.score} pts in ${formatElapsed(dailyBest.timeMs)}`}</p>
+            ) : null}
+            <BevelButton
+              className="keepmaze__start"
+              disabled={noTrivia}
+              onClick={() => {
+                beginRun(daily);
+                setStarted(true);
+              }}
+            >
               Start
             </BevelButton>
             {noTrivia && (
@@ -233,7 +310,12 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
   }
 
   const restart = () => {
-    dispatch({ type: 'restart' });
+    if (daily) beginRun(true);
+    else {
+      dispatch({ type: 'restart' });
+      startedAt.current = now();
+      setRunMs(null);
+    }
     setVisited([ENTRANCE_ROOM_ID]);
   };
 
@@ -269,6 +351,14 @@ export function KeepMazeUI({ disc, dungeon, onOpenSection, storage, rng = Math.r
             <p className="certificate__rank">
               Scholar Rank: <strong>{scholarRank(state.score, state.moves)}</strong>
             </p>
+            {daily ? (
+              <p className="certificate__daily">
+                <span className="certificate__daily-badge">{`Daily Challenge ${day}`}</span>{' '}
+                {`Time: ${formatElapsed(runMs ?? 0)}`}
+                {dailyBest ? ` \u2022 Today's best: ${dailyBest.score} pts in ${formatElapsed(dailyBest.timeMs)}` : ''}
+                {dailyNewBest ? ' \u2022 New daily best!' : ''}
+              </p>
+            ) : null}
             {newBest ? <p className="certificate__best-badge">New Personal Best!</p> : null}
             {best ? (
               <p className="certificate__best">

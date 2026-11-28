@@ -11,6 +11,9 @@ import type { StorageLike } from '../../src/library/discLibrary';
 import { compileDisc } from '../../src/model/compiler';
 import type { DiscManifest } from '../../src/model/manifest';
 
+/** Disc library entries only: other disclore97.* keys (such as the last place read) do not count. */
+const discKeys = (s: { map: Map<string, string> }) => [...s.map.keys()].filter((k) => k.startsWith(KEY_PREFIX)).length;
+
 const disc: DiscManifest = {
   disc_id: 'disc1',
   title: 'Test Disc',
@@ -186,17 +189,17 @@ describe('Mount Disc Image (.json)', () => {
     const storage = memoryStorage();
     render(<App sources={sources} storage={storage} />);
     pick(jsonFile(serializeDiscImage(m)));
-    await waitFor(() => expect(storage.map.size).toBe(1), MOUNT_WAIT);
+    await waitFor(() => expect(discKeys(storage)).toBe(1), MOUNT_WAIT);
     pick(jsonFile(serializeDiscImage(m)));
     await waitFor(() => expect(screen.getAllByText(m.title).length).toBeGreaterThan(0), MOUNT_WAIT);
-    expect(storage.map.size).toBe(1);
+    expect(discKeys(storage)).toBe(1);
   });
 
   const expectRejected = async (text: string, messagePattern: RegExp, storage: ReturnType<typeof memoryStorage>) => {
     pick(jsonFile(text));
     const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(messagePattern);
-    expect(storage.map.size).toBe(0);
+    expect(discKeys(storage)).toBe(0);
     expect(screen.queryByText(/Lighthouses/)).toBeNull();
     return box;
   };
@@ -255,7 +258,7 @@ describe('Mount Disc Image (.json)', () => {
     pick(jsonFile(serializeDiscImage({ ...burned(), disc_id: 'disc1' })));
     const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(/same ID \("disc1"\) as a built-in disc/);
-    expect(storage.map.size).toBe(0);
+    expect(discKeys(storage)).toBe(0);
   });
 
   it('rejects a file that is too large without reading it', async () => {
@@ -266,7 +269,7 @@ describe('Mount Disc Image (.json)', () => {
     pick(big);
     const box = await screen.findByRole('dialog', { name: 'Mount Disc Image' }, MOUNT_WAIT);
     expect(within(box).getByRole('alert').textContent).toMatch(/too large/);
-    expect(storage.map.size).toBe(0);
+    expect(discKeys(storage)).toBe(0);
   });
 
   it('keeps the open disc when a mount is rejected', async () => {

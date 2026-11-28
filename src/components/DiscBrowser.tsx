@@ -4,6 +4,7 @@ import { playSpinUp } from '../audio/audio';
 import type { Theme } from '../library/theme';
 import { editionOf } from '../model/editions';
 import type { DiscManifest } from '../model/manifest';
+import type { ContinueTarget, MasterySummary } from '../model/mastery';
 import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
 import { BevelButton } from './BevelButton';
@@ -104,6 +105,11 @@ export interface DiscBrowserProps {
   refreshing?: boolean;
   /** Shows the "Archive Key '97" collector stamp in the Home status bar (the Konami code toggles it). */
   archiveKey?: boolean;
+  /** Cross-disc progress for the Study Mastery strip on Home. */
+  mastery?: MasterySummary;
+  /** Where Continue Studying goes, and its handler. */
+  continueTo?: ContinueTarget;
+  onContinue?: () => void;
 }
 
 /** Plain words for where an outline came from, for its banner. */
@@ -188,6 +194,9 @@ export function DiscBrowser({
   onRefreshDisc,
   refreshing = false,
   archiveKey = false,
+  mastery,
+  continueTo,
+  onContinue,
 }: DiscBrowserProps) {
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
@@ -394,6 +403,9 @@ export function DiscBrowser({
         demoDiscs={demoDiscs}
         onToggleDemoDiscs={onToggleDemoDiscs}
         archiveKey={archiveKey}
+        mastery={mastery}
+        continueTo={continueTo}
+        onContinue={onContinue}
       />
     </div>
   );

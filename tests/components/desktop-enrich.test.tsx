@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../src/App';
-import { RECYCLE_BIN_MESSAGE } from '../../src/components/DesktopIcons';
+import { DesktopIcons, RECYCLE_BIN_MESSAGE } from '../../src/components/DesktopIcons';
 import { castlesDisc } from '../../src/discs/castles';
 import { retroDisc } from '../../src/discs/retro';
 import type { StorageLike } from '../../src/library/discLibrary';
@@ -34,8 +34,18 @@ afterEach(() => {
 });
 
 describe('desktop shortcuts', () => {
-  it('keeps the disc and ReadMe shortcuts and adds Burn CD-R, Dictionary, and Recycle Bin last', () => {
+  it('keeps the desktop clean: only the utilities, with no built-in disc shortcuts by default', () => {
     app();
+    const names = within(shortcuts())
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+    expect(names).toEqual(['Burn CD-R', 'Dictionary', 'ReadMe.txt', 'Recycle Bin']);
+  });
+
+  it('shows the built-in disc shortcuts first only when they are switched on', () => {
+    render(
+      <DesktopIcons discs={[castlesDisc, retroDisc]} onOpenDisc={() => {}} onOpenReadMe={() => {}} onBurnNew={() => {}} onOpenDictionary={() => {}} discShortcuts />,
+    );
     const names = within(shortcuts())
       .getAllByRole('button')
       .map((b) => b.textContent);
@@ -65,13 +75,16 @@ describe('desktop shortcuts', () => {
     expect(screen.getByRole('dialog', { name: 'Dictionary' })).toBeTruthy();
   });
 
-  it('Castles and ReadMe still open as before', async () => {
+  it('ReadMe still opens as before, and an enabled Castles shortcut opens its disc', async () => {
     const user = userEvent.setup();
     app();
     await user.dblClick(within(shortcuts()).getByRole('button', { name: 'ReadMe.txt' }));
     expect(screen.getByRole('dialog', { name: /ReadMe\.txt/ })).toBeTruthy();
+    cleanup();
+    const onOpenDisc = vi.fn();
+    render(<DesktopIcons discs={[castlesDisc]} onOpenDisc={onOpenDisc} onOpenReadMe={() => {}} discShortcuts />);
     await user.dblClick(within(shortcuts()).getByRole('button', { name: "Castles '97" }));
-    expect(screen.getAllByText(castlesDisc.title).length).toBeGreaterThan(0);
+    expect(onOpenDisc).toHaveBeenCalledWith('castles');
   });
 });
 
@@ -100,9 +113,15 @@ describe('Recycle Bin', () => {
 
 describe('desktop right-click menu', () => {
   const menu = () => screen.queryByRole('menu', { name: 'Desktop' });
-  const ITEMS = ['Burn New CD-R Disc...', 'Mount Disc Image (.json)...', 'Starfield Screensaver', 'About / ReadMe.txt'];
+  const ITEMS = [
+    'Burn New CD-R Disc...',
+    'Mount Disc Image (.json)...',
+    'Starfield Screensaver',
+    'Display Properties / Change Wallpaper...',
+    'About / ReadMe.txt',
+  ];
 
-  it('opens on the bare desktop with its four items, and Escape closes it', async () => {
+  it('opens on the bare desktop with its five items, and Escape closes it', async () => {
     const user = userEvent.setup();
     const { container } = app();
     fireEvent.contextMenu(desk(container), { clientX: 40, clientY: 60 });
@@ -169,7 +188,7 @@ describe('desktop right-click menu', () => {
     expect(screen.getByRole('dialog', { name: /Starfield screensaver/ })).toBeTruthy();
     await user.keyboard('x');
     fireEvent.contextMenu(desk(container));
-    await user.click(screen.getByRole('menuitem', { name: ITEMS[3] }));
+    await user.click(screen.getByRole('menuitem', { name: ITEMS[4] }));
     expect(screen.getByRole('dialog', { name: /ReadMe\.txt/ })).toBeTruthy();
   });
 });

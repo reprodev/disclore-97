@@ -847,3 +847,38 @@
     flex-wrap: wrap;
   }
 }
+
+/* Daily Challenge: a checkbox and today's best on the Welcome card, and a stamp on the certificate. */
+.keepmaze__daily {
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+.keepmaze__daily-note {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink);
+}
+.certificate__daily {
+  margin: 2px 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+}
+.certificate__daily-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: var(--color-title-text);
+  background: var(--color-crimson);
+  border: 1px solid var(--color-gold-dark);
+  border-radius: 0;
+}
+
+/* Short screens: on the victory screen the room stage slims down, so the whole certificate fits without scrolling. */
+@media (max-height: 700px) {
+  .keepmaze:has(.certificate) .keepmaze__stage {
+    height: 104px;
+  }
+}

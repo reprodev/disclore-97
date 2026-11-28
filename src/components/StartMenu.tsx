@@ -24,6 +24,8 @@ export interface StartMenuActions {
   demoDiscs?: boolean;
   /** Turns the built-in demo discs on or off. Omit to hide the Demo Discs item. */
   onToggleDemoDiscs?: (on: boolean) => void;
+  /** Opens Display Properties (Change Wallpaper). */
+  onDisplayProperties?: () => void;
 }
 
 export interface StartMenuProps extends StartMenuActions {
@@ -57,6 +59,7 @@ export function StartMenu({
   theme = 'classic',
   demoDiscs = true,
   onToggleDemoDiscs,
+  onDisplayProperties,
 }: StartMenuProps) {
   const [sub, setSub] = useState<Submenu>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -190,6 +193,7 @@ export function StartMenu({
         {item('Dictionary...', 'book', onOpenDictionary)}
         {item('Take a Tour', 'castle', onTour)}
         {item('Study Flashcards', 'key', onFlashcards)}
+        {item('Display Properties...', 'computer', onDisplayProperties)}
         <button
           type="button"
           role="menuitem"

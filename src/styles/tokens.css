@@ -82,6 +82,26 @@
   --font-mono: "Courier New", Courier, monospace;
 
   --bevel-w: 2px;
+  /*
+   * Desktop wallpapers (Display Properties). These stay the same in every edition: the Edition Default
+   * wallpaper is the one that follows the edition. Each has a base, a pattern ink, and an icon-label
+   * colour chosen for at least 4.5:1 against the base.
+   */
+  --wallpaper-teal: #008080;
+  --wallpaper-teal-fleck: #006666;
+  --wallpaper-teal-label: #FFFFFF;
+  --wallpaper-slate: #2B3440;
+  --wallpaper-slate-line: #364152;
+  --wallpaper-slate-label: #F2F2F2;
+  --wallpaper-crosshatch: #5E5E66;
+  --wallpaper-crosshatch-line: #707079;
+  --wallpaper-crosshatch-label: #FFFFFF;
+  --wallpaper-parchment: #D8C9A0;
+  --wallpaper-parchment-line: #C5B386;
+  --wallpaper-parchment-label: #1A140A;
+  --wallpaper-blueprint: #1F4E79;
+  --wallpaper-blueprint-line: #2F6497;
+  --wallpaper-blueprint-label: #FFFFFF;
 }
 
 /*

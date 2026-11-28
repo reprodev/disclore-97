@@ -8,7 +8,10 @@ import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
 import '../styles/shortcuts.css';
 
-/** Disc shortcuts. A shortcut is shown only when its disc is loaded. */
+/**
+ * Built-in disc shortcuts. They are off by default so the desktop stays clean (the discs are one click
+ * away on Home); with discShortcuts on, each is shown while its disc is loaded.
+ */
 const DISC_SHORTCUTS: { discId: string; label: string; icon: IconName }[] = [
   { discId: 'castles', label: "Castles '97", icon: 'castle' },
   { discId: 'retro-dialup', label: "Retro '97", icon: 'computer' },
@@ -26,6 +29,8 @@ export interface DesktopIconsProps {
   onBurnNew?: () => void;
   /** Opens the Dictionary. Omit to hide the Dictionary shortcut. */
   onOpenDictionary?: () => void;
+  /** Shows the built-in disc shortcuts (Castles '97, Retro '97). Off by default. */
+  discShortcuts?: boolean;
 }
 
 /** What the Recycle Bin says when it is opened. */
@@ -50,12 +55,13 @@ export function DesktopIcons({
   onOpenNotes,
   onBurnNew,
   onOpenDictionary,
+  discShortcuts = false,
 }: DesktopIconsProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [recycleOpen, setRecycleOpen] = useState(false);
 
   const shortcuts: Shortcut[] = [
-    ...DISC_SHORTCUTS.filter((s) => discs.some((d) => d.disc_id === s.discId)).map((s) => ({
+    ...(discShortcuts ? DISC_SHORTCUTS : []).filter((s) => discs.some((d) => d.disc_id === s.discId)).map((s) => ({
       id: s.discId,
       label: s.label,
       icon: s.icon,

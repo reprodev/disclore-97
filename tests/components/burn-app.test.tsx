@@ -40,6 +40,9 @@ function memoryStorage(): StorageLike & { map: Map<string, string> } {
   };
 }
 
+/** Disc library entries only: other disclore97.* keys (such as the last place read) do not count. */
+const discKeys = (s: { map: Map<string, string> }) => [...s.map.keys()].filter((k) => k.startsWith(KEY_PREFIX)).length;
+
 /** Storage fake whose every member throws. */
 function throwingStorage(): StorageLike {
   const boom = () => {
@@ -152,7 +155,7 @@ describe('App burn integration', () => {
     await waitFor(() => expect(alert.textContent).toMatch(/network could not be reached/), { timeout: 4000 });
     expect(screen.getByRole('dialog', { name: 'Burn New CD-R Disc...' })).toBeTruthy();
     expect(screen.getAllByText('Test Disc').length).toBeGreaterThan(0);
-    expect(storage.map.size).toBe(0);
+    expect(discKeys(storage)).toBe(0);
     expect(oscillatorTypes.filter((t) => t === 'sawtooth').length).toBe(spinsBefore);
   });
 

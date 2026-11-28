@@ -128,6 +128,7 @@ describe('Start menu', () => {
       'Dictionary...',
       'Take a Tour',
       'Study Flashcards',
+      'Display Properties...',
       'Edition Switcher\u25BA',
       'About / ReadMe.txt',
       'Replay Intro Splash',

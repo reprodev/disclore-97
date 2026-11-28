@@ -1126,3 +1126,69 @@
   font-style: italic;
   color: var(--color-bevel-shadow);
 }
+
+/* Study Mastery & Continue: a compact sunken Win95 strip in the masthead row, beside the badge. */
+.home-mastery {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 0 auto;
+  padding: 3px 4px 3px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border-radius: 0;
+}
+.home-mastery__title {
+  margin: 0;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.home-mastery__stats {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+.home-mastery__stat {
+  display: flex;
+  gap: 3px;
+  white-space: nowrap;
+}
+.home-mastery__stat dd {
+  margin: 0;
+  font-weight: bold;
+}
+.home-mastery__continue {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.home-mastery + .home-hero__badge {
+  margin-left: 0;
+}
+.display-properties__status {
+  margin: 0;
+  font-size: 11px;
+}
+@media (max-width: 767px) {
+  .home-mastery {
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 0;
+  }
+  .home-mastery__stats {
+    flex-wrap: wrap;
+  }
+}
+
+/* Narrower desktops: the decorative CD-ROM badge gives way to the Study Mastery strip, so the masthead stays one row. */
+@media (max-width: 1199px) {
+  .home-mastery + .home-hero__badge {
+    display: none;
+  }
+}

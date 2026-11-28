@@ -13,6 +13,11 @@ import {
 import { Starfield } from './components/Starfield';
 import { DesktopContextMenu } from './components/DesktopContextMenu';
 import { DesktopWallpaper } from './components/DesktopWallpaper';
+import { DisplayPropertiesDialog } from './components/DisplayPropertiesDialog';
+import { addMastered, loadLastVisit, loadMastered, loadVictories, saveLastVisit } from './library/progress';
+import { loadWallpaper, saveWallpaper } from './library/wallpaper';
+import { continueTarget, masterySummary } from './model/mastery';
+import type { WallpaperId } from './model/wallpapers';
 import { KONAMI_SEQUENCE, konamiStep, STARFIELD_CLICK_GAP_MS, STARFIELD_CLICKS } from './model/easterEggs';
 import { refreshDisc } from './adapters/burn';
 import { BurnDialog } from './components/BurnDialog';
@@ -140,6 +145,13 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
   const [burned, setBurned] = useState<DiscManifest[]>(() => library.load());
   // Bookmarks share the library's storage: the browser's localStorage unless a test or embedder supplies one.
   const [bookmarkStorage] = useState(() => storage ?? (sources === undefined ? getBrowserStorage() : undefined));
+  /** The desktop wallpaper, saved under disclore97.wallpaper. Edition Default follows the edition. */
+  const [wallpaper, setWallpaperState] = useState<WallpaperId>(() => loadWallpaper(bookmarkStorage));
+  const setWallpaper = (id: WallpaperId) => {
+    setWallpaperState(id);
+    saveWallpaper(bookmarkStorage, id);
+  };
+  const [displayOpen, setDisplayOpen] = useState(false);
   /**
    * Demo Discs (Built-In), saved under disclore97.demoDiscs and on by default. It applies only to the
    * built-in discs: a `sources` prop (tests, embedding) supplies its own discs, so it has no toggle.
@@ -199,6 +211,15 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
 
   const disc = discs.find((d) => d.disc_id === nav.discId);
 
+  // Study Mastery and Continue Studying on Home, read fresh from storage each time Home comes back.
+  const onHome = nav.discId === null;
+  const homeMastery = useMemo(() => {
+    if (!onHome) return undefined;
+    const read = new Map(discs.map((d) => [d.disc_id, loadVisited(bookmarkStorage, d.disc_id)] as const));
+    const mastered = new Map(discs.map((d) => [d.disc_id, loadMastered(bookmarkStorage, d.disc_id)] as const));
+    return masterySummary(discs, { read, mastered, wins: loadVictories(bookmarkStorage) });
+  }, [discs, onHome]);
+  const continueTo = useMemo(() => (onHome ? continueTarget(discs, loadLastVisit(bookmarkStorage)) : null), [discs, onHome]);
   // The ambient soundscape follows the open disc (it stays off until the Ambience button is pressed).
   const ambienceDiscId = disc?.disc_id;
   useEffect(() => {
@@ -227,6 +248,16 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     visitedRef.current = next;
     setVisited(next);
     saveVisited(bookmarkStorage, disc.disc_id, next);
+  }, [marksDiscId, openSectionId]);
+  // Remember where the reader is, for Continue Studying on Home: the open article, or the disc itself
+  // when it was opened to another view (an article read earlier on the same disc is kept).
+  useEffect(() => {
+    if (!marksDiscId) return;
+    if (openSectionId !== null) {
+      saveLastVisit(bookmarkStorage, { discId: marksDiscId, sectionId: openSectionId });
+      return;
+    }
+    if (loadLastVisit(bookmarkStorage)?.discId !== marksDiscId) saveLastVisit(bookmarkStorage, { discId: marksDiscId });
   }, [marksDiscId, openSectionId]);
 
   // Easter egg: the Konami code toggles the "Archive Key '97" stamp in the Home status bar. It listens
@@ -608,7 +639,18 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
         />
       );
     } else if (v.kind === 'flashcards') {
-      main = <FlashcardsView disc={disc} deck={deck} onDeck={setDeck} onOpenSection={goSection} />;
+      main = (
+        <FlashcardsView
+          disc={disc}
+          deck={deck}
+          onDeck={(next) => {
+            setDeck(next);
+            // Mastered cards are kept per disc, for the Study Mastery strip on Home.
+            if (next) addMastered(bookmarkStorage, disc.disc_id, next.mastered);
+          }}
+          onOpenSection={goSection}
+        />
+      );
     } else if (v.kind === 'tour') {
       main = <TourView disc={disc} stop={tourStop} onStop={setTourStop} onOpenSection={goSection} />;
     } else if (v.kind === 'gallery') {
@@ -653,8 +695,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
 
   return (
     <div className="desktop">
-      <div className="desktop__work app-shell" onClick={onDesktopClick} onContextMenu={onDesktopContextMenu}>
-        <DesktopWallpaper edition={theme} />
+      <div className="desktop__work app-shell" data-wallpaper={wallpaper} onClick={onDesktopClick} onContextMenu={onDesktopContextMenu}>
+        <DesktopWallpaper edition={theme} wallpaper={wallpaper} />
         <DesktopIcons
           discs={discs}
           onOpenDisc={openDisc}
@@ -682,7 +724,8 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
               },
               { label: 'Mount Disc Image (.json)...', onSelect: openImagePicker },
               { label: 'Starfield Screensaver', onSelect: () => setStarfieldOn(true), separator: true },
-              { label: 'About / ReadMe.txt', onSelect: openReadMe, separator: true },
+              { label: 'Display Properties / Change Wallpaper...', onSelect: () => setDisplayOpen(true), separator: true },
+              { label: 'About / ReadMe.txt', onSelect: openReadMe },
             ]}
           />
         ) : null}
@@ -735,6 +778,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           demoDiscs={demoDiscs}
           onToggleDemoDiscs={onToggleDemoDiscs}
           archiveKey={archiveKey}
+          mastery={homeMastery}
+          continueTo={continueTo ?? undefined}
+          onContinue={continueTo ? () => (continueTo.sectionId ? openSectionIn(continueTo.discId, continueTo.sectionId) : openDisc(continueTo.discId)) : undefined}
           onRefreshDisc={disc && removable.has(disc.disc_id) ? () => void onRefreshDisc(disc.disc_id) : undefined}
           refreshing={refreshingId !== null && refreshingId === disc?.disc_id}
         />
@@ -769,6 +815,9 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
             if (file) void mountImage(file);
           }}
         />
+        {displayOpen ? (
+          <DisplayPropertiesDialog edition={theme} wallpaper={wallpaper} onChange={setWallpaper} onClose={() => setDisplayOpen(false)} />
+        ) : null}
         {imageNotice ? (
           <MessageDialog
             title={imageNotice.title}
@@ -848,6 +897,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           onOpenReadMe: openReadMe,
           onReplaySplash: () => setStage('splash'),
           onSetTheme: setEdition,
+          onDisplayProperties: () => setDisplayOpen(true),
           theme,
           demoDiscs,
           onToggleDemoDiscs,

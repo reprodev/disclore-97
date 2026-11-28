@@ -5,6 +5,7 @@ import { editionOf } from '../model/editions';
 import { pickRandomSection } from '../model/discSearch';
 import { ARCHIVE_KEY_STAMP } from '../model/easterEggs';
 import type { DiscManifest } from '../model/manifest';
+import type { ContinueTarget, MasterySummary } from '../model/mastery';
 import type { QuickJumpMode } from '../model/nav';
 import { BevelButton } from './BevelButton';
 import { DidYouKnow } from './DidYouKnow';
@@ -57,6 +58,12 @@ export interface HomeLauncherProps {
   onToggleDemoDiscs?: (on: boolean) => void;
   /** Shows the "Archive Key '97" collector stamp in the status bar. */
   archiveKey?: boolean;
+  /** Cross-disc progress for the Study Mastery strip. Omit to hide the strip. */
+  mastery?: MasterySummary;
+  /** Where Continue Studying goes (for its tooltip). */
+  continueTo?: ContinueTarget;
+  /** Jumps back to the last disc and article. Omit to dim the button. */
+  onContinue?: () => void;
 }
 
 function Card({
@@ -134,6 +141,9 @@ export function HomeLauncher({
   demoDiscs = true,
   onToggleDemoDiscs,
   archiveKey = false,
+  mastery,
+  continueTo,
+  onContinue,
 }: HomeLauncherProps) {
   const noDiscs = discs.length === 0;
   const canTurnOnDemo = onToggleDemoDiscs !== undefined && !demoDiscs;
@@ -177,6 +187,33 @@ export function HomeLauncher({
             </h1>
             <p className="home-hero__tag">encyclopedia</p>
           </div>
+          {mastery ? (
+            <section className="home-mastery" aria-label="Study Mastery">
+              <p className="home-mastery__title">Study Mastery</p>
+              <dl className="home-mastery__stats">
+                <div className="home-mastery__stat">
+                  <dt>Read</dt>
+                  <dd>{`${mastery.articlesRead}/${mastery.articlesTotal}`}</dd>
+                </div>
+                <div className="home-mastery__stat">
+                  <dt>Mastered</dt>
+                  <dd>{`${mastery.cardsMastered}/${mastery.cardsTotal}`}</dd>
+                </div>
+                <div className="home-mastery__stat">
+                  <dt>Victories</dt>
+                  <dd>{mastery.victories}</dd>
+                </div>
+              </dl>
+              <BevelButton
+                className="home-mastery__continue"
+                disabled={!onContinue}
+                title={continueTo ? `Continue: ${continueTo.label}` : 'Open a disc to start; this button brings you back to it.'}
+                onClick={() => onContinue?.()}
+              >
+                Continue Studying
+              </BevelButton>
+            </section>
+          ) : null}
           <p className="home-hero__badge">D: CD-ROM Mounted &bull; Procedural Audio</p>
         </header>
 

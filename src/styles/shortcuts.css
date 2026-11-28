@@ -187,3 +187,155 @@
   border-top: 1px solid var(--color-bevel-shadow);
   border-bottom: 1px solid var(--color-bevel-hi);
 }
+
+/* Fixed wallpapers (Display Properties): a solid base and a quiet pattern, all --wallpaper-* tokens. */
+.desktop-wallpaper__base--teal {
+  fill: var(--wallpaper-teal);
+}
+.desktop-wallpaper__base--slate {
+  fill: var(--wallpaper-slate);
+}
+.desktop-wallpaper__base--crosshatch {
+  fill: var(--wallpaper-crosshatch);
+}
+.desktop-wallpaper__base--parchment {
+  fill: var(--wallpaper-parchment);
+}
+.desktop-wallpaper__base--blueprint {
+  fill: var(--wallpaper-blueprint);
+}
+.desktop-wallpaper__ink--teal {
+  fill: var(--wallpaper-teal-fleck);
+}
+.desktop-wallpaper__ink--slate {
+  fill: var(--wallpaper-slate-line);
+}
+.desktop-wallpaper__ink--parchment {
+  fill: var(--wallpaper-parchment-line);
+}
+.desktop-wallpaper__line--crosshatch {
+  stroke: var(--wallpaper-crosshatch-line);
+  stroke-width: 1;
+}
+.desktop-wallpaper__line--blueprint {
+  stroke: var(--wallpaper-blueprint-line);
+  stroke-width: 1;
+}
+.desktop-wallpaper__line--blueprint-minor {
+  stroke: var(--wallpaper-blueprint-line);
+  stroke-width: 1;
+  stroke-dasharray: 1 3;
+}
+
+/* Icon labels stay readable on every wallpaper (4.5:1 or better against each base). */
+.desktop__work[data-wallpaper='teal'] .desktop-icon__label {
+  color: var(--wallpaper-teal-label);
+}
+.desktop__work[data-wallpaper='slate'] .desktop-icon__label {
+  color: var(--wallpaper-slate-label);
+}
+.desktop__work[data-wallpaper='crosshatch'] .desktop-icon__label {
+  color: var(--wallpaper-crosshatch-label);
+}
+.desktop__work[data-wallpaper='parchment'] .desktop-icon__label {
+  color: var(--wallpaper-parchment-label);
+}
+.desktop__work[data-wallpaper='blueprint'] .desktop-icon__label {
+  color: var(--wallpaper-blueprint-label);
+}
+/* A selected icon keeps the Win95 navy label on any wallpaper. */
+.desktop__work .desktop-icon[data-selected='true'] .desktop-icon__label,
+.desktop__work .desktop-icon:focus-visible .desktop-icon__label {
+  color: var(--color-title-text);
+}
+
+/* Display Properties: a Win95 dialog with a monitor preview above the wallpaper list. */
+.window.display-properties {
+  width: min(400px, 100%);
+  max-height: 100%;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+}
+.display-properties .window-content {
+  overflow: auto;
+}
+.display-properties__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+.display-properties__tab {
+  align-self: flex-start;
+  margin: 0 0 -9px;
+  padding: 2px 10px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-surface) var(--color-bevel-hi);
+}
+.display-properties__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 8px 8px;
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+.display-properties__monitor {
+  align-self: center;
+  padding: 8px 8px 14px;
+  background: var(--color-surface);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-hi) var(--color-bevel-edge) var(--color-bevel-edge) var(--color-bevel-hi);
+}
+.display-properties__screen {
+  position: relative;
+  isolation: isolate;
+  width: 176px;
+  height: 108px;
+  overflow: hidden;
+  background: var(--color-desktop);
+  border: 2px solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+.display-properties__list {
+  display: flex;
+  flex-direction: column;
+  /* A fieldset is min-content wide by default; let it shrink so long descriptions end in an ellipsis. */
+  min-width: 0;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 2px;
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+}
+.display-properties__option {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  padding: 2px 4px;
+  cursor: default;
+}
+.display-properties__option:has(input:checked) {
+  color: var(--color-title-text);
+  background: var(--color-title-bg);
+}
+.display-properties__name {
+  font-weight: bold;
+  white-space: nowrap;
+}
+.display-properties__desc {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.display-properties__buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
