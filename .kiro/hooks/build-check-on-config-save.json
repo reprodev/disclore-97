@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Production build on config save",
+      "trigger": "PostFileSave",
+      "description": "When vite.config.ts or wrangler.toml is saved, run the production build (type check plus vite build), so a Cloudflare Pages or bundle regression shows up at once.",
+      "matcher": "vite\\.config\\.ts|wrangler\\.toml",
+      "action": {
+        "type": "command",
+        "command": "npm run build",
+        "timeout": 300
+      }
+    }
+  ]
+}

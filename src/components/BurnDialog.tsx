@@ -4,6 +4,9 @@ import { burn, burnFallback } from '../adapters/burn';
 import type { BurnResult } from '../adapters/burn';
 import { ERROR_MESSAGES } from '../adapters/errors';
 import type { BurnError, FetchLike } from '../adapters/types';
+import { useT } from '../i18n/LocaleContext';
+import { LANGUAGE_NAMES, toWikiLanguage, WIKI_LANGUAGES } from '../model/languages';
+import type { WikiLanguage } from '../model/languages';
 import type { DiscManifest } from '../model/manifest';
 import { parseInput } from '../model/sourceInput';
 import { topicFromUrl } from '../model/topicGuess';
@@ -26,6 +29,8 @@ export interface BurnDialogProps {
   initialText?: string;
   /** Starts burning the initial text as soon as the dialog opens. */
   autoStart?: boolean;
+  /** The Wikipedia language a topic is looked up in, to start with. English by default. */
+  language?: WikiLanguage;
 }
 
 const OFFLINE_NOTICE = 'URL sources need a connection.';
@@ -60,7 +65,11 @@ export function BurnDialog({
   online = defaultOnline,
   initialText = '',
   autoStart = false,
+  language = 'en',
 }: BurnDialogProps) {
+  const tr = useT();
+  /** Which Wikipedia a topic burn reads: the allowlisted codes only (see languages.ts). */
+  const [lang, setLang] = useState<WikiLanguage>(() => toWikiLanguage(language));
   const layerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -121,7 +130,7 @@ export function BurnDialog({
         return;
       }
     }
-    void run((signal) => burn(input, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal }));
+    void run((signal) => burn(input, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal, language: lang }));
   };
 
   const onBurn = () => burnText(text);
@@ -147,7 +156,7 @@ export function BurnDialog({
   const onTryTopic = (topic: string) => {
     if (busy) return;
     setText(topic);
-    void run((signal) => burn(topic, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal }));
+    void run((signal) => burn(topic, { ...(fetchImpl ? { fetch: fetchImpl } : {}), signal, language: lang }));
   };
 
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -165,16 +174,16 @@ export function BurnDialog({
   const fallbackTopic = !isOfflineNotice && error?.fallbackTopic ? error.fallbackTopic : undefined;
   const offlineTopic = isOfflineNotice ? fallbackTopicFor(text) : fallbackTopic;
   // The error's own message, which can carry details such as the quoted wait on a busy GitHub line.
-  const message = error ? (isOfflineNotice ? OFFLINE_NOTICE : error.message || ERROR_MESSAGES[error.code]) : '';
+  const message = error ? (isOfflineNotice ? tr('burn_offline') : error.message || ERROR_MESSAGES[error.code]) : '';
   // Typing clears the error, so the box still holds the address that failed.
   const failedInput = error && !isOfflineNotice && WIKI_FALLBACK_CODES.has(error.code) ? parseInput(text) : undefined;
   const wikiTopic = failedInput?.ok && failedInput.kind === 'webpage' ? topicFromUrl(failedInput.url) : undefined;
 
   return (
     <div ref={layerRef} className="modal-layer">
-      <Window title="Burn New CD-R Disc..." className="burn-dialog" modal onClose={cancel}>
+      <Window title={tr('burn_title')} className="burn-dialog" modal onClose={cancel}>
         <div className="burn-dialog__body">
-          <label htmlFor="burn-input">Paste a GitHub address, a web page address, some Markdown, or a topic:</label>
+          <label htmlFor="burn-input">{tr('burn_prompt')}</label>
           <textarea
             id="burn-input"
             ref={inputRef}
@@ -185,7 +194,23 @@ export function BurnDialog({
             onChange={onChange}
           />
           <PresetList onSelect={onPreset} disabled={busy} />
-          {offline && !error ? <p role="status">{OFFLINE_NOTICE}</p> : null}
+          <div className="burn-dialog__language">
+            <label htmlFor="burn-language">{tr('burn_language')}</label>
+            <select
+              id="burn-language"
+              className="win95-select"
+              value={lang}
+              disabled={busy}
+              onChange={(e) => setLang(toWikiLanguage(e.target.value))}
+            >
+              {WIKI_LANGUAGES.map((code) => (
+                <option key={code} value={code} lang={code}>
+                  {`${LANGUAGE_NAMES[code]} (${code})`}
+                </option>
+              ))}
+            </select>
+          </div>
+          {offline && !error ? <p role="status">{tr('burn_offline')}</p> : null}
           {busy ? <BurnProgress /> : null}
           <div role="alert" className="burn-error" hidden={!error}>
             {error ? (
@@ -224,9 +249,9 @@ export function BurnDialog({
           </div>
           <div className="burn-dialog__buttons">
             <BevelButton disabled={busy || text.trim() === ''} onClick={onBurn}>
-              Burn
+              {tr('burn_button')}
             </BevelButton>
-            <BevelButton onClick={cancel}>Cancel</BevelButton>
+            <BevelButton onClick={cancel}>{tr('burn_cancel')}</BevelButton>
           </div>
         </div>
       </Window>

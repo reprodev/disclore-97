@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LocaleContext';
 import { BevelButton } from './BevelButton';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
@@ -65,23 +66,24 @@ export function NavToolbar({
   onGallery,
   onDictionary,
 }: NavToolbarProps) {
+  const tr = useT();
   return (
     <div className="nav-toolbar" role="toolbar" aria-label="Navigation">
-      <Tool icon="back" label="Back" disabled={!canBack} onClick={onBack} />
-      <Tool icon="forward" label="Forward" disabled={!canForward} onClick={onForward} />
+      <Tool icon="back" label={tr('menu_back')} disabled={!canBack} onClick={onBack} />
+      <Tool icon="forward" label={tr('menu_forward')} disabled={!canForward} onClick={onForward} />
       <span className="nav-toolbar__sep" aria-hidden="true" />
-      <Tool icon="home" label="Home" onClick={onHome} />
-      <Tool icon="cd" label="Discs" onClick={onDiscs} />
+      <Tool icon="home" label={tr('menu_home')} onClick={onHome} />
+      <Tool icon="cd" label={tr('tool_discs')} onClick={onDiscs} />
       <span className="nav-toolbar__sep" aria-hidden="true" />
-      <Tool icon="diagram" label="Diagram" disabled={!onDiagram} onClick={onDiagram} />
-      <Tool icon="notepad" label="Timeline" disabled={!onTimeline} onClick={onTimeline} />
-      <Tool icon="torch" label="KeepMaze" disabled={!onKeepMaze} onClick={onKeepMaze} />
+      <Tool icon="diagram" label={tr('menu_diagram')} disabled={!onDiagram} onClick={onDiagram} />
+      <Tool icon="notepad" label={tr('menu_timeline')} disabled={!onTimeline} onClick={onTimeline} />
+      <Tool icon="torch" label={tr('menu_keepmaze')} disabled={!onKeepMaze} onClick={onKeepMaze} />
       <span className="nav-toolbar__sep" aria-hidden="true" />
-      <Tool icon="castle" label="Tour" disabled={!onTour} onClick={onTour} />
-      <Tool icon="key" label="Flashcards" disabled={!onFlashcards} onClick={onFlashcards} />
-      <Tool icon="cd" label="Gallery" disabled={!onGallery} onClick={onGallery} />
-      <Tool icon="book" label="Dictionary" disabled={!onDictionary} onClick={onDictionary} />
-      <Tool icon="notepad" label="Notebook" disabled={!onNotebook} onClick={onNotebook} />
+      <Tool icon="castle" label={tr('menu_tour')} disabled={!onTour} onClick={onTour} />
+      <Tool icon="key" label={tr('menu_flashcards')} disabled={!onFlashcards} onClick={onFlashcards} />
+      <Tool icon="cd" label={tr('menu_gallery')} disabled={!onGallery} onClick={onGallery} />
+      <Tool icon="book" label={tr('tool_dictionary')} disabled={!onDictionary} onClick={onDictionary} />
+      <Tool icon="notepad" label={tr('tool_notebook')} disabled={!onNotebook} onClick={onNotebook} />
     </div>
   );
 }

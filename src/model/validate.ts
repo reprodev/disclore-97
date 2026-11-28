@@ -8,6 +8,7 @@ import type {
   ValidationError,
   ValidationResult,
 } from './manifest';
+import { isWikiLanguage } from './languages';
 import { isValidCaption, MAX_MEDIA, safeMediaUrl } from './media';
 import { solveDungeon } from './solver';
 
@@ -178,6 +179,13 @@ export function validateManifest(input: unknown): ValidationResult {
         field(it, 'url', p, 'string');
         field(it, 'caption', p, 'string');
       });
+    }
+
+    // Optional disc language: checked only when present.
+    if ('language' in root && root.language !== undefined) {
+      if (field(root, 'language', '$', 'string') && !isWikiLanguage(root.language)) {
+        err('$.language', 'wrong-type', 'Disc language must be a supported Wikipedia language code at $.language');
+      }
     }
 
     // Optional offline-outline marker: checked only when present.

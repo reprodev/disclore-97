@@ -1,12 +1,15 @@
 /**
  * handleTopic: testable core of the /api/topic Pages Function.
- * Looks a topic up on English Wikipedia and answers with an ExtractedSource-shaped JSON body:
+ * Looks a topic up on Wikipedia and answers with an ExtractedSource-shaped JSON body:
  * title, section headings, plain-text paragraphs, and a few safe pictures.
  *
- * The Wikipedia host is fixed here and built from parts. Callers choose only the search
- * text, so this cannot be pointed at any other address.
+ * The Wikipedia hosts are fixed here and built from parts, one per language in the WIKI_LANGUAGES
+ * allowlist. Callers choose only the search text and one of those language codes (`lang`, English
+ * when absent). Any other `lang` is refused, so this cannot be pointed at any other address.
  */
 
+import { DEFAULT_LANGUAGE, isWikiLanguage, toWikiLanguage, WIKI_LANGUAGES } from '../model/languages';
+import type { WikiLanguage } from '../model/languages';
 import { MAX_CAPTION, MAX_MEDIA, pickMedia } from '../model/media';
 import type { MediaItem } from '../model/manifest';
 import type { ExtractedSource } from '../model/source';
@@ -27,7 +30,14 @@ const MIN_IMAGE_HEIGHT = 150;
 const THUMB_WIDTH = 800;
 
 const SCHEME = 'https:';
-const WIKI_HOST = ['en', 'wikipedia', 'org'].join('.');
+/** One fixed host per allowlisted language, for example fr.wikipedia.org. Nothing else is ever looked up. */
+// A frozen, null-prototype table, so no inherited key (such as "__proto__") can ever name a host.
+const WIKI_HOSTS: Readonly<Record<WikiLanguage, string>> = Object.freeze(
+  Object.assign(
+    Object.create(null) as Record<WikiLanguage, string>,
+    Object.fromEntries(WIKI_LANGUAGES.map((code) => [code, [code, 'wikipedia', 'org'].join('.')])),
+  ),
+);
 const USER_AGENT = 'Disclore97-Topic/1.0 (encyclopedia topic lookup for a retro disc viewer)';
 
 /** Sections that hold lists of links or citations rather than prose. */
@@ -43,13 +53,62 @@ const SKIP_SECTIONS = new Set([
   'sources',
   'general references',
   'explanatory notes',
+  // The same reference-style sections in the other allowlisted languages.
+  'voir aussi',
+  'références',
+  'liens externes',
+  'bibliographie',
+  'siehe auch',
+  'einzelnachweise',
+  'weblinks',
+  'literatur',
+  'anmerkungen',
+  'véase también',
+  'referencias',
+  'enlaces externos',
+  'bibliografía',
+  'voci correlate',
+  'collegamenti esterni',
+  'bibliografia',
+  'ver também',
+  'referências',
+  'ligações externas',
+  'zie ook',
+  'externe links',
+  'bronnen',
+  'zobacz też',
+  'przypisy',
+  'linki zewnętrzne',
+  'se även',
+  'referenser',
+  'externa länkar',
+  'ayrıca bakınız',
+  'kaynakça',
+  'dış bağlantılar',
+  'kaynaklar',
+  '関連項目',
+  '脚注',
+  '外部リンク',
+  '参考文献',
+  '같이 보기',
+  '각주',
+  '외부 링크',
+  '참고 문헌',
+  '参见',
+  '参考资料',
+  '外部链接',
+  'انظر أيضا',
+  'انظر أيضًا',
+  'مراجع',
+  'وصلات خارجية',
 ]);
 const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 /** File names of site furniture, maps of flags, and other non-illustrative images. */
 const JUNK_FILE =
   /(?:^|[^a-z])(?:icons?|logos?|flags?|symbols?|commons|wikimedia|wikidata|wikiquote|disambig|stub|ambox|padlock|portal|question|edit|oojs|ooui|nuvola|crystal|blank)(?![a-z])/i;
 /** Disambiguation pages open with a short line such as "X may refer to:". */
-const DISAMBIGUATION = /\brefers? to:\s*$/i;
+const DISAMBIGUATION =
+  /(?:\brefers? to|peut (?:faire référence|désigner)|steht für|puede referirse|può riferirsi|pode referir-se|kan verwijzen|może oznaczać|kan syfta på|şu anlamlara gelebilir|يمكن أن يشير)[^\n]*:\s*$/i;
 
 function json(status: number, body: Record<string, unknown>, extra?: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
@@ -77,16 +136,16 @@ export function cleanQuery(raw: string | null): string {
     .trim();
 }
 
-function apiUrl(params: Record<string, string>): string {
-  const u = new URL(`${SCHEME}//${WIKI_HOST}/w/api.php`);
+function apiUrl(lang: WikiLanguage, params: Record<string, string>): string {
+  const u = new URL(`${SCHEME}//${WIKI_HOSTS[lang]}/w/api.php`);
   const all: Record<string, string> = { action: 'query', format: 'json', formatversion: '2', ...params };
   for (const [k, v] of Object.entries(all)) u.searchParams.set(k, v);
   return u.href;
 }
 
 /** The public page address for an article title. */
-export function pageUrl(title: string): string {
-  return `${SCHEME}//${WIKI_HOST}/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
+export function pageUrl(title: string, lang: WikiLanguage = DEFAULT_LANGUAGE): string {
+  return `${SCHEME}//${WIKI_HOSTS[toWikiLanguage(lang)]}/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
 }
 
 /**
@@ -179,9 +238,15 @@ function articleImages(data: unknown): MediaItem[] {
   return out;
 }
 
-async function lookup(query: string, deps: TopicDeps, signal: AbortSignal, timedOut: Promise<never>): Promise<Response> {
+async function lookup(
+  query: string,
+  lang: WikiLanguage,
+  deps: TopicDeps,
+  signal: AbortSignal,
+  timedOut: Promise<never>,
+): Promise<Response> {
   const found = await getJson(
-    apiUrl({
+    apiUrl(lang, {
       generator: 'search',
       gsrsearch: query,
       gsrlimit: '1',
@@ -210,7 +275,7 @@ async function lookup(query: string, deps: TopicDeps, signal: AbortSignal, timed
   if (lead !== '') candidates.push({ url: lead, caption: page.title });
   try {
     const more = await getJson(
-      apiUrl({
+      apiUrl(lang, {
         titles: page.title,
         generator: 'images',
         gimlimit: '30',
@@ -234,7 +299,7 @@ async function lookup(query: string, deps: TopicDeps, signal: AbortSignal, timed
     headings,
     paragraphs,
     ...(media.length > 0 ? { media } : {}),
-    metadata: { kind: 'topic', source: pageUrl(page.title) },
+    metadata: { kind: 'topic', source: pageUrl(page.title, lang) },
   };
   return json(200, body as unknown as Record<string, unknown>);
 }
@@ -244,13 +309,20 @@ export async function handleTopic(request: Request, deps: TopicDeps): Promise<Re
     return json(405, { error: 'method-not-allowed' }, { allow: 'GET' });
   }
   let raw: string | null;
+  let rawLang: string | null;
   try {
-    raw = new URL(request.url).searchParams.get('q');
+    const params = new URL(request.url).searchParams;
+    raw = params.get('q');
+    rawLang = params.get('lang');
   } catch {
     raw = null;
+    rawLang = null;
   }
   const query = cleanQuery(raw);
   if (query === '') return json(400, { error: 'missing-query' });
+  // Only an allowlisted code ever reaches a host name. Anything else is refused, not guessed at.
+  if (rawLang !== null && rawLang !== '' && !isWikiLanguage(rawLang)) return json(400, { error: 'unsupported-language' });
+  const lang: WikiLanguage = isWikiLanguage(rawLang) ? rawLang : DEFAULT_LANGUAGE;
 
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -262,7 +334,7 @@ export async function handleTopic(request: Request, deps: TopicDeps): Promise<Re
   });
   timedOut.catch(() => undefined);
   try {
-    return await lookup(query, deps, controller.signal, timedOut);
+    return await lookup(query, lang, deps, controller.signal, timedOut);
   } catch (e) {
     if (e instanceof Failure) return e.response;
     return json(502, { error: 'upstream-failed' });

@@ -7,6 +7,7 @@ import { ARCHIVE_KEY_STAMP } from '../model/easterEggs';
 import type { DiscManifest } from '../model/manifest';
 import type { ContinueTarget, MasterySummary } from '../model/mastery';
 import type { QuickJumpMode } from '../model/nav';
+import { useT } from '../i18n/LocaleContext';
 import { BevelButton } from './BevelButton';
 import { DidYouKnow } from './DidYouKnow';
 import { PackShelf } from './PackShelf';
@@ -157,11 +158,12 @@ export function HomeLauncher({
     onOpenSection(pick.discId, pick.sectionId);
   };
   const edition = editionOf(theme);
+  const tr = useT();
   const packs = `${discs.length} Expansion ${discs.length === 1 ? 'Pack' : 'Packs'} Ready`;
 
   return (
     <Window
-      title="DiscLore '97 Home"
+      title={tr('home_title')}
       className="home-window"
       maximizable
       defaultMaximized
@@ -188,19 +190,19 @@ export function HomeLauncher({
             <p className="home-hero__tag">encyclopedia</p>
           </div>
           {mastery ? (
-            <section className="home-mastery" aria-label="Study Mastery">
-              <p className="home-mastery__title">Study Mastery</p>
+            <section className="home-mastery" aria-label={tr('mastery_title')}>
+              <p className="home-mastery__title">{tr('mastery_title')}</p>
               <dl className="home-mastery__stats">
                 <div className="home-mastery__stat">
-                  <dt>Read</dt>
+                  <dt>{tr('mastery_read')}</dt>
                   <dd>{`${mastery.articlesRead}/${mastery.articlesTotal}`}</dd>
                 </div>
                 <div className="home-mastery__stat">
-                  <dt>Mastered</dt>
+                  <dt>{tr('mastery_mastered')}</dt>
                   <dd>{`${mastery.cardsMastered}/${mastery.cardsTotal}`}</dd>
                 </div>
                 <div className="home-mastery__stat">
-                  <dt>Victories</dt>
+                  <dt>{tr('mastery_victories')}</dt>
                   <dd>{mastery.victories}</dd>
                 </div>
               </dl>
@@ -210,7 +212,7 @@ export function HomeLauncher({
                 title={continueTo ? `Continue: ${continueTo.label}` : 'Open a disc to start; this button brings you back to it.'}
                 onClick={() => onContinue?.()}
               >
-                Continue Studying
+                {tr('mastery_continue')}
               </BevelButton>
             </section>
           ) : null}
@@ -218,7 +220,7 @@ export function HomeLauncher({
         </header>
 
         <div className="home__grid">
-          <Group legend="Expansion Packs (CD-ROM Drive D:)" className="home-group--packs">
+          <Group legend={tr('home_packs')} className="home-group--packs">
             {onOpenSection ? (
               <Pinpointer
                 discs={discs}
@@ -265,32 +267,32 @@ export function HomeLauncher({
           </Group>
 
           <div className="home__side">
-            <Group legend="Quick Jump Modes" className="home-group--editorial">
+            <Group legend={tr('home_quickJump')} className="home-group--editorial">
               <div className="home__cards">
                 <Card
                   icon="diagram"
-                  title="Interactive Diagrams"
+                  title={tr('home_diagrams')}
                   text="find and jump straight to pin diagrams"
                   disabled={!hasDiagrams}
                   onClick={onQuickJump ? () => onQuickJump('diagram') : undefined}
                 />
                 <Card
                   icon="torch"
-                  title="KeepMaze Quest"
+                  title={tr('home_keepmaze')}
                   text="explore the trivia dungeon"
                   disabled={!hasDungeons}
                   onClick={onQuickJump ? () => onQuickJump('keepmaze') : undefined}
                 />
                 <Card
                   icon="castle"
-                  title="Take a Tour"
+                  title={tr('start_tour')}
                   text="a guided walk through a disc, stop by stop"
                   disabled={!hasSections}
                   onClick={onQuickJump ? () => onQuickJump('tour') : undefined}
                 />
                 <Card
                   icon="key"
-                  title="Study Flashcards"
+                  title={tr('start_flashcards')}
                   text="drill trivia and Quick Facts as index cards"
                   disabled={!hasSections}
                   onClick={onQuickJump ? () => onQuickJump('flashcards') : undefined}
@@ -298,7 +300,7 @@ export function HomeLauncher({
                 {onOpenSection ? (
                   <Card
                     icon="book"
-                    title="Surprise Me!"
+                    title={tr('home_surprise')}
                     text={noDiscs ? 'needs a mounted disc' : 'open a random article from any disc'}
                     disabled={!hasSections}
                     onClick={surprise}
@@ -314,18 +316,18 @@ export function HomeLauncher({
               </p>
             </Group>
 
-            <Group legend="Utilities" className="home-group--editorial">
+            <Group legend={tr('home_utilities')} className="home-group--editorial">
               <div className="home__cards home__cards--grid">
                 <Card
                   icon="cd"
-                  title="Burn New CD-R Disc..."
+                  title={tr('start_burn')}
                   text="burn a Wikipedia topic, GitHub repo, or web page"
                   onClick={onBurnNew}
                 />
                 {onMountImage ? (
                   <Card
                     icon="cd"
-                    title="Mount Disc Image (.json)..."
+                    title={tr('start_mount')}
                     text="open a disc image saved on this computer"
                     onClick={onMountImage}
                   />
@@ -333,7 +335,7 @@ export function HomeLauncher({
                 {onOpenDictionary ? (
                   <Card
                     icon="book"
-                    title="Dictionary..."
+                    title={tr('start_dictionary')}
                     text="look up a word on every mounted disc"
                     onClick={() => onOpenDictionary()}
                   />
@@ -341,7 +343,7 @@ export function HomeLauncher({
                 {onOpenNotebook ? (
                   <Card
                     icon="notepad"
-                    title="Notebook..."
+                    title={tr('menu_notebook')}
                     text="your study notes for a disc"
                     onClick={() => onOpenNotebook()}
                   />
@@ -356,13 +358,13 @@ export function HomeLauncher({
                 ) : null}
                 <Card
                   icon="notepad"
-                  title="About / ReadMe.txt"
+                  title={tr('start_readme')}
                   text="what DiscLore '97 and KeepMaze are"
                   onClick={onOpenReadMe}
                 />
                 <Card
                   icon="key"
-                  title="Replay Intro Splash"
+                  title={tr('start_replay')}
                   text="watch the boot screen again"
                   onClick={onReplaySplash}
                 />
@@ -371,7 +373,7 @@ export function HomeLauncher({
 
             <section className="home-info" aria-labelledby="home-info-title">
               <h2 id="home-info-title" className="home-info__title">
-                How DiscLore '97 Works
+                {tr('home_howItWorks')}
               </h2>
               <dl className="home-info__list">
                 {HOW_IT_WORKS.map((item) => (
@@ -396,7 +398,7 @@ export function HomeLauncher({
               {ARCHIVE_KEY_STAMP}
             </div>
           ) : null}
-          <div className="status-bar__panel status-bar__panel--cd">CD-ROM: AutoPlay Ready</div>
+          <div className="status-bar__panel status-bar__panel--cd">{tr('home_autoplay')}</div>
         </div>
       </div>
     </Window>

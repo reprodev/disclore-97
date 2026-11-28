@@ -5,6 +5,8 @@ import { fetchWithDeadline } from './http';
 import type { AdapterOptions, FetchLike, Result } from './types';
 import { sanitizeLine } from '../model/compiler';
 import { MAX_CAPTION, MAX_MEDIA, pickMedia } from '../model/media';
+import { isWikiLanguage } from '../model/languages';
+import type { WikiLanguage } from '../model/languages';
 import type { ExtractedSource } from '../model/source';
 
 const DEFAULT_ENDPOINT = '/api/topic';
@@ -39,13 +41,15 @@ function pageSource(v: unknown, fallback: string): string {
  */
 export async function fetchTopicSource(
   topic: string,
-  opts: AdapterOptions & { endpoint?: string } = {},
+  opts: AdapterOptions & { endpoint?: string; language?: WikiLanguage } = {},
 ): Promise<Result<ExtractedSource>> {
   const fetchFn: FetchLike = opts.fetch ?? ((i, init) => globalThis.fetch(i, init));
   const ms = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const endpoint = opts.endpoint ?? DEFAULT_ENDPOINT;
   const label = `Topic: ${topic}`;
-  const target = `${endpoint}?q=${encodeURIComponent(topic.slice(0, MAX_QUERY))}`;
+  // English is the default, so its address stays exactly as before; other languages add `&lang=`.
+  const lang = opts.language && isWikiLanguage(opts.language) && opts.language !== 'en' ? `&lang=${opts.language}` : '';
+  const target = `${endpoint}?q=${encodeURIComponent(topic.slice(0, MAX_QUERY))}${lang}`;
 
   const res = await fetchWithDeadline(fetchFn, target, INIT, ms, opts.signal);
   if (!res.ok) return res;

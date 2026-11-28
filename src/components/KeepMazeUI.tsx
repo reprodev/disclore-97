@@ -13,6 +13,8 @@ import type { PersonalBest } from '../model/game';
 import type { GameAction, GameState } from '../model/game';
 import { ENTRANCE_ROOM_ID } from '../model/manifest';
 import type { DiscManifest, Dungeon } from '../model/manifest';
+import { useLocale, useT } from '../i18n/LocaleContext';
+import { discTextAttrs } from '../model/languages';
 import { BevelButton } from './BevelButton';
 import { DungeonViewport, roomVariant } from './DungeonViewport';
 import { MiniMap } from './MiniMap';
@@ -77,6 +79,9 @@ export function KeepMazeUI({
    * day's best is kept under disclore97.dailyChallenge.
    */
   const [day] = useState(() => dateKey(today()));
+  const tr = useT();
+  /** Room names and trivia are disc text, marked with the disc's own language. */
+  const discLang = discTextAttrs(disc.language, useLocale());
   const [daily, setDaily] = useState(false);
   const startedAt = useRef(0);
   const [runMs, setRunMs] = useState<number | null>(null);
@@ -192,21 +197,21 @@ export function KeepMazeUI({
     <div className="keepmaze__hud-cluster">
       <div className="keepmaze__map">
         <MiniMap dungeon={dungeon} visited={visited} currentRoomId={state.roomId} />
-        <ul className="minimap-legend" aria-label="Mini-map legend">
-          <li><span className="minimap-legend__swatch minimap-legend__swatch--current" aria-hidden="true" />Current</li>
-          <li><span className="minimap-legend__swatch minimap-legend__swatch--visited" aria-hidden="true" />Visited</li>
-          <li><span className="minimap-legend__swatch minimap-legend__swatch--unknown" aria-hidden="true" />Unexplored</li>
+        <ul className="minimap-legend" aria-label={tr('km_legend')}>
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--current" aria-hidden="true" />{tr('km_current')}</li>
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--visited" aria-hidden="true" />{tr('km_visited')}</li>
+          <li><span className="minimap-legend__swatch minimap-legend__swatch--unknown" aria-hidden="true" />{tr('km_unexplored')}</li>
         </ul>
         <p className="quest-card__progress">
-          Rooms explored: {visited.length} of {dungeon.rooms.length}
+          {tr('km_rooms', { n: visited.length, total: dungeon.rooms.length })}
         </p>
       </div>
       <div className="keepmaze__trophy">
-        <dl className="quest-card__stats medallion" aria-label="Knowledge stats">
-          <div className="quest-card__stat torch-rack" data-tappable="true" title="Tap the torches" onClick={tapTorches}>
-            <dt>Torches</dt>
+        <dl className="quest-card__stats medallion" aria-label={tr('km_stats')}>
+          <div className="quest-card__stat torch-rack" data-tappable="true" title={tr('km_tapTorches')} onClick={tapTorches}>
+            <dt>{tr('km_torches')}</dt>
             <dd>
-              <span className="torches" role="img" aria-label={`${state.torches} of ${STARTING_TORCHES} torches lit`}>
+              <span className="torches" role="img" aria-label={tr('km_torchesLit', { n: state.torches, total: STARTING_TORCHES })}>
                 {Array.from({ length: STARTING_TORCHES }, (_, i) => (
                   <span key={i} className="torches__torch torch-rack__slot" data-lit={i < state.torches ? 'true' : 'false'}>
                     <PixelIcon name="torch" size={24} />
@@ -223,20 +228,20 @@ export function KeepMazeUI({
             </text>
           </svg>
           <div className="quest-card__stat medallion__score">
-            <dt>Score</dt>
+            <dt>{tr('km_score')}</dt>
             <dd>{state.score}</dd>
           </div>
           <div className="quest-card__stat medallion__streak">
-            <dt>Streak</dt>
+            <dt>{tr('km_streak')}</dt>
             <dd>{state.streak}</dd>
           </div>
         </dl>
         {best ? (
           <p className="quest-card__best medallion__best">
-            Personal Best: {best.bestScore} pts ({best.bestRank})
+            {tr('km_personalBest', { score: best.bestScore, rank: best.bestRank })}
           </p>
         ) : (
-          <p className="medallion__best medallion__best--none">No best yet</p>
+          <p className="medallion__best medallion__best--none">{tr('km_noBest')}</p>
         )}
       </div>
     </div>
@@ -245,7 +250,7 @@ export function KeepMazeUI({
   /** The right main panel: one warm ivory manuscript card with a navy caption bar and gold and burgundy trim. */
   const panel = (body: ReactNode, mode: 'welcome' | 'room' | 'question') => (
     <div className="keepmaze__panel" data-mode={mode}>
-      <p className="quest-card__title">KeepMaze Quest</p>
+      <p className="quest-card__title">{tr('km_quest')}</p>
       {whisper ? (
         <span className="keepmaze__whisper" aria-live="polite">
           {whisper}
@@ -257,7 +262,7 @@ export function KeepMazeUI({
 
   /** Bottom console strip: the HUD cluster beside the main panel. */
   const consoleStrip = (body: ReactNode, mode: 'welcome' | 'room' | 'question') => (
-    <section className="keepmaze__console quest-card" aria-label="KeepMaze Quest">
+    <section className="keepmaze__console quest-card" aria-label={tr('km_quest')}>
       {hud}
       {panel(body, mode)}
     </section>
@@ -269,10 +274,12 @@ export function KeepMazeUI({
         {stage}
         {consoleStrip(
           <div className="keepmaze__welcome">
-            <p className="keepmaze__kicker">Welcome to KeepMaze</p>
-            <h2 className="keepmaze__room keepmaze__dungeon-title">{dungeon.title}</h2>
+            <p className="keepmaze__kicker">{tr('km_welcome')}</p>
+            <h2 className="keepmaze__room keepmaze__dungeon-title" {...discLang}>
+              {dungeon.title}
+            </h2>
             <p className="quest-card__objective">
-              Reach the Throne Room by unlocking doors with encyclopedia trivia.
+              {tr('km_objective')}
             </p>
             <label className="win95-check keepmaze__daily">
               <input
@@ -282,10 +289,10 @@ export function KeepMazeUI({
                 disabled={noTrivia}
                 onChange={(e) => setDaily(e.target.checked)}
               />
-              <span className="win95-check__label">{`Daily Challenge (${day})`}</span>
+              <span className="win95-check__label">{tr('km_daily', { day })}</span>
             </label>
             {dailyBest ? (
-              <p className="keepmaze__daily-note">{`Today's best: ${dailyBest.score} pts in ${formatElapsed(dailyBest.timeMs)}`}</p>
+              <p className="keepmaze__daily-note">{tr('km_todayBest', { score: dailyBest.score, time: formatElapsed(dailyBest.timeMs) })}</p>
             ) : null}
             <BevelButton
               className="keepmaze__start"
@@ -295,11 +302,11 @@ export function KeepMazeUI({
                 setStarted(true);
               }}
             >
-              Start
+              {tr('km_start')}
             </BevelButton>
             {noTrivia && (
               <p className="keepmaze__message" role="status">
-                This dungeon needs trivia questions before it can be played.
+                {tr('km_noTrivia')}
               </p>
             )}
           </div>,
@@ -353,16 +360,16 @@ export function KeepMazeUI({
             </p>
             {daily ? (
               <p className="certificate__daily">
-                <span className="certificate__daily-badge">{`Daily Challenge ${day}`}</span>{' '}
-                {`Time: ${formatElapsed(runMs ?? 0)}`}
-                {dailyBest ? ` \u2022 Today's best: ${dailyBest.score} pts in ${formatElapsed(dailyBest.timeMs)}` : ''}
-                {dailyNewBest ? ' \u2022 New daily best!' : ''}
+                <span className="certificate__daily-badge">{tr('km_dailyBadge', { day })}</span>{' '}
+                {tr('km_time', { time: formatElapsed(runMs ?? 0) })}
+                {dailyBest ? ` \u2022 ${tr('km_todayBest', { score: dailyBest.score, time: formatElapsed(dailyBest.timeMs) })}` : ''}
+                {dailyNewBest ? ` \u2022 ${tr('km_newDailyBest')}` : ''}
               </p>
             ) : null}
-            {newBest ? <p className="certificate__best-badge">New Personal Best!</p> : null}
+            {newBest ? <p className="certificate__best-badge">{tr('km_newBest')}</p> : null}
             {best ? (
               <p className="certificate__best">
-                Personal Best: {best.bestScore} pts ({best.bestRank})
+                {tr('km_personalBest', { score: best.bestScore, rank: best.bestRank })}
               </p>
             ) : null}
             <p className="keepmaze__message certificate__result" role="status">
@@ -398,18 +405,18 @@ export function KeepMazeUI({
   };
 
   const roomCard = (
-    <div className="keepmaze__room-card">
+    <div className="keepmaze__room-card" {...discLang}>
       <p className="keepmaze__room">{room?.name ?? state.roomId}</p>
       <p className="keepmaze__message keepmaze__description">{room?.description}</p>
       <div className="keepmaze__stats">
-        <span>Moves: {state.moves}</span>
-        <span>Incorrect: {state.incorrect}</span>
+        <span>{tr('km_moves', { n: state.moves })}</span>
+        <span>{tr('km_incorrect', { n: state.incorrect })}</span>
         <BevelButton className="keepmaze__restart" onClick={restart}>
-          Restart
+          {tr('km_restart')}
         </BevelButton>
       </div>
       <div className="keepmaze__exits">
-        <span className="keepmaze__exits-label">Exits:</span>
+        <span className="keepmaze__exits-label">{tr('km_exits')}</span>
         <ul className="keepmaze__list">
           {(room?.exits ?? []).map((exit, i) => {
             const dest = dungeon.rooms.find((r) => r.room_id === exit.to);
@@ -440,14 +447,14 @@ export function KeepMazeUI({
         <span className="keepmaze__qheader-sep" aria-hidden="true">
           {'•'}
         </span>
-        <span>Moves: {state.moves}</span>
+        <span>{tr('km_moves', { n: state.moves })}</span>
         <span className="keepmaze__qheader-sep" aria-hidden="true">
           {'•'}
         </span>
-        <span>Incorrect: {state.incorrect}</span>
+        <span>{tr('km_incorrect', { n: state.incorrect })}</span>
       </p>
       <BevelButton className="keepmaze__restart" onClick={restart}>
-        Restart
+        {tr('km_restart')}
       </BevelButton>
     </div>
   );
@@ -459,10 +466,10 @@ export function KeepMazeUI({
         <>
           {pending ? questionHeader : roomCard}
           {!pending && !state.lastWrong && (
-            <p className="keepmaze__hint">Choose an exit. A trivia question guards each door.</p>
+            <p className="keepmaze__hint">{tr('km_hint')}</p>
           )}
           {pending && (
-            <div className="keepmaze__question keepmaze__question--manuscript" role="group" aria-label="Trivia question">
+            <div className="keepmaze__question keepmaze__question--manuscript" role="group" aria-label={tr('km_question')} {...discLang}>
               {/* Illuminated drop cap. A span, not a <p>, so the prompt stays the group's first paragraph. */}
               <span className="keepmaze__dropcap" aria-hidden="true">
                 Q
@@ -489,10 +496,10 @@ export function KeepMazeUI({
                   setPeekId((id) => (id === pending.question.question_id ? null : pending.question.question_id));
                 }}
               >
-                Peek Hint
+                {tr('km_peek')}
               </BevelButton>
               {peekId === pending.question.question_id && peekSection ? (
-                <div className="keepmaze__peek" role="note" aria-label="Hint preview">
+                <div className="keepmaze__peek" role="note" aria-label={tr('km_hintPreview')}>
                   <p className="keepmaze__peek-title">{peekSection.title}</p>
                   <p className="keepmaze__peek-text">{firstSentence(peekSection.paragraphs[0] ?? '')}</p>
                 </div>

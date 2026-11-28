@@ -3,6 +3,7 @@
  * Uses the voice the browser already has: no audio files, no network requests, and no
  * AudioContext. Respects the global Mute: muting stops speech, and nothing speaks while muted.
  */
+import { speechTag } from '../model/languages';
 import { isMuted, subscribeMuted } from './audio';
 
 interface Run {
@@ -36,10 +37,36 @@ export function stopSpeaking(): void {
 }
 
 /**
+ * Picks the browser voice for a BCP 47 tag: an exact match first (`fr-FR`), then any voice of the
+ * same language (`fr-CA`), preferring a local voice. Returns undefined when the browser has none,
+ * in which case the utterance's `lang` alone lets the browser choose.
+ */
+export function chooseVoice(voices: readonly SpeechSynthesisVoice[], tag: string): SpeechSynthesisVoice | undefined {
+  const want = tag.toLowerCase();
+  const base = want.split('-')[0]!;
+  const norm = (v: SpeechSynthesisVoice) => String(v.lang ?? '').toLowerCase().replace('_', '-');
+  const exact = voices.filter((v) => norm(v) === want);
+  const same = voices.filter((v) => norm(v).split('-')[0] === base);
+  const pick = (list: SpeechSynthesisVoice[]) => list.find((v) => v.localService) ?? list[0];
+  return pick(exact) ?? pick(same);
+}
+
+/** The browser's voices, or none. Never throws. */
+function voicesOf(s: SpeechSynthesis): SpeechSynthesisVoice[] {
+  try {
+    return typeof s.getVoices === 'function' ? s.getVoices() : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Speaks the given paragraphs one after another. `onEnd` runs exactly once, when the last
  * paragraph finishes, when speech fails, or when it is stopped. onProgress(current, total),
  * with a 1-based paragraph number, runs when narration begins and as each paragraph starts.
  * `rate` is the speaking speed (1 is normal, 1.2 is brisk), clamped to 0.5 to 2.
+ * `language` is the disc's language (for example `fr`): the utterance gets its tag (`fr-FR`) and a
+ * matching voice when the browser has one. English (`en-US`) when omitted.
  * Returns false (and speaks nothing) when speech is unavailable, muted, or there is no text.
  */
 export function speak(
@@ -47,6 +74,7 @@ export function speak(
   onEnd: () => void,
   onProgress?: (current: number, total: number) => void,
   rate = 1,
+  language?: string,
 ): boolean {
   const s = synth();
   const texts = (Array.isArray(paragraphs) ? paragraphs : [])
@@ -72,10 +100,13 @@ export function speak(
     }
   };
   onProgress?.(1, texts.length);
+  const tag = speechTag(language);
+  const voice = chooseVoice(voicesOf(s), tag);
   try {
     texts.forEach((text, i) => {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';
+      u.lang = tag;
+      if (voice) u.voice = voice;
       u.rate = Number.isFinite(rate) ? Math.min(2, Math.max(0.5, rate)) : 1;
       u.onstart = () => {
         if (current === run) onProgress?.(i + 1, texts.length);

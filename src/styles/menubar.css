@@ -40,7 +40,8 @@
 .menubar__menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  /* Logical: the dropdown opens under its item in both directions, so RTL menus stay on screen. */
+  inset-inline-start: 0;
   z-index: 100;
   min-width: 140px;
   padding: 2px;

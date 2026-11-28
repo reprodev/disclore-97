@@ -14,6 +14,15 @@ import { Starfield } from './components/Starfield';
 import { DesktopContextMenu } from './components/DesktopContextMenu';
 import { DesktopWallpaper } from './components/DesktopWallpaper';
 import { DisplayPropertiesDialog } from './components/DisplayPropertiesDialog';
+import { LanguageDialog } from './components/LanguageDialog';
+import { LOCALE_INFO } from './i18n';
+import type { Locale } from './i18n';
+import { LocaleContext } from './i18n/LocaleContext';
+import { loadBest } from './library/best';
+import { loadDailyBook } from './library/dailyChallenge';
+import { loadLocale, saveLocale } from './library/locale';
+import { dateKey } from './model/daily';
+import { toWikiLanguage } from './model/languages';
 import { addMastered, loadLastVisit, loadMastered, loadVictories, saveLastVisit } from './library/progress';
 import { loadWallpaper, saveWallpaper } from './library/wallpaper';
 import { continueTarget, masterySummary } from './model/mastery';
@@ -152,6 +161,25 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     saveWallpaper(bookmarkStorage, id);
   };
   const [displayOpen, setDisplayOpen] = useState(false);
+  /** The shell language, saved under disclore97.locale. English is the default. */
+  const [locale, setLocaleState] = useState<Locale>(() => loadLocale(bookmarkStorage));
+  const setLocale = (next: Locale) => {
+    setLocaleState(next);
+    saveLocale(bookmarkStorage, next);
+  };
+  const [languageOpen, setLanguageOpen] = useState(false);
+  // The page's own language follows the shell, for screen readers and fonts.
+  useEffect(() => {
+    // English leaves the page exactly as before; other shells mark <html lang> for screen readers.
+    if (typeof document === 'undefined' || locale === 'en') return;
+    const root = document.documentElement;
+    const before = root.getAttribute('lang');
+    root.setAttribute('lang', locale);
+    return () => {
+      if (before === null) root.removeAttribute('lang');
+      else root.setAttribute('lang', before);
+    };
+  }, [locale]);
   /**
    * Demo Discs (Built-In), saved under disclore97.demoDiscs and on by default. It applies only to the
    * built-in discs: a `sources` prop (tests, embedding) supplies its own discs, so it has no toggle.
@@ -634,6 +662,17 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           bookmarked={marks.includes(v.section_id)}
           onToggleBookmark={() => toggleMark(v.section_id)}
           onLookUpWord={(word) => setDictionary({ word })}
+          {...(disc.language ? { language: disc.language } : {})}
+          booklet={{
+            disc,
+            edition: theme,
+            best: loadBest(bookmarkStorage, disc.disc_id),
+            daily: (() => {
+              const day = dateKey(new Date());
+              const result = loadDailyBook(bookmarkStorage)[day]?.[disc.disc_id];
+              return result ? { day, result } : null;
+            })(),
+          }}
           {...(bookmarkStorage ? { onAddNote: addNote } : {})}
           {...(disc.media ? { media: disc.media } : {})}
         />
@@ -693,8 +732,11 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
     );
   }
 
+  // Only a non-English shell carries lang and dir, so the English page is exactly as before.
+  const shellLang = locale === 'en' ? {} : { lang: locale, dir: LOCALE_INFO[locale].dir };
   return (
-    <div className="desktop">
+    <LocaleContext.Provider value={locale}>
+    <div className="desktop" {...shellLang}>
       <div className="desktop__work app-shell" data-wallpaper={wallpaper} onClick={onDesktopClick} onContextMenu={onDesktopContextMenu}>
         <DesktopWallpaper edition={theme} wallpaper={wallpaper} />
         <DesktopIcons
@@ -816,7 +858,16 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           }}
         />
         {displayOpen ? (
-          <DisplayPropertiesDialog edition={theme} wallpaper={wallpaper} onChange={setWallpaper} onClose={() => setDisplayOpen(false)} />
+          <DisplayPropertiesDialog
+            edition={theme}
+            wallpaper={wallpaper}
+            onChange={setWallpaper}
+            onLocaleChange={setLocale}
+            onClose={() => setDisplayOpen(false)}
+          />
+        ) : null}
+        {languageOpen ? (
+          <LanguageDialog locale={locale} onChange={setLocale} onClose={() => setLanguageOpen(false)} />
         ) : null}
         {imageNotice ? (
           <MessageDialog
@@ -867,6 +918,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           <BurnDialog
             onBurned={onBurned}
             onClose={() => setBurnOpen(false)}
+            language={toWikiLanguage(locale)}
             {...(burnSample ? { initialText: burnSample, autoStart: true } : {})}
             {...(fetchImpl ? { fetch: fetchImpl } : {})}
           />
@@ -898,6 +950,7 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
           onReplaySplash: () => setStage('splash'),
           onSetTheme: setEdition,
           onDisplayProperties: () => setDisplayOpen(true),
+          onLanguage: () => setLanguageOpen(true),
           theme,
           demoDiscs,
           onToggleDemoDiscs,
@@ -905,5 +958,6 @@ export function App({ sources, skipSplash, fetch: fetchImpl, storage, search }: 
       />
       {starfieldOn ? <Starfield onExit={endStarfield} /> : null}
     </div>
+    </LocaleContext.Provider>
   );
 }

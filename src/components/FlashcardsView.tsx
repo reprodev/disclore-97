@@ -3,6 +3,8 @@ import { playSlideClick } from '../audio/audio';
 import { buildFlashcards, flipCard, gotIt, initDeck, isComplete, needReview, restartDeck } from '../model/flashcards';
 import type { DeckState } from '../model/flashcards';
 import type { DiscManifest } from '../model/manifest';
+import { useLocale } from '../i18n/LocaleContext';
+import { discTextAttrs } from '../model/languages';
 import { BevelButton } from './BevelButton';
 import '../styles/flashcards.css';
 
@@ -23,6 +25,7 @@ const TYPING = /^(?:button|input|textarea|select|a)$/i;
  * a few cards later). When every card is mastered, Restart Deck starts again.
  */
 export function FlashcardsView({ disc, deck, onDeck, onOpenSection }: FlashcardsViewProps) {
+  const discLang = discTextAttrs(disc.language, useLocale());
   const cards = useMemo(() => buildFlashcards(disc), [disc]);
   const state = deck ?? initDeck(cards);
   const total = cards.length;
@@ -54,7 +57,7 @@ export function FlashcardsView({ disc, deck, onDeck, onOpenSection }: Flashcards
 
   if (total === 0) {
     return (
-      <section className="flashcards" aria-label="Study Flashcards">
+      <section className="flashcards" aria-label="Study Flashcards" {...discLang}>
         <h1 className="flashcards__title">Study Flashcards</h1>
         <p className="flashcards__empty">This disc has nothing to study yet.</p>
       </section>
@@ -62,7 +65,7 @@ export function FlashcardsView({ disc, deck, onDeck, onOpenSection }: Flashcards
   }
 
   return (
-    <section className="flashcards" aria-label="Study Flashcards">
+    <section className="flashcards" aria-label="Study Flashcards" {...discLang}>
       <p className="flashcards__kicker">Study Flashcards &bull; {disc.title}</p>
       <p className="flashcards__status" aria-live="polite">
         Card {position} of {total} &bull; Mastered: {state.mastered.length} / {total}

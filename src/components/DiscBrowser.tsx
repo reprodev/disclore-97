@@ -7,6 +7,7 @@ import type { DiscManifest } from '../model/manifest';
 import type { ContinueTarget, MasterySummary } from '../model/mastery';
 import { hasTimeline } from '../model/timeline';
 import type { QuickJumpMode, View } from '../model/nav';
+import { useT } from '../i18n/LocaleContext';
 import { BevelButton } from './BevelButton';
 import { Breadcrumb } from './Breadcrumb';
 import { ContentsSidebar } from './ContentsSidebar';
@@ -198,6 +199,7 @@ export function DiscBrowser({
   continueTo,
   onContinue,
 }: DiscBrowserProps) {
+  const tr = useT();
   const open = openDiscId === null ? undefined : discs.find((d) => d.disc_id === openDiscId);
   /** Disc id the Load Disc dialog was opened over, or null when it is closed. */
   const [loadOverId, setLoadOverId] = useState<string | null>(null);
@@ -253,43 +255,43 @@ export function DiscBrowser({
           <MenuBar
             menus={[
               {
-                label: 'File',
+                label: tr('menu_file'),
                 items: [
-                  { label: 'Load Disc...', onSelect: () => setLoadOverId(disc.disc_id) },
-                  ...(onBurnNew ? [{ label: 'Burn New Disc...', onSelect: onBurnNew }] : []),
-                  ...(onSaveImage ? [{ label: 'Save Disc Image (.json)', onSelect: onSaveImage }] : []),
-                  ...(onMountImage ? [{ label: 'Mount Disc Image (.json)...', onSelect: onMountImage }] : []),
-                  ...(refreshable ? [{ label: 'Refresh Disc from Source...', onSelect: goRefresh }] : []),
-                  { label: 'Close Disc', onSelect: onCloseDisc },
+                  { label: tr('menu_loadDisc'), onSelect: () => setLoadOverId(disc.disc_id) },
+                  ...(onBurnNew ? [{ label: tr('menu_burnNew'), onSelect: onBurnNew }] : []),
+                  ...(onSaveImage ? [{ label: tr('menu_saveImage'), onSelect: onSaveImage }] : []),
+                  ...(onMountImage ? [{ label: tr('start_mount'), onSelect: onMountImage }] : []),
+                  ...(refreshable ? [{ label: tr('menu_refresh'), onSelect: goRefresh }] : []),
+                  { label: tr('menu_closeDisc'), onSelect: onCloseDisc },
                 ],
               },
               {
-                label: 'Go',
+                label: tr('menu_go'),
                 items: [
-                  { label: 'Back', onSelect: () => canBack && goBack() },
-                  { label: 'Forward', onSelect: () => canForward && goForward() },
-                  { label: 'Home', onSelect: goHome },
+                  { label: tr('menu_back'), onSelect: () => canBack && goBack() },
+                  { label: tr('menu_forward'), onSelect: () => canForward && goForward() },
+                  { label: tr('menu_home'), onSelect: goHome },
                 ],
               },
               {
-                label: 'View',
+                label: tr('menu_view'),
                 items: [
-                  { label: 'Diagram', onSelect: () => goDiagram?.() },
-                  { label: 'Timeline', onSelect: () => goTimeline?.() },
-                  { label: 'KeepMaze', onSelect: () => goKeepMaze?.() },
-                  ...(goTour ? [{ label: 'Tour', onSelect: () => goTour() }] : []),
-                  ...(goFlashcards ? [{ label: 'Flashcards', onSelect: () => goFlashcards() }] : []),
-                  ...(goGallery ? [{ label: 'Gallery', onSelect: () => goGallery() }] : []),
-                  ...(goDictionary ? [{ label: 'Dictionary...', onSelect: () => goDictionary() }] : []),
-                  ...(goNotebook ? [{ label: 'Notebook...', onSelect: () => goNotebook() }] : []),
-                  ...(onCycleTheme ? [{ label: `Edition: ${editionOf(theme).name}`, onSelect: onCycleTheme }] : []),
-                  ...(onCopyShareLink ? [{ label: 'Copy Share Link', onSelect: onCopyShareLink }] : []),
+                  { label: tr('menu_diagram'), onSelect: () => goDiagram?.() },
+                  { label: tr('menu_timeline'), onSelect: () => goTimeline?.() },
+                  { label: tr('menu_keepmaze'), onSelect: () => goKeepMaze?.() },
+                  ...(goTour ? [{ label: tr('menu_tour'), onSelect: () => goTour() }] : []),
+                  ...(goFlashcards ? [{ label: tr('menu_flashcards'), onSelect: () => goFlashcards() }] : []),
+                  ...(goGallery ? [{ label: tr('menu_gallery'), onSelect: () => goGallery() }] : []),
+                  ...(goDictionary ? [{ label: tr('start_dictionary'), onSelect: () => goDictionary() }] : []),
+                  ...(goNotebook ? [{ label: tr('menu_notebook'), onSelect: () => goNotebook() }] : []),
+                  ...(onCycleTheme ? [{ label: tr('menu_edition', { name: editionOf(theme).name }), onSelect: onCycleTheme }] : []),
+                  ...(onCopyShareLink ? [{ label: tr('menu_copyLink'), onSelect: onCopyShareLink }] : []),
                   ...(onToggleDemoDiscs
-                    ? [{ label: 'Demo Discs (Built-In)', checked: demoDiscs, onSelect: () => onToggleDemoDiscs(!demoDiscs) }]
+                    ? [{ label: tr('start_demo'), checked: demoDiscs, onSelect: () => onToggleDemoDiscs(!demoDiscs) }]
                     : []),
                 ],
               },
-              ...(onOpenShortcuts ? [{ label: 'Help', items: [{ label: 'Shortcuts...', onSelect: onOpenShortcuts }] }] : []),
+              ...(onOpenShortcuts ? [{ label: tr('menu_help'), items: [{ label: tr('menu_shortcuts'), onSelect: onOpenShortcuts }] }] : []),
             ]}
           />
         }

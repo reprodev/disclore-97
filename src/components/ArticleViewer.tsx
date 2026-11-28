@@ -8,7 +8,10 @@ import { normalizeQuery, splitByQuery } from '../model/findInText';
 import { quoteText } from '../library/notebook';
 import { relatedSections } from '../model/topics';
 import { BevelButton } from './BevelButton';
+import { useLocale } from '../i18n/LocaleContext';
+import { discTextAttrs } from '../model/languages';
 import { CiteDialog } from './CiteDialog';
+import type { BookletData } from './CiteDialog';
 import { MediaReel } from './MediaReel';
 import { Plate } from './Plate';
 import '../styles/article.css';
@@ -35,6 +38,10 @@ export interface ArticleViewerProps {
   onLookUpWord?: (word: string) => void;
   /** Adds a Quick Fact to the disc's Research Notebook. When omitted, the + Note buttons are not shown. */
   onAddNote?: (sectionTitle: string, fact: string) => void;
+  /** The disc's Wikipedia language: Read Aloud uses a matching voice, and Arabic reads right to left. */
+  language?: string;
+  /** Data for the Jewel-Case Booklet tab in Cite / Print Preview. */
+  booklet?: BookletData;
 }
 
 export function ArticleViewer({
@@ -49,8 +56,11 @@ export function ArticleViewer({
   media,
   onLookUpWord,
   onAddNote,
+  language,
+  booklet,
 }: ArticleViewerProps) {
   const ref = useRef<HTMLElement | null>(null);
+  const shellLocale = useLocale();
   const [citeOpen, setCiteOpen] = useState(false);
   /** Narration progress, 1-based paragraph number out of the total. Null when not speaking. */
   const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
@@ -251,6 +261,7 @@ export function ArticleViewer({
       () => setProgress(null),
       (current, total) => setProgress({ current: current + from, total: total + from }),
       speed,
+      language,
     );
   };
 
@@ -270,7 +281,11 @@ export function ArticleViewer({
   };
 
   return (
-    <article ref={ref} className="article-viewer">
+    <article
+      ref={ref}
+      className="article-viewer"
+      {...discTextAttrs(language, shellLocale)}
+    >
       {/* Pinned header: the title, the tool row, and the Find bar stay put while the body scrolls. */}
       <header className="article-header">
         <h1 className={progress?.current === 1 ? 'article-title article-title--speaking' : 'article-title'} data-speaking={progress?.current === 1 ? 'true' : undefined}>
@@ -473,7 +488,7 @@ export function ArticleViewer({
         ) : null}
       </div>
       {citeOpen && discTitle !== undefined ? (
-        <CiteDialog section={section} discTitle={discTitle} onClose={() => setCiteOpen(false)} />
+        <CiteDialog section={section} discTitle={discTitle} booklet={booklet} language={language} onClose={() => setCiteOpen(false)} />
       ) : null}
     </article>
   );

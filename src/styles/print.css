@@ -170,3 +170,44 @@
     widows: 3;
   }
 }
+
+/*
+ * Printing the Jewel-Case Booklet. In booklet mode the dialog also puts `booklet-printing` on
+ * <body>: the citation page and the tabs give way, and the insert prints at jewel-case size, a
+ * 120 mm square front cover and a 150 x 118 mm back tray, with dashed cut lines. Tokens only.
+ */
+@media print {
+  body.booklet-printing .cite-dialog__page,
+  body.booklet-printing .cite-dialog__tabs {
+    display: none;
+  }
+  body.booklet-printing .booklet {
+    display: block;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+    border: 0;
+  }
+  body.booklet-printing .booklet__front,
+  body.booklet-printing .booklet__back {
+    color: var(--color-ink);
+    background: var(--color-paper);
+    border: 1px dashed var(--color-ink);
+    outline: 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  body.booklet-printing .booklet__front {
+    width: 120mm;
+    height: 120mm;
+    margin: 0 0 8mm;
+  }
+  body.booklet-printing .booklet__back {
+    width: 150mm;
+    height: 118mm;
+  }
+  body.booklet-printing .booklet__tray {
+    overflow: hidden;
+  }
+}

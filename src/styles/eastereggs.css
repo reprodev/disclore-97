@@ -181,7 +181,8 @@
 .keepmaze__whisper {
   position: absolute;
   top: 2px;
-  right: 6px;
+  /* Logical: opposite the caption text in both directions, so it never covers the title in RTL. */
+  inset-inline-end: 6px;
   max-width: 60%;
   overflow: hidden;
   font-family: var(--font-ui);

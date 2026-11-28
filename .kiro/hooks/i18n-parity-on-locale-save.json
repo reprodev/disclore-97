@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "i18n key parity on locale save",
+      "trigger": "PostFileSave",
+      "description": "When a file under src/i18n/ is saved, run the i18n tests: every locale dictionary must have exactly the same keys as English, no empty strings, matching {placeholders}, and valid right-to-left metadata.",
+      "matcher": "(^|[\\\\/])src[\\\\/]i18n[\\\\/]",
+      "action": {
+        "type": "command",
+        "command": "npx vitest --run tests/i18n/",
+        "timeout": 120
+      }
+    }
+  ]
+}

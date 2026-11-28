@@ -1,3 +1,4 @@
+import { useT } from '../i18n/LocaleContext';
 import '../styles/workspace.css';
 
 export interface StatusBarProps {
@@ -12,9 +13,10 @@ export interface StatusBarProps {
  * It is not a live region, so it never announces itself.
  */
 export function StatusBar({ discTitle, viewLabel }: StatusBarProps) {
+  const tr = useT();
   return (
     <div className="status-bar" role="group" aria-label="Status bar">
-      <div className="status-bar__panel status-bar__panel--disc">Disc: {discTitle}</div>
+      <div className="status-bar__panel status-bar__panel--disc">{tr('status_disc', { title: discTitle })}</div>
       <div className="status-bar__panel status-bar__panel--view">{viewLabel}</div>
       <div className="status-bar__panel status-bar__panel--cd">
         <span>CD-ROM: </span>
@@ -22,7 +24,7 @@ export function StatusBar({ discTitle, viewLabel }: StatusBarProps) {
           <span className="status-bar__cd-reading" aria-hidden="true">
             Reading 4x
           </span>
-          <span className="status-bar__cd-ready">Ready</span>
+          <span className="status-bar__cd-ready">{tr('status_ready')}</span>
         </span>
       </div>
     </div>

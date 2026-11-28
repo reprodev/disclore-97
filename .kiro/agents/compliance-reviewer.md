@@ -56,7 +56,7 @@ Start from `git status` and `git diff` (or the files the user names). Then check
 
 ### Safety (SSRF, media, secrets)
 12. **SSRF.** `/api/extract` only fetches addresses that pass `checkTarget` (http or https, no credentials, ports 80 and 443 only, no localhost, private, loopback, link-local, or reserved addresses), and every redirect is checked again.
-13. **Fixed hosts.** `/api/topic` calls only the English Wikipedia API. `/api/define` calls only the free Dictionary API, with the host built from parts and the word checked against a letters-only pattern.
+13. **Fixed hosts.** `/api/topic` calls only the Wikipedia API of a language in the `WIKI_LANGUAGES` allowlist (`src/model/languages.ts`), with each host built from fixed parts and `lang` checked by `isWikiLanguage`. `/api/define` calls only the free Dictionary API, with the host built from parts and the word checked against a letters-only pattern.
 14. **Media URLs.** Every picture address goes through `safeMediaUrl`: public `https` only, no `http`, `javascript:`, `data:`, `blob:`, private hosts, credentials, odd ports, whitespace, or `.svg`. At most 8 pictures, captions are plain text, images use `referrerPolicy="no-referrer"` and fall back to an SVG plate. Do not accept the removal of a media check because another layer has one.
 15. **Absolute URLs in `src/`.** Only GitHub addresses may appear as literals, and `NotepadWindow.tsx` has no `http:` or `https:` text at all.
 16. **Secrets.** No `process.env`, `API_KEY`, `Authorization`, or `secret` in `functions/` or `src/extract/`, and no `Authorization` in `src/adapters/`. No keys or `.env` files in the repo.

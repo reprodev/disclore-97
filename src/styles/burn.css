@@ -116,3 +116,12 @@
   padding: 2px 8px;
   font-size: 11px;
 }
+
+/* Wikipedia Language selector: one compact row under the presets. */
+.burn-dialog__language {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}

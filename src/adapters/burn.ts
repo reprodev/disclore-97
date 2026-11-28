@@ -9,6 +9,8 @@ import { fetchWebpageSource } from './webpage';
 import { loadDisc } from '../discs/loader';
 import { compileDisc } from '../model/compiler';
 import { MAX_OUTLINE_INPUT } from '../model/manifest';
+import { DEFAULT_LANGUAGE, toWikiLanguage } from '../model/languages';
+import type { WikiLanguage } from '../model/languages';
 import type { DiscManifest, OutlineSource } from '../model/manifest';
 import type { ExtractedSource } from '../model/source';
 import { parseInput } from '../model/sourceInput';
@@ -19,6 +21,8 @@ export interface BurnDeps {
   fetch?: FetchLike;
   signal?: AbortSignal;
   onStage?: (s: BurnStage) => void;
+  /** The Wikipedia language for a topic burn. English when omitted. */
+  language?: WikiLanguage;
 }
 
 export type BurnResult = { ok: true; manifest: DiscManifest } | { ok: false; error: BurnError };
@@ -59,6 +63,8 @@ interface Finish {
   outline?: OutlineSource;
   /** Keeps this disc id, so a refreshed disc replaces the one it upgrades. */
   discId?: string;
+  /** The Wikipedia language a topic disc was burned in. English is left off the manifest. */
+  language?: WikiLanguage;
 }
 
 /** Compile, then gate through loadDisc(manifest, false). */
@@ -70,6 +76,7 @@ function compileAndLoad(source: ExtractedSource, deps: BurnDeps, finish: Finish 
     manifest = compileDisc(source);
     if (finish.discId !== undefined) manifest = { ...manifest, disc_id: finish.discId };
     if (finish.outline !== undefined) manifest = { ...manifest, outline: { ...finish.outline } };
+    if (finish.language !== undefined && finish.language !== DEFAULT_LANGUAGE) manifest = { ...manifest, language: finish.language };
   } catch {
     return fail('validation-failed');
   }
@@ -120,17 +127,20 @@ async function run(input: string, deps: BurnDeps, options: RunOptions = {}): Pro
   let source: ExtractedSource;
   let fallbackTopic: string | undefined;
   let outline: OutlineSource | undefined;
+  let language: WikiLanguage | undefined;
 
   if (parsed.kind === 'markdown') {
     source = markdownToSource(parsed.text);
   } else if (parsed.kind === 'topic') {
     // Real encyclopedia content when /api/topic can supply it; otherwise the offline study outline.
     stage(deps, 'fetching');
+    language = toWikiLanguage(deps.language);
     let found: Result<ExtractedSource>;
     try {
       found = await fetchTopicSource(parsed.text, {
         ...(deps.fetch ? { fetch: deps.fetch } : {}),
         ...(signal ? { signal } : {}),
+        language,
       });
     } catch {
       found = { ok: false, error: makeError('fetch-failed') };
@@ -141,7 +151,7 @@ async function run(input: string, deps: BurnDeps, options: RunOptions = {}): Pro
     } else if (options.strictTopic) {
       return { ok: false, error: topicRefreshError(found.error, parsed.text) };
     } else {
-      source = topicToSource(parsed.text);
+      source = topicToSource(parsed.text, language);
       outline = outlineOf('topic', parsed.text);
     }
   } else {
@@ -173,6 +183,7 @@ async function run(input: string, deps: BurnDeps, options: RunOptions = {}): Pro
   const result = compileAndLoad(source, deps, {
     ...(outline ? { outline } : {}),
     ...(options.discId !== undefined ? { discId: options.discId } : {}),
+    ...(language !== undefined ? { language } : {}),
   });
   if (signal?.aborted) return fail('cancelled');
   return result;
@@ -221,7 +232,8 @@ export async function refreshDisc(disc: DiscManifest, deps: BurnDeps = {}): Prom
     const parsed = parseInput(origin.input);
     if (!parsed.ok || parsed.kind !== origin.kind) return fail('validation-failed');
     if (deps.signal?.aborted) return fail('cancelled');
-    const result = await run(origin.input, deps, { strictTopic: true, discId: disc.disc_id });
+    // A topic disc refreshes from the same Wikipedia language it was burned in.
+    const result = await run(origin.input, { ...deps, language: toWikiLanguage(disc.language) }, { strictTopic: true, discId: disc.disc_id });
     if (!result.ok) {
       // A refresh offers no Burn offline button: the outline already is the offline disc.
       const error: BurnError =

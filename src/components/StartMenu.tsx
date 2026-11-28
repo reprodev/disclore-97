@@ -4,6 +4,7 @@ import { playClick, playSpinUp } from '../audio/audio';
 import { EDITIONS, THEMES } from '../model/editions';
 import type { Theme } from '../model/editions';
 import type { DiscManifest } from '../model/manifest';
+import { useT } from '../i18n/LocaleContext';
 import { PixelIcon } from './PixelIcon';
 import type { IconName } from './PixelIcon';
 import '../styles/taskbar.css';
@@ -26,6 +27,8 @@ export interface StartMenuActions {
   onToggleDemoDiscs?: (on: boolean) => void;
   /** Opens Display Properties (Change Wallpaper). */
   onDisplayProperties?: () => void;
+  /** Opens the Language dialog. */
+  onLanguage?: () => void;
 }
 
 export interface StartMenuProps extends StartMenuActions {
@@ -60,7 +63,9 @@ export function StartMenu({
   demoDiscs = true,
   onToggleDemoDiscs,
   onDisplayProperties,
+  onLanguage,
 }: StartMenuProps) {
+  const tr = useT();
   const [sub, setSub] = useState<Submenu>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -81,6 +86,10 @@ export function StartMenu({
     const target = e.target as HTMLElement;
     const items = Array.from(rootRef.current?.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])') ?? []);
     const inSub = target.closest('.startmenu__sub') !== null;
+    // Right to left, a submenu opens toward the start (its arrow is mirrored), so the open and close keys swap.
+    const rtl = rootRef.current ? getComputedStyle(rootRef.current).direction === 'rtl' : false;
+    const openKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const closeKey = rtl ? 'ArrowRight' : 'ArrowLeft';
     switch (e.key) {
       case 'Escape':
         e.preventDefault();
@@ -106,7 +115,7 @@ export function StartMenu({
         e.preventDefault();
         items[items.length - 1]?.focus();
         break;
-      case 'ArrowRight': {
+      case openKey: {
         const key = target.getAttribute('data-submenu') as Submenu;
         if (key) {
           e.preventDefault();
@@ -116,7 +125,7 @@ export function StartMenu({
         }
         break;
       }
-      case 'ArrowLeft':
+      case closeKey:
         if (inSub) {
           e.preventDefault();
           const owner = rootRef.current?.querySelector<HTMLElement>(`[data-submenu="${sub}"]`);
@@ -162,7 +171,7 @@ export function StartMenu({
           onClick={toggleSub('discs')}
         >
           <PixelIcon name="cd" size={32} />
-          <span>Mounted Discs</span>
+          <span>{tr('start_mountedDiscs')}</span>
           <span className="startmenu__arrow" aria-hidden="true">
             {'\u25BA'}
           </span>
@@ -188,12 +197,13 @@ export function StartMenu({
           </div>
         ) : null}
         <div className="startmenu__sep" role="separator" />
-        {item('Burn New CD-R Disc...', 'cd', onBurnNew)}
-        {item('Mount Disc Image (.json)...', 'cd', onMountImage)}
-        {item('Dictionary...', 'book', onOpenDictionary)}
-        {item('Take a Tour', 'castle', onTour)}
-        {item('Study Flashcards', 'key', onFlashcards)}
-        {item('Display Properties...', 'computer', onDisplayProperties)}
+        {item(tr('start_burn'), 'cd', onBurnNew)}
+        {item(tr('start_mount'), 'cd', onMountImage)}
+        {item(tr('start_dictionary'), 'book', onOpenDictionary)}
+        {item(tr('start_tour'), 'castle', onTour)}
+        {item(tr('start_flashcards'), 'key', onFlashcards)}
+        {item(tr('start_display'), 'computer', onDisplayProperties)}
+        {item(tr('start_language'), 'book', onLanguage)}
         <button
           type="button"
           role="menuitem"
@@ -205,7 +215,7 @@ export function StartMenu({
           onClick={toggleSub('edition')}
         >
           <PixelIcon name="torch" size={32} />
-          <span>Edition Switcher</span>
+          <span>{tr('start_edition')}</span>
           <span className="startmenu__arrow" aria-hidden="true">
             {'\u25BA'}
           </span>
@@ -241,14 +251,14 @@ export function StartMenu({
             <span className="startmenu__check startmenu__check--wide" aria-hidden="true">
               {demoDiscs ? '\u2713' : ''}
             </span>
-            <span>Demo Discs (Built-In)</span>
+            <span>{tr('start_demo')}</span>
           </button>
         ) : null}
         <div className="startmenu__sep" role="separator" />
-        {item('About / ReadMe.txt', 'notepad', onOpenReadMe)}
-        {item('Replay Intro Splash', 'key', onReplaySplash)}
+        {item(tr('start_readme'), 'notepad', onOpenReadMe)}
+        {item(tr('start_replay'), 'key', onReplaySplash)}
         <div className="startmenu__sep" role="separator" />
-        {item('Close All Windows', 'key', onCloseAll)}
+        {item(tr('start_closeAll'), 'key', onCloseAll)}
       </div>
     </div>
   );

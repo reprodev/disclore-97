@@ -3,6 +3,8 @@ import { isMuted, playSlideClick, subscribeMuted } from '../audio/audio';
 import { isSpeechAvailable, speak, stopSpeaking } from '../audio/speech';
 import type { DiscManifest } from '../model/manifest';
 import { buildTour } from '../model/tour';
+import { useLocale } from '../i18n/LocaleContext';
+import { discTextAttrs } from '../model/languages';
 import { BevelButton } from './BevelButton';
 import { Plate } from './Plate';
 import '../styles/tour.css';
@@ -28,6 +30,7 @@ export interface TourViewProps {
  * ends at the last stop, and stops on Pause, Mute, Previous, Next, a new article, or when the tour closes.
  */
 export function TourView({ disc, stop, onStop, onOpenSection }: TourViewProps) {
+  const discLang = discTextAttrs(disc.language, useLocale());
   const stops = useMemo(() => buildTour(disc), [disc]);
   const total = stops.length;
   const at = Math.min(Math.max(stop, 0), Math.max(total - 1, 0));
@@ -69,12 +72,18 @@ export function TourView({ disc, stop, onStop, onOpenSection }: TourViewProps) {
     };
     if (speechReady && !isMuted()) {
       const texts = [current.title, current.spotlightFact, ...(current.timelineNote ? [current.timelineNote] : [])];
-      const started = speak(texts, () => {
-        if (cancelled || !playingRef.current || !aliveRef.current) return;
-        // Mute silences the voice and ends it early: that is a pause, not the end of the stop.
-        if (isMuted()) setPlaying(false);
-        else advance();
-      });
+      const started = speak(
+        texts,
+        () => {
+          if (cancelled || !playingRef.current || !aliveRef.current) return;
+          // Mute silences the voice and ends it early: that is a pause, not the end of the stop.
+          if (isMuted()) setPlaying(false);
+          else advance();
+        },
+        undefined,
+        1,
+        disc.language,
+      );
       if (started) {
         return () => {
           cancelled = true;
@@ -92,7 +101,7 @@ export function TourView({ disc, stop, onStop, onOpenSection }: TourViewProps) {
 
   if (!current) {
     return (
-      <section className="tour" aria-label="Take a Tour">
+      <section className="tour" aria-label="Take a Tour" {...discLang}>
         <h1 className="tour__title">Take a Tour</h1>
         <p className="tour__empty">This disc has no articles to tour.</p>
       </section>
@@ -121,14 +130,14 @@ export function TourView({ disc, stop, onStop, onOpenSection }: TourViewProps) {
       return;
     }
     const texts = [current.title, current.spotlightFact, ...(current.timelineNote ? [current.timelineNote] : [])];
-    setSpeaking(speak(texts, () => setSpeaking(false)));
+    setSpeaking(speak(texts, () => setSpeaking(false), undefined, 1, disc.language));
   };
 
   const pictureFailed = current.media !== undefined && broken.has(current.media.url);
   const caption = current.media && !pictureFailed ? current.media.caption : `Plate: ${current.title}`;
 
   return (
-    <section className="tour" aria-label="Take a Tour">
+    <section className="tour" aria-label="Take a Tour" {...discLang}>
       <p className="tour__kicker">Take a Tour &bull; {disc.title}</p>
       <div
         className="tour__progress"

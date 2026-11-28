@@ -163,9 +163,10 @@
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: 3px 20px 3px 22px;
+  padding-block: 3px;
+  padding-inline: 22px 20px;
   font: inherit;
-  text-align: left;
+  text-align: start;
   white-space: nowrap;
   color: inherit;
   background: none;
@@ -338,4 +339,52 @@
   display: flex;
   justify-content: space-between;
   gap: 6px;
+}
+
+/* Language dialog and the quick Language selector in Display Properties. */
+.window.language-dialog {
+  width: min(320px, 100%);
+  max-height: 100%;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+}
+.language-dialog .window-content {
+  overflow: auto;
+}
+.language-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+.language-dialog__prompt,
+.language-dialog__note {
+  margin: 0;
+}
+.language-dialog__note {
+  font-size: 11px;
+}
+.language-dialog__buttons {
+  justify-content: flex-end;
+}
+.display-properties__language {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.win95-select {
+  min-width: 0;
+  padding: 1px 2px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: var(--bevel-w) solid;
+  border-color: var(--color-bevel-shadow) var(--color-bevel-hi) var(--color-bevel-hi) var(--color-bevel-shadow);
+  border-radius: 0;
+}
+.win95-select:focus-visible {
+  outline: 1px dotted var(--color-bevel-edge);
+  outline-offset: 1px;
 }

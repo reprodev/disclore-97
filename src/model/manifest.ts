@@ -42,6 +42,11 @@ export interface DiscManifest {
    * burn the full disc later. Omitted on every full disc.
    */
   outline?: OutlineSource;
+  /**
+   * The Wikipedia language the disc was burned in, one of WIKI_LANGUAGES in languages.ts (for
+   * example "fr"). Omitted means English, so every existing disc reads exactly as before.
+   */
+  language?: string;
 }
 
 /** The source kinds an offline study outline can stand in for. */
